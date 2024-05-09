@@ -17,10 +17,34 @@ export const router = createBrowserRouter([
                         path:'',
                         element: <DashboardPage/>
                     },
+                    {
+                        path:'users',
+                        // element: <UsersPage/>
+                    },
+                    {
+                        path:'levels',
+                        // element: <LevelsPage/>
+                    },
+                    {
+                        path:'sub-levels',
+                        // element: <SubLevelsPage/>
+                    },
+                    {
+                        path:'events',
+                        // element: <EventsPage/>
+                    },
+                    {
+                        path:'faq',
+                        // element: <FaqPage/>
+                    },
+                    {
+                        path:'support-page',
+                        // element: <SupportPage/>
+                    },
                     // {
-                    //     path:'products',
-                    //     element: <Products/>
-                    // }
+                        // path:'logout',
+                        // element: <LogoutPage/>
+                    // },
                 ]
             }
         ]
