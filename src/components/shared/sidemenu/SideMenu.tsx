@@ -1,6 +1,8 @@
 import { IconType } from "react-icons";
-import { IoCalculatorSharp, IoLogOutOutline, IoPerson, IoSpeedometerOutline, IoSubway } from 'react-icons/io5'
+import { IoBarChart, IoCalendar, IoLogOutOutline, IoPerson, IoPieChart, IoSpeedometerOutline } from 'react-icons/io5'
 import { SideMenuItem } from "./SideMenuItem";
+import { NavLink } from "react-router-dom";
+import './SideMenu.css';
 
 
 interface MenuItem {
@@ -12,9 +14,10 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline },
-  { title: 'Usuarios', subTitle: 'Listado de usuarios', href: '/users', Icon: IoPerson },
-  { title: 'Niveles', subTitle: '', href: '/levels', Icon: IoCalculatorSharp },
-  { title: 'Sub-Niveles', subTitle: '', href: '/sub-levels', Icon: IoSubway },
+  { title: 'Usuarios', subTitle: 'Listado de usuarios', href: '/dashboard/users', Icon: IoPerson },
+  { title: 'Niveles', subTitle: 'Niveles de clase', href: '/dashboard/levels', Icon: IoPieChart },
+  { title: 'Sub-Niveles', subTitle: 'Subniveles de clase', href: '/dashboard/sub-levels', Icon: IoBarChart },
+  { title: 'Eventos', subTitle: 'Creación de eventos', href: '/dashboard/events', Icon: IoCalendar },
 
 ]
 
@@ -54,13 +57,15 @@ export const SideMenu = () => {
         }
 
         {/**Logout */}
-        <div>
-          <IoLogOutOutline />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-lg text-slate-300 font-bold leading-5">Logout</span>
-          <span className="text-sm text-slate-500 hidden md:block">Cerrar Sesión</span>
-        </div>
+        <NavLink to={'/auth/login'} className={"mt-10"}>
+          <div>
+            <IoLogOutOutline />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg text-slate-300 font-bold leading-5">Logout</span>
+            <span className="text-sm text-slate-500 hidden md:block">Cerrar sesión</span>
+          </div>
+        </NavLink>
 
 
       </nav>
