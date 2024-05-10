@@ -39,10 +39,11 @@ export const SignInPage = () => {
           <input type="checkbox" name="remember" className="text-blue-500" />
           <label className="text-gray-600 ml-2">Remember Me</label>
         </div>
-
+        {/** Forget-Password*/}
         <div className="mb-6 text-blue-500">
           <a href="/forget-password" className="hover:underline">Contraseña olvidada?</a>
         </div>
+        {/** Button*/}
         <button type="submit" className="bg-indigo-600">Login</button>
 
       </form>
