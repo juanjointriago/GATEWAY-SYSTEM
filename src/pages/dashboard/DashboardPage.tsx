@@ -1,4 +1,4 @@
-import { IoBarChart, IoCalendar, IoPerson, IoPieChart } from "react-icons/io5"
+import { IoBarChart, IoCalendar, IoPerson, IoPersonAdd, IoPersonAddOutline, IoPersonCircle, IoPersonRemove, IoPersonRemoveOutline, IoPersonSharp, IoPieChart } from "react-icons/io5"
 import { WhiteCard } from "../../components"
 
 export const DashboardPage = () => {
@@ -38,6 +38,33 @@ export const DashboardPage = () => {
         </WhiteCard>
 
 
+        <WhiteCard centered>
+          <IoPersonAdd size={48} className="text-indigo-600" />
+          <h2>Estudiantes</h2>
+          <p>Total de estudiantes Activos</p>
+        </WhiteCard>
+
+
+
+        <WhiteCard centered>
+          <IoPersonAddOutline size={48} className="text-indigo-600" />
+          <h2>Docentes</h2>
+          <p>Total de docentes Activos</p>
+        </WhiteCard>
+
+
+        <WhiteCard centered>
+          <IoPersonRemove size={48} className="text-indigo-600" />
+          <h2>Estudiantes Inactivos</h2>
+          <p>Total de estudiantes en baja</p>
+        </WhiteCard>
+
+
+        <WhiteCard centered>
+          <IoPersonRemoveOutline size={48} className="text-indigo-600" />
+          <h2>Docentes Inactivos</h2>
+          <p>Total de docentes en baja</p>
+        </WhiteCard>
 
       </div>
     </>
