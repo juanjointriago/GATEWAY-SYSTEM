@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore"
 import { db } from "./initialize"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,8 +10,16 @@ type data = any
  * @param object 
  * @returns 
  */
-export const adddItem = async (collectionName: string, object: data) => {
-    return await setDoc(doc(db, collectionName, object.id.toString()), object)
+export const adddItem = async (collectionName: string, data: data) => {
+
+    try {
+        const docRef = await addDoc(collection(db, collectionName), data)
+        console.log('Document written with ID: ', docRef.id);
+    } catch (error) {
+        console.warn("Error adding document: ", error)
+
+    }
+    // return await setDoc(doc(db, collectionName, object.id.toString()), object)
 }
 
 /**
@@ -37,10 +45,19 @@ export const getDocsFromCollection = async (collectionName: string) => {
 }
 
 export const getItemById = async (collectionName: string, id: string) => {
-    const docSnap = await getDoc(doc(db, `${collectionName}/${id}`));
+
+    const docRef = doc(db, collectionName, id);
+    const docSnap = await getDoc(docRef);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let data: any | null = null;
     if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() }
+        data = { id: docSnap.id, ...docSnap.data() }
     }
-    return null;
+    else {
+        data = null;
+    }
+    return data
+
 }
 

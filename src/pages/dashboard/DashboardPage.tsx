@@ -1,4 +1,4 @@
-import { IoBarChart, IoCalendar, IoPerson, IoPersonAdd, IoPersonAddOutline, IoPersonCircle, IoPersonRemove, IoPersonRemoveOutline, IoPersonSharp, IoPieChart } from "react-icons/io5"
+import { IoBarChart, IoCalendar, IoPerson, IoPersonAdd, IoPersonAddOutline, IoPersonRemove, IoPersonRemoveOutline, IoPieChart } from "react-icons/io5"
 import { WhiteCard } from "../../components"
 
 export const DashboardPage = () => {

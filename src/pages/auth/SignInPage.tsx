@@ -1,7 +1,13 @@
 import { FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuthStore } from "../../stores/auth/auth.store";
 
 
 export const SignInPage = () => {
+
+  const navigate = useNavigate();
+
+  const loginUser = useAuthStore(state => state.loginUser)
 
   /**
    * @description Handle form submit
@@ -15,9 +21,12 @@ export const SignInPage = () => {
       remember: { checked: boolean }
     };
     console.log(username.value, password.value, remember.checked);
-    username.value = '';
-    password.value = '';
-    remember.checked = false;
+    try {
+      loginUser(username.value, password.value)
+      navigate('/dashboard');
+    } catch (error) {
+      console.warn('Error de autenticación', error)
+    }
   }
 
   return (

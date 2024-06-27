@@ -13,7 +13,7 @@ export const EventsPage = () => {
                   <th scope="col" className="px-6 py-4">#</th>
                   <th scope="col" className="px-6 py-4">First</th>
                   <th scope="col" className="px-6 py-4">Last</th>
-                  <th scope="col" className="px-6 py-4">Handle</th>
+                  <th scope="col" className="px-6 py-4">Handle</th> 
                 </tr>
               </thead>
               <tbody>
