@@ -15,14 +15,14 @@ export const SignInPage = () => {
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     console.log('onSumbit event =>', { event })
     event.preventDefault();
-    const { username, password, remember } = event.target as typeof event.target & {
-      username: { value: string };
+    const { email, password, remember } = event.target as typeof event.target & {
+      email: { value: string };
       password: { value: string };
       remember: { checked: boolean }
     };
-    console.log(username.value, password.value, remember.checked);
+    console.log(email.value, password.value, remember.checked);
     try {
-      loginUser(username.value, password.value)
+      loginUser(email.value, password.value)
       navigate('/dashboard');
     } catch (error) {
       console.warn('Error de autenticación', error)

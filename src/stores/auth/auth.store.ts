@@ -17,9 +17,9 @@ export const storeAPI: StateCreator<AuthState> = (set) => ({
     status: 'pending',
     user: undefined,
     loginUser: async (email: string, password: string) => {
-        console.debug('login', { email, password })
         try {
             const { user } = await AuthService.login(email, password);
+            console.debug('login', { email, password })
             set({ status: 'authorized', ...user });
         } catch (error) {
             set({ status: 'unauthorized', user: undefined });
@@ -28,12 +28,18 @@ export const storeAPI: StateCreator<AuthState> = (set) => ({
     },
 
     checkAuthStatus: async () => {
-        try {
-            const user = await AuthService.checkStatus();
+        console.log('here')
+        // try {
+        const user = await AuthService.checkStatus();
+        if (user) {
+            console.log(user)
             set({ status: 'authorized', user });
-        } catch (error) {
+        } else {
+
             set({ status: 'unauthorized', user: undefined });
         }
+        // } catch (error) {
+        // }
     },
 
     logoutUser: () => {

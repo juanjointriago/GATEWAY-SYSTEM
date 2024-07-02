@@ -35,6 +35,7 @@ export class AuthService {
                     backdrop: true,
                 });
                 //TODO set user in store
+                
             } return firebaseUser;
         } catch (error) {
             Swal.fire("Error", '', "error");
@@ -46,8 +47,10 @@ export class AuthService {
         const user = auth.currentUser;
         try {
             user && await getItemById("users", user.uid);
+            console.log('checkStatus', JSON.stringify(user))
         } catch (error) {
             console.warn(error)
+            throw new Error('Unable to check status');
         }
 
     }
