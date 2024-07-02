@@ -13,14 +13,14 @@ export const SignInPage = () => {
    * @description Handle form submit
    */
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    console.log('onSumbit event =>', { event })
+    // console.log('onSumbit event =>', { event })
     event.preventDefault();
     const { email, password, remember } = event.target as typeof event.target & {
       email: { value: string };
       password: { value: string };
       remember: { checked: boolean }
     };
-    console.log(email.value, password.value, remember.checked);
+    // console.log(email.value, password.value, remember.checked);
     try {
       loginUser(email.value, password.value)
       navigate('/dashboard');

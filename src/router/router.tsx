@@ -47,6 +47,10 @@ export const router = createBrowserRouter([
                         path: 'support-page',
                         element: <SupportPage />
                     },
+                    {
+                        path: 'courses',
+                        element: <SupportPage />
+                    },
                 ],
             },
             {
