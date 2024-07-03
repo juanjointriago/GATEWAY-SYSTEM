@@ -9,8 +9,9 @@ export interface AuthState {
     status: 'pending' | 'unauthorized' | 'authorized';
     user?: FirestoreUser
     loginUser: (email: string, password: string) => Promise<void>;
+    loginGoogle: () => Promise<void>;
     checkAuthStatus: () => Promise<void>;
-    logoutUser: () => void
+    logoutUser: () => void;
 }
 
 export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
@@ -27,6 +28,17 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
             throw new Error('Unable to login');
         }
     },
+    
+    loginGoogle: async () => {
+        const user = await AuthService.googleSignUpLogin();
+        if (user) {
+            set({ status: 'authorized', ...user });
+        }
+        else {
+            set({ status: 'unauthorized', user: undefined });
+            throw new Error('Unable to Google login');
+        }
+    },
 
     checkAuthStatus: async () => {
         console.log('start checkAuthStatus=>')
@@ -41,8 +53,8 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
     },
 
     logoutUser: () => {
-        set({ status: 'unauthorized', user: undefined });
         AuthService.logout();
+        set({ status: 'unauthorized', user: undefined });
         useAuthStore.persist.clearStorage();
     }
 })

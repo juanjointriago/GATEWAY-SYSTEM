@@ -60,7 +60,7 @@ export class AuthService {
      * @param action 
      * @returns 
      */
-    static googleSignUpLogin = async (action: () => void) => {
+    static googleSignUpLogin = async () => {
         const auth = getAuth();
         const googleAuthProvider = new GoogleAuthProvider();
         googleAuthProvider.setCustomParameters({
@@ -98,7 +98,6 @@ export class AuthService {
                 };
                 await adddItem("users", dataUser);
                 Swal.close();
-                action();
                 return;
             }
             if (!firebaseUser.isActive) {
@@ -112,7 +111,6 @@ export class AuthService {
                 return;
             }
             Swal.close();
-            action();
             return firebaseUser;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -124,7 +122,7 @@ export class AuthService {
 
     }
 
-    static signUpGateway = async (sigUpUser: FirestoreUser, action:()=>void) => {
+    static signUpGateway = async (sigUpUser: FirestoreUser, action: () => void) => {
         const auth = getAuth();
         const { email, password, name, role, phone, address, bornDate, cc, city, country } = sigUpUser;
         const { user } = await createUserWithEmailAndPassword(auth, email, password!)
@@ -147,7 +145,7 @@ export class AuthService {
         };
 
         await updateProfile(user, { displayName: name });
-        await setDoc(doc(db, "users" , uid), dataUser);
+        await setDoc(doc(db, "users", uid), dataUser);
         await signOut(auth);
         action();
     }
