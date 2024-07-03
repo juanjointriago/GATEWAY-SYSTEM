@@ -1,18 +1,19 @@
 import { StateCreator } from "zustand";
-import { AuthService, FirestoreUser } from "../../services";
+import { AuthService } from "../../services";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { FirestoreUser } from "../../interface";
+import { immer } from "zustand/middleware/immer";
 
 export interface AuthState {
     status: 'pending' | 'unauthorized' | 'authorized';
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     user?: FirestoreUser
     loginUser: (email: string, password: string) => Promise<void>;
     checkAuthStatus: () => Promise<void>;
     logoutUser: () => void
 }
 
-export const storeAPI: StateCreator<AuthState> = (set) => ({
+export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     status: 'pending',
     user: undefined,
 
@@ -40,16 +41,18 @@ export const storeAPI: StateCreator<AuthState> = (set) => ({
     },
 
     logoutUser: () => {
+        set({ status: 'unauthorized', user: undefined });
         AuthService.logout();
-        useAuthStore.persist.clearStorage()
+        useAuthStore.persist.clearStorage();
     }
 })
 
 
 export const useAuthStore = create<AuthState>()(
-    devtools(persist(
-        storeAPI, {
-        name: 'auth-store'
-    }
-    ))
+    devtools(
+        persist(
+            immer(storeAPI), {
+            name: 'auth-store'
+        }
+        ))
 )

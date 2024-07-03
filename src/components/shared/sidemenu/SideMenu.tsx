@@ -3,6 +3,8 @@ import { IoBarChart, IoCalendar, IoLogoTableau, IoLogOutOutline, IoPerson, IoPie
 import { SideMenuItem } from "./SideMenuItem";
 import './SideMenu.css';
 import { useAuthStore } from "../../../stores/auth/auth.store";
+import { Navigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 
 interface MenuItem {
@@ -25,7 +27,13 @@ const menuItems: MenuItem[] = [
 
 export const SideMenu = () => {
   const logoutUser = useAuthStore(state => state.logoutUser);
+  const authStatus = useAuthStore(state => state.status);
   const user = useAuthStore(state => state.user);
+  // const navigate = useNavigate()
+  if (authStatus === 'unauthorized') {
+    return <Navigate to="/auth/signin" />
+  }
+  
 
   return (
     <div id="menu" className="bg-gray-900 min-h-screen z-10 text-slate-300 w-80 left-0 overflow-y-scroll">
@@ -46,7 +54,7 @@ export const SideMenu = () => {
             <img className="rounded-full w-8 h-8" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=128&q=80" alt="" />
           </span>
           <span className="text-sm md:text-base font-bold">
-           {user?.displayName || ''}
+            {user?.displayName || ''}
           </span>
         </a>
       </div>
@@ -60,7 +68,10 @@ export const SideMenu = () => {
         }
 
         {/**Logout */}
-        <div className="mt-10" onClick={() => logoutUser()}>
+        <div className="mt-10" onClick={() => {
+          logoutUser();
+          // navigate('/')
+        }}>
           <div>
             <IoLogOutOutline />
           </div>

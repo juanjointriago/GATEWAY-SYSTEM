@@ -14,6 +14,7 @@ export const DashboardLayout = () => {
   if (authStatus === 'unauthorized') {
     return <Navigate to="/auth/signin" />
   }
+  
   console.log(JSON.stringify(authStatus))
   return (
     <div className="bg-slate-200 overflow-y-scroll w-screen h-screen antialiased text-slate-900 selection:bg-blue-900 selection:text-white">
