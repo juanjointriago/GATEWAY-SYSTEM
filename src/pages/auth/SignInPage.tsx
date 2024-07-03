@@ -42,14 +42,18 @@ export const SignInPage = () => {
           <input type="password" name="password" />
         </div>
         {/** Remember-me*/}
-        <div className="mb-4 flex items-center">
+        {/* <div className="mb-4 flex items-center">
           <input type="checkbox" name="remember" className="text-blue-500" />
           <label className="text-gray-600 ml-2">Remember Me</label>
-        </div>
+        </div> */}
         {/** Forget-Password*/}
-        <div className="mb-6 text-blue-500">
-          <a href="/forget-password" className="hover:underline">Contraseña olvidada?</a>
+        <div className=" text-blue-500">
+          <a href="/auth/forgot-password" className="hover:underline">Contraseña olvidada?</a>
         </div>
+        <div className="mb-6 text-blue-500">
+          <a href="/auth/signup" className="hover:underline">Tienes una cuenta?</a>
+        </div>
+
         {/** Button*/}
         <button type="submit" className="bg-indigo-600">Login</button>
 
