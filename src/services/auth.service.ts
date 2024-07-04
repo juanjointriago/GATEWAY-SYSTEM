@@ -21,7 +21,7 @@ export class AuthService {
         });
         try {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
-            const firebaseUser = await getItemById<FirestoreUser>("users", user.uid);
+            const firebaseUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, user.uid);
             console.log('firebaseUser', firebaseUser);
             Swal.close();
             if (firebaseUser && !firebaseUser.isActive) {
@@ -78,7 +78,7 @@ export class AuthService {
                 },
             });
             const { uid, email, displayName, photoURL } = user;
-            const firebaseUser = await getItemById<FirestoreUser>("users", uid);
+            const firebaseUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, uid);
             if (!firebaseUser?.id) {
                 const dataUser = {
                     uid,
@@ -96,7 +96,7 @@ export class AuthService {
                     isActive: false,
                     createdAt: new Date().getTime(),
                 };
-                await adddItem("users", dataUser);
+                await adddItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
                 Swal.close();
                 return;
             }
@@ -145,7 +145,7 @@ export class AuthService {
         };
 
         await updateProfile(user, { displayName: name });
-        await setDoc(doc(db, "users", uid), dataUser);
+        await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);
         await signOut(auth);
         action();
     }
@@ -157,7 +157,7 @@ export class AuthService {
         const user = auth.currentUser;
         if (user) {
             try {
-                const FirestoreUser = await getItemById<FirestoreUser>("users", user.uid);
+                const FirestoreUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, user.uid);
                 return FirestoreUser;
             } catch (error) {
                 console.log(error);

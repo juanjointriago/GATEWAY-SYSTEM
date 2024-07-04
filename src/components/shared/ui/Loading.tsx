@@ -1,14 +1,8 @@
 import { FC } from "react"
 
-interface Props {
-    message?: string;
-}
-export const Loading: FC<Props> = ({ message }) => {
-    console.log({ message });
-    
+
+export const Loading: FC = () => {
     return (
-        <div className="bg-indigo-500">
-            <svg className="animate-spin h-5 w-5 mr-3 ..." viewBox="0 0 24 24"></svg>
-        </div>
+        <div className="rounded-md h-12 w-12 border-4 border-t-4 border-white animate-spin absolute"></div>
     )
 }

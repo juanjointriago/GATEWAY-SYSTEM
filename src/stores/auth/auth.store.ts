@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { FirestoreUser } from "../../interface";
 import { immer } from "zustand/middleware/immer";
+import { useLevelStore } from "../level/level.store";
 
 export interface AuthState {
     status: 'pending' | 'unauthorized' | 'authorized';
@@ -56,6 +57,7 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
         AuthService.logout();
         set({ status: 'unauthorized', user: undefined });
         useAuthStore.persist.clearStorage();
+        useLevelStore.persist.clearStorage();
     }
 })
 

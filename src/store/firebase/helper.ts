@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, DocumentData, getDoc, getDocs, setDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, DocumentData, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
 import { db } from "./initialize"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +29,11 @@ export const setItem = async (collectionName: string, data: DocumentData) => {
     return await setDoc(doc(db, collectionName, data.id), data)
 }
 
+
+export const updateItem = async (collectionName: string, data: DocumentData) => {
+    return await updateDoc(doc(db, collectionName, data.id), data);
+}
+
 export const deleteItem = async (collectionName: string, id: string) => {
     return await deleteDoc(doc(db, collectionName, id))
 }
@@ -37,6 +42,8 @@ export const getDocsFromCollection = async <T>(collectionName: string) => {
     const data: T[] = [];
     (await getDocs(collection(db, collectionName))).forEach((doc) => {
         data.push({ id: doc.id, ...doc.data() } as T)
+        // data.push({ ...doc.data() } as T)
+
     });
     return data
 }

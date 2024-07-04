@@ -1,6 +1,6 @@
 export interface level {
     id: string;
-    descripcion: string;
+    description: string;
     name: string;
     isActive: boolean;
     createdAt: number;
@@ -17,3 +17,4 @@ export interface subLevel {
     createdAt: number;
     updatedAt: number;
 }
+
