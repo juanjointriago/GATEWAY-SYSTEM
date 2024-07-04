@@ -16,7 +16,7 @@ export const Table =<T,> ({data, columns}:Props<T>) => {
       const rows = !data?.length ? (
         <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
           <td colSpan={columns.length} className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-            No data
+            No existen registros
           </td>
         </tr>
       ) : (

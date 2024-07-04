@@ -3,7 +3,7 @@ import { deleteItem, getDocsFromCollection, setItem, updateItem } from "../store
 
 export class LevelService {
     static getLevels = async () => {
-        const levels = await getDocsFromCollection<level[]>(import.meta.env.VITE_COLLECTION_LEVELS)
+        const levels = await getDocsFromCollection<level>(import.meta.env.VITE_COLLECTION_LEVELS)
         return levels;
     };
 

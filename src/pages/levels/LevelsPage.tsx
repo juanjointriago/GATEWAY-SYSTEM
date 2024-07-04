@@ -5,10 +5,10 @@ import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useLevelStore } from "../../stores";
 
 const levelsCols: Array<ColumnProps<level>> = [
-  { key: 'Código', title: 'Código' },
-  { key: 'Nombre', title: 'Nombre' },
-  { key: 'Descripción', title: 'Descripción' },
-  { key: 'Es', title: 'Es Público' },
+  { key: 'id', title: 'Código' },
+  { key: 'name', title: 'Nombre' },
+  { key: 'description', title: 'Descripción' },
+  // { key: 'isActive', title: 'Activo?' },
   {
     key: 'Acciones', title: 'Acciones', render: (_, record) => {
       return <>
@@ -19,19 +19,20 @@ const levelsCols: Array<ColumnProps<level>> = [
 ]
 
 export const LevelsPage = () => {
-const getAllLevels = useLevelStore(state => state.getAndSetLevels)
-const levels = useLevelStore(state => state.levels)
+  const getAllLevels = useLevelStore(state => state.getAndSetLevels)
+  const levels = useLevelStore(state => state.levels);
 
-useEffect(() => {
-  getAllLevels();
-}, [])
+  useEffect(() => {
+    getAllLevels();
+  }, [])
 
-// console.log({getAllLevels})
+  // console.log({getAllLevels})
   return (
     <>
-      <div>Niveles</div>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded">Crear Nivel</button>
-      <TableContainer columns={levelsCols} data={levels}/>
+      <div className="pt-5">
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Niveles</h1>
+        <TableContainer columns={levelsCols} data={levels} />
+      </div>
     </>
   )
 }

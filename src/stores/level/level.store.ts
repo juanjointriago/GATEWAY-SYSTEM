@@ -21,13 +21,8 @@ const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand
     getAndSetLevels: async () => {
         try {
             const levels = await LevelService.getLevels()
-        console.log('NIVELES ENCONTRADOS',{ levels })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // set({ levels: [...levels] as any})
-        levels.forEach((level) => {
-            console.log('Elemento iterado',level)
-            set({ levels: [...get().levels, ...level] })
-        });
+            console.log('NIVELES ENCONTRADOS', { levels })
+            set({ levels: [...levels] })
         } catch (error) {
             console.warn(error)
         }
