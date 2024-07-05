@@ -1,15 +1,22 @@
 import { useForm } from "react-hook-form";
 import { level } from "../../../interface";
+import { useLevelStore } from "../../../stores";
+import {v4 as uuid}from 'uuid'
 
 export const FormLevel = () => {
 
+    const createLevel = useLevelStore(state => state.createLevel);
     const defaultValues: level = {
+        id:'',
         name: '',
         description: '',
         isActive: false,
     }
     const { register, handleSubmit, formState: { errors } } = useForm<level>({ defaultValues });
-    const onSubmit = handleSubmit((data) => { console.log({ data }) })
+    const onSubmit = handleSubmit(async (data) => { 
+        const levelRecord = {id:uuid(),...data}
+        await createLevel(levelRecord);
+        console.log({ data }) })
 
     // console.log({ errors })
     return (

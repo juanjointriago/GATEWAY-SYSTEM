@@ -5,15 +5,17 @@ import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useLevelStore } from "../../stores";
 
 const levelsCols: Array<ColumnProps<level>> = [
-  { key: 'id', title: 'Código' },
+  // { key: 'id', title: 'Código' },
   { key: 'name', title: 'Nombre' },
   { key: 'description', title: 'Descripción' },
-  // { key: 'isActive', title: 'Activo?' },
+  { key: 'isActive', title: 'Activo' },
   {
     key: 'Acciones', title: 'Acciones', render: (_, record) => {
-      return <>
-        <div className="text-blue-500 font-bold">Editar {record.name}</div>
-      </>;
+      return <div className="flex flex-row justify-between">
+        <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
+        <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
+        <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
+      </div>;
     }
   },
 ]

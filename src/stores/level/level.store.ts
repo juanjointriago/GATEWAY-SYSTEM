@@ -28,8 +28,8 @@ const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand
         }
     },
     createLevel: async (level: level) => {
-        set({ levels: [...get().levels, level] })
         await LevelService.createLevel(level);
+        set({ levels: [...get().levels, level] })
     },
     updateLevel: (level: level) => {
         console.log('updateLevel', level)
