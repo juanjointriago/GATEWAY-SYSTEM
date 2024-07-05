@@ -50,8 +50,8 @@ export const TableContainer = <T,>({ data, columns }: Props<T>) => {
         <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
           <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
             {/* boton de nuevo registro */}
-            {<button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded"  type="button"
-        onClick={() => setShowModal(true)}>+ </button>}
+            {<button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
+              onClick={() => setShowModal(true)}>+ </button>}
             <div className="overflow-hidden">
               <table className="min-w-full ">
                 <thead className="bg-gray-200 border-b">
@@ -63,7 +63,7 @@ export const TableContainer = <T,>({ data, columns }: Props<T>) => {
           </div>
         </div>
         {/* Modal */}
-        <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title="Crear Nivel" children={<FormLevel/>} />
+        <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title="Crear Nivel" children={<FormLevel />} />
       </div>
     </div>
   )
