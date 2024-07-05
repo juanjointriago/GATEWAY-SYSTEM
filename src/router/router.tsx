@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { Root } from '../Root'
 import { AuthLayout, DashboardLayout } from '../layouts'
-import { DashboardPage, ForgotPassword, SignInPage, SignUpPage } from '../pages'
+import { CoursesPage, DashboardPage, ForgotPassword, SignInPage, SignUpPage } from '../pages'
 import { UsersPage } from '../pages/users/UsersPage'
 import { LevelsPage } from '../pages/levels/LevelsPage'
 import { SubLevelsPage } from '../pages/sublevels/SubLevelsPage'
@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'courses',
-                        element: <SupportPage />
+                        element: <CoursesPage />
                     },
                 ],
             },
