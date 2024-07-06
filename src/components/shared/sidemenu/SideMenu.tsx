@@ -20,10 +20,10 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
   { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook, active: true },
-  { title: 'Usuarios', subTitle: 'Listado de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
-  { title: 'Niveles', subTitle: 'Niveles de clase', href: '/dashboard/levels', Icon: IoPieChart, active: true },
-  { title: 'Sub-Niveles', subTitle: 'Subniveles de clase', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
-  { title: 'Eventos', subTitle: 'Creación de eventos', href: '/dashboard/events', Icon: IoCalendar, active: true },
+  { title: 'Usuarios', subTitle: 'Gestión de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
+  { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
+  { title: 'Cursos', subTitle: 'Gestion de Cursos', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
+  { title: 'Reservaciones', subTitle: 'Creación de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
 
 ]
 

@@ -9,7 +9,7 @@ const levelsCols: Array<ColumnProps<level>> = [
   // { key: 'id', title: 'Código' },
   { key: 'name', title: 'Nombre' },
   { key: 'description', title: 'Descripción' },
-  { key: 'isActive', title: 'Activo' },
+  { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" checked /> : <input type="checkbox" checked={false} /> },
   {
     key: 'Acciones', title: 'Acciones', render: (_, record) => {
       return <div className="flex flex-row justify-between">
@@ -22,7 +22,7 @@ const levelsCols: Array<ColumnProps<level>> = [
 ]
 
 export const LevelsPage = () => {
-  
+
   const levels = useLevelStore(state => state.levels);
 
 
@@ -31,8 +31,8 @@ export const LevelsPage = () => {
   return (
     <>
       <div className="pt-5">
-        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Niveles</h1>
-        <TableContainer columns={levelsCols} data={levels} modalChildren={<FormLevel />} modalTitle="Ccrear Niveles"/>
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Modalidades</h1>
+        <TableContainer columns={levelsCols} data={levels} modalChildren={<FormLevel />} modalTitle="Ccrear Niveles" />
       </div>
     </>
   )
