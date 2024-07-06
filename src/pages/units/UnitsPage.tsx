@@ -4,6 +4,7 @@ import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useUnitStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { TableContainer } from "../../components/shared/tables/TableContainer";
+import { FormUnit } from "../../components/shared/forms/FormUnit";
 
 
 const unitsCols :Array<ColumnProps<unit>> = [
@@ -33,8 +34,8 @@ export const UnitsPage = () => {
   return (
     <>
     <div className="pt-5">
-      <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Niveles</h1>
-      <TableContainer columns={unitsCols} data={units} />
+      <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
+      <TableContainer columns={unitsCols} data={units} modalChildren={<FormUnit/>} modalTitle="Crear Unidades"/>
     </div>
   </>
   )

@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { ColumnProps } from "../../../interface/ui/tables.interface";
 import { ModalGeneric } from "../ui/ModalGeneric";
-import { FormLevel } from "../forms";
 
 
 type Props<T> = {
   columns: Array<ColumnProps<T>>;
   data?: T[];
+  modalChildren: ReactElement;
+  modalTitle: string;
 };
 
 
 
-export const TableContainer = <T,>({ data, columns }: Props<T>) => {
+export const TableContainer = <T,>({ data, columns, modalChildren,modalTitle }: Props<T>) => {
   const [showModal, setShowModal] = useState(false);
   const headers = columns.map((column, index) => {
     return (
@@ -63,7 +64,7 @@ export const TableContainer = <T,>({ data, columns }: Props<T>) => {
           </div>
         </div>
         {/* Modal */}
-        <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title="Crear Nivel" children={<FormLevel />} />
+        <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={modalTitle} children={modalChildren} />
       </div>
     </div>
   )
