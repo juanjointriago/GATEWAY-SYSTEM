@@ -6,8 +6,10 @@ interface Props {
   Icon: IconType;
   title: string;
   subTitle: string
+  expanded?: boolean
 }
 export const SideMenuItem = ({ href, Icon, title, subTitle }: Props) => {
+  
   return (
     <NavLink key={href} to={href} end>
       <div><Icon /></div>

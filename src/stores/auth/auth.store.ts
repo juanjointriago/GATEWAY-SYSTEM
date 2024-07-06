@@ -15,21 +15,24 @@ export interface AuthState {
     logoutUser: () => void;
 }
 
-export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
+export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     status: 'pending',
     user: undefined,
 
     loginUser: async (email: string, password: string) => {
         const user = await AuthService.login(email, password);
+        console.log('auth.store/StoreAPI/loginUser ', { user });
         if (user) {
-            console.log('login', { email, password })
-            set({ status: 'authorized', ...user });
+            // console.log('login', { email, password })
+            console.log('Caso de que existe usuario =>', { user });
+            set({ status: 'authorized', user });
+            console.log("USUARIO almacenado", get().user);
         } else {
             set({ status: 'unauthorized', user: undefined });
             throw new Error('Unable to login');
         }
     },
-    
+
     loginGoogle: async () => {
         const user = await AuthService.googleSignUpLogin();
         if (user) {

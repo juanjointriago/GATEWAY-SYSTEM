@@ -22,9 +22,10 @@ export class AuthService {
         try {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
             const firebaseUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, user.uid);
-            console.log('firebaseUser', firebaseUser);
+            console.log('Auth.Service/static login/ getItemById=>', { firebaseUser });
             Swal.close();
-            if (firebaseUser && !firebaseUser.isActive) {
+            if (firebaseUser && firebaseUser.isActive === false) {
+                console.log("Caso Usuario inactivo")
                 Swal.fire({
                     title: `Su usuario está en proceso de aprobación`,
                     icon: "info",
@@ -35,13 +36,13 @@ export class AuthService {
                 return;
             }
             if (firebaseUser && firebaseUser.isActive) {
-                console.log('Login Exitoso', firebaseUser);
                 Swal.fire({
                     title: `Bienvenido ${firebaseUser.name}`,
                     icon: "success",
                     allowOutsideClick: true,
                     backdrop: true,
                 });
+                console.log('Login Exitoso', { firebaseUser });
                 return firebaseUser;
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

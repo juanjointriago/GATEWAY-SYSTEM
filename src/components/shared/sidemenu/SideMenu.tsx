@@ -1,5 +1,5 @@
 import { IconType } from "react-icons";
-import { IoBarChart, IoCalendar, IoLogoTableau, IoLogOutOutline, IoPerson, IoPieChart, IoSpeedometerOutline } from 'react-icons/io5'
+import { IoBarChart, IoBook, IoCalendar, IoLogoTableau, IoLogOutOutline, IoPerson, IoPieChart, IoSpeedometerOutline } from 'react-icons/io5'
 import { SideMenuItem } from "./SideMenuItem";
 import './SideMenu.css';
 import { useAuthStore } from "../../../stores/auth/auth.store";
@@ -11,29 +11,31 @@ interface MenuItem {
   title: string;
   subTitle: string;
   href: string;
-  Icon: IconType
+  Icon: IconType;
+  active?:boolean;
 }
 
 const menuItems: MenuItem[] = [
-  { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline },
-  { title: 'Cursos', subTitle: 'Administrador de Cursos', href: '/dashboard/courses', Icon: IoLogoTableau },
-  { title: 'Usuarios', subTitle: 'Listado de usuarios', href: '/dashboard/users', Icon: IoPerson },
-  { title: 'Niveles', subTitle: 'Niveles de clase', href: '/dashboard/levels', Icon: IoPieChart },
-  { title: 'Sub-Niveles', subTitle: 'Subniveles de clase', href: '/dashboard/sub-levels', Icon: IoBarChart },
-  { title: 'Eventos', subTitle: 'Creación de eventos', href: '/dashboard/events', Icon: IoCalendar },
+  { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
+  { title: 'Cursos', subTitle: 'Administrador de Cursos', href: '/dashboard/courses', Icon: IoLogoTableau,active: true },
+  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook,active: true },
+  { title: 'Usuarios', subTitle: 'Listado de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
+  { title: 'Niveles', subTitle: 'Niveles de clase', href: '/dashboard/levels', Icon: IoPieChart, active: true},
+  { title: 'Sub-Niveles', subTitle: 'Subniveles de clase', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
+  { title: 'Eventos', subTitle: 'Creación de eventos', href: '/dashboard/events', Icon: IoCalendar, active: true },
 
 ]
 
 
 export const SideMenu = () => {
-  const logoutUser = useAuthStore(state => state.logoutUser);
-  const authStatus = useAuthStore(state => state.status);
   const user = useAuthStore(state => state.user);
+  const authStatus = useAuthStore(state => state.status);
+  const logoutUser = useAuthStore(state => state.logoutUser);
   // const navigate = useNavigate()
   if (authStatus === 'unauthorized') {
     return <Navigate to="/auth/signin" />
   }
-  
+  console.log({user})
 
   return (
     <div id="menu" className=" min-w-[20rem] bg-gray-900 min-h-screen z-10 text-slate-300 w-80 left-0 overflow-y-scroll">
@@ -51,10 +53,10 @@ export const SideMenu = () => {
         <p className="text-slate-500">Bienvenid@ ,</p>
         <a href="#" className="inline-flex space-x-2 items-center">
           <span>
-            <img className="rounded-full w-8 h-8" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=128&q=80" alt="" />
+            <img className="rounded-full w-8 h-8" src={user?.photoUrl ?? 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=128&q=80'} alt="" />
           </span>
           <span className="text-sm md:text-base font-bold">
-            {user?.displayName || ''}
+            {user?.name ?? ''}
           </span>
         </a>
       </div>
@@ -80,8 +82,6 @@ export const SideMenu = () => {
             <span className="text-sm text-slate-500 hidden md:block">Cerrar sesión</span>
           </div>
         </div>
-
-
       </nav>
     </div>
   )
