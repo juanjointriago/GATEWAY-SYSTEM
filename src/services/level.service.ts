@@ -3,6 +3,7 @@ import { deleteItem, getDocsFromCollection, getItemById, setItem, updateItem } f
 
 export class LevelService {
     static getLevels = async () => await getDocsFromCollection<level>(import.meta.env.VITE_COLLECTION_LEVELS);
+    
     static getLevelById = async (id:string) => await getItemById<level>(import.meta.env.VITE_COLLECTION_LEVELS, id);
 
     static createLevel = async (level: level) => await setItem(import.meta.env.VITE_COLLECTION_LEVELS, level);

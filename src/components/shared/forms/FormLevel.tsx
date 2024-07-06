@@ -10,6 +10,8 @@ export const FormLevel = () => {
         name: '',
         description: '',
         isActive: false,
+        createdAt: new Date().getDate(),
+        updatedAt: new Date().getDate(),
     }
     const { register, handleSubmit, reset, formState: { errors } } = useForm<level>({ defaultValues });
     const onSubmit = handleSubmit(async (data) => {

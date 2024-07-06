@@ -1,9 +1,11 @@
 import { IconType } from "react-icons";
-import { IoBarChart, IoBook, IoCalendar, IoLogoTableau, IoLogOutOutline, IoPerson, IoPieChart, IoSpeedometerOutline } from 'react-icons/io5'
+import { IoBarChart, IoBook, IoCalendar, IoLogOutOutline, IoPerson, IoPieChart, IoSpeedometerOutline } from 'react-icons/io5'
 import { SideMenuItem } from "./SideMenuItem";
 import './SideMenu.css';
 import { useAuthStore } from "../../../stores/auth/auth.store";
 import { Navigate } from "react-router-dom";
+import { useLevelStore, useSubLevelStore } from "../../../stores";
+import { useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -12,15 +14,14 @@ interface MenuItem {
   subTitle: string;
   href: string;
   Icon: IconType;
-  active?:boolean;
+  active?: boolean;
 }
 
 const menuItems: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
-  { title: 'Cursos', subTitle: 'Administrador de Cursos', href: '/dashboard/courses', Icon: IoLogoTableau,active: true },
-  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook,active: true },
+  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook, active: true },
   { title: 'Usuarios', subTitle: 'Listado de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
-  { title: 'Niveles', subTitle: 'Niveles de clase', href: '/dashboard/levels', Icon: IoPieChart, active: true},
+  { title: 'Niveles', subTitle: 'Niveles de clase', href: '/dashboard/levels', Icon: IoPieChart, active: true },
   { title: 'Sub-Niveles', subTitle: 'Subniveles de clase', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
   { title: 'Eventos', subTitle: 'Creación de eventos', href: '/dashboard/events', Icon: IoCalendar, active: true },
 
@@ -29,13 +30,23 @@ const menuItems: MenuItem[] = [
 
 export const SideMenu = () => {
   const user = useAuthStore(state => state.user);
+  const getAllLevels = useLevelStore(state => state.getAndSetLevels);
+  const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
+
   const authStatus = useAuthStore(state => state.status);
   const logoutUser = useAuthStore(state => state.logoutUser);
   // const navigate = useNavigate()
+  useEffect(() => {
+    getAllLevels();
+    getAllSubLevels();
+
+  }, [])
+
+
   if (authStatus === 'unauthorized') {
     return <Navigate to="/auth/signin" />
   }
-  console.log({user})
+  console.log({ user })
 
   return (
     <div id="menu" className=" min-w-[20rem] bg-gray-900 min-h-screen z-10 text-slate-300 w-80 left-0 overflow-y-scroll">

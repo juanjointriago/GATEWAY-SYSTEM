@@ -1,9 +1,12 @@
 export interface unit {
-    id: string;
+    id?: string;
     name: string;
     description: string;
-    level: string;
+    sublevel: string;
+    photoUrl: string;
+    supportMaterial: string;
+    workSheetUrl: string;
     isActive: boolean;
-    createdAt: number;
-    updatedAt: number;
+    createdAt?: number;
+    updatedAt?: number;
 }

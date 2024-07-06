@@ -29,7 +29,7 @@ export const UnitsPage = () => {
   const units = useUnitStore(state => state.units);
   useEffect(() => {
     getAllUnits();
-  }, [])
+  }, []);
 
   return (
     <>

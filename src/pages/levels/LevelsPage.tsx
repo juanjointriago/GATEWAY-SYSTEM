@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { level } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
@@ -22,12 +22,10 @@ const levelsCols: Array<ColumnProps<level>> = [
 ]
 
 export const LevelsPage = () => {
-  const getAllLevels = useLevelStore(state => state.getAndSetLevels)
+  
   const levels = useLevelStore(state => state.levels);
 
-  useEffect(() => {
-    getAllLevels();
-  }, [])
+
 
   // console.log({getAllLevels})
   return (
