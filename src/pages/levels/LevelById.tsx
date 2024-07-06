@@ -10,15 +10,19 @@ export const LevelById: FC<Props> = ({ levelId }) => {
 
     const setLevelFounded = async () => {
         const newLevel = await getLevelById(levelId)
-        if (newLevel) setFoundLevel(newLevel);
+        if (newLevel) {
+            console.log('HAY NIVELLLLL')
+            setFoundLevel(newLevel)
+        }
     }
 
     useEffect(() => {
-        if (!levelId) return;
         setLevelFounded();
-    }, [levelId])
-console.log('LevelById',{foundLevel})
+    }, )
+    // console.log('LevelById', { foundLevel })
     return (
-        <div>{foundLevel?.name ?? 'cargando'}</div>
+        <>
+            {foundLevel && <div>{foundLevel.name}</div>}
+        </>
     )
 }

@@ -6,7 +6,7 @@ import { devtools, persist } from "zustand/middleware";
 
 interface LevelStore {
     levels: level[]
-    getLevelById: (id: string) => Promise<level>;
+    getLevelById: (id: string) => level | undefined;
     getAndSetLevels: () => Promise<void>;
     createLevel: (level: level) => Promise<void>;
     updateLevel: (level: level) => void;
@@ -15,8 +15,10 @@ interface LevelStore {
 
 const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     levels: [],
-    getLevelById: async (id: string) => {
-        const foundLevel = await LevelService.getLevelById(id);
+    getLevelById:   (id: string) => {
+        // const foundLevel = await LevelService.getLevelById(id);
+        const foundLevel =  get().levels.find(level => level.id = id)
+        console.log(foundLevel)
         return foundLevel
     },
     getAndSetLevels: async () => {
