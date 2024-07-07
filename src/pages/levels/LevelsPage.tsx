@@ -25,8 +25,6 @@ export const LevelsPage = () => {
 
   const levels = useLevelStore(state => state.levels);
 
-
-
   // console.log({getAllLevels})
   return (
     <>

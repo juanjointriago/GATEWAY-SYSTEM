@@ -4,7 +4,7 @@ import { SideMenuItem } from "./SideMenuItem";
 import './SideMenu.css';
 import { useAuthStore } from "../../../stores/auth/auth.store";
 import { Navigate } from "react-router-dom";
-import { useLevelStore, useSubLevelStore } from "../../../stores";
+import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import { useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 
@@ -30,6 +30,7 @@ const menuItems: MenuItem[] = [
 
 export const SideMenu = () => {
   const user = useAuthStore(state => state.user);
+  const getAllUsers = useUserStore(state => state.getAllUsers);
   const getAllLevels = useLevelStore(state => state.getAndSetLevels);
   const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
 
@@ -37,9 +38,9 @@ export const SideMenu = () => {
   const logoutUser = useAuthStore(state => state.logoutUser);
   // const navigate = useNavigate()
   useEffect(() => {
+    getAllUsers();
     getAllLevels();
     getAllSubLevels();
-
   }, [])
 
 
