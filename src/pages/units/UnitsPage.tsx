@@ -1,34 +1,47 @@
-import { useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { unit } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useUnitStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
+import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
+import { NavLink } from "react-router-dom";
 
 
-const unitsCols: Array<ColumnProps<unit>> = [
-  { key: 'name', title: 'Nombre' },
-  { key: 'description', title: 'Descripción' },
-  { key: 'level', title: 'Curso', render: (_, record) => <LevelById levelId={record.sublevel} /> },
-  { key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) =>  <NavLink to={record.supportMaterial} title="Abrir" target="_blank" end>
-    <span className="underline text-sm text-blue-500 hidden md:block">📄 Abrir material</span>
-</NavLink> },
-  { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" checked /> : <input type="checkbox" checked={false} /> },
-  {
-    key: 'Acciones', title: 'Acciones', render: (_, record) => {
-      return <div className="flex flex-row justify-between">
-        <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
-        <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
-        <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
-      </div>;
-    }
-  },
-]
 
 
 export const UnitsPage = () => {
+  const [isVisibleSupportMaterial, setIsVisibleSupportMaterial] = useState(false);
+  // const [isVisibleWorkSheet, setIsVisibleWorkSheet] = useState(false);
+  const unitsCols: Array<ColumnProps<unit>> = [
+    { key: 'name', title: 'Nombre' },
+    { key: 'description', title: 'Descripción' },
+    { key: 'level', title: 'Curso', render: (_, record) => <LevelById levelId={record.sublevel} /> },
+    {
+      key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) => <>
+        <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => setIsVisibleSupportMaterial(true)}>🔍 Support Material</button>
+        <UrlIframe title="Gateway Support Material" isVisible={isVisibleSupportMaterial} setIsVisible={setIsVisibleSupportMaterial} src={record.supportMaterial} errorMsg="Error al cargar el archivo" />
+      </>
+    },
+    {
+      key: 'workSheetUrl', title: 'Wrork Sheet', render: (_, record) => <div className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+        <NavLink to={record.workSheetUrl} target="_blank" end>
+          <span className="text-sm uppercase text-blue-500 hidden md:block">🔍 WorkSheet</span>
+        </NavLink> </div>
+    },
+    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" checked /> : <input type="checkbox" checked={false} /> },
+    {
+      key: 'Acciones', title: 'Acciones', render: (_, record) => {
+        return <div className="flex flex-row justify-between">
+          <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
+          <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
+          <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
+        </div>;
+      }
+    },
+  ]
+
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
   useEffect(() => {
