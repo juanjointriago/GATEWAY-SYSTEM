@@ -2,6 +2,7 @@ import { create, StateCreator } from "zustand";
 import { FirestoreUser } from "../../interface";
 import { UserService } from "../../services";
 import { devtools, persist } from "zustand/middleware";
+import Swal from "sweetalert2";
 
 interface UsersStore {
     users: FirestoreUser[];
@@ -48,6 +49,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         try {
             await UserService.updateUsers(user);
             set({ users: get().users.map(u => u.id === user.id ? user : u) });
+            Swal.fire('Usuario actualizado', `El usuario ${user.name} ha sido actualizado`, 'success');
         } catch (error) {
             console.warn(error);
         }

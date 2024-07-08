@@ -11,7 +11,7 @@ export const LevelById: FC<Props> = ({ levelId }) => {
     const setLevelFounded = async () => {
         const newLevel = await getLevelById(levelId)
         if (newLevel) {
-            console.log('HAY NIVELLLLL')
+            // console.log('HAY NIVELLLLL')
             setFoundLevel(newLevel)
         }
     }

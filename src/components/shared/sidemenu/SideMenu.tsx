@@ -1,31 +1,13 @@
-import { IconType } from "react-icons";
-import { IoBarChart, IoBook, IoCalendar, IoLogOutOutline, IoPerson, IoPieChart, IoSpeedometerOutline } from 'react-icons/io5'
+import { IoLogOutOutline } from 'react-icons/io5'
 import { SideMenuItem } from "./SideMenuItem";
 import './SideMenu.css';
 import { useAuthStore } from "../../../stores/auth/auth.store";
 import { Navigate } from "react-router-dom";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import { useEffect } from "react";
+import { menuItems } from './menu';
 // import { useNavigate } from "react-router-dom";
 
-
-interface MenuItem {
-  title: string;
-  subTitle: string;
-  href: string;
-  Icon: IconType;
-  active?: boolean;
-}
-
-const menuItems: MenuItem[] = [
-  { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
-  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook, active: true },
-  { title: 'Usuarios', subTitle: 'Gestión de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
-  { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
-  { title: 'Cursos', subTitle: 'Gestion de Cursos', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
-  { title: 'Reservaciones', subTitle: 'Creación de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
-
-]
 
 
 export const SideMenu = () => {
@@ -76,7 +58,7 @@ export const SideMenu = () => {
       {/* Menu Items */}
       <nav id="nav" className="w-full px-6">
         {
-          menuItems.map(item => (
+          menuItems(user?.role ?? 'student').map(item => (
             <SideMenuItem key={item.href} {...item} />
           ))
         }

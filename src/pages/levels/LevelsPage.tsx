@@ -9,7 +9,7 @@ const levelsCols: Array<ColumnProps<level>> = [
   // { key: 'id', title: 'Código' },
   { key: 'name', title: 'Nombre' },
   { key: 'description', title: 'Descripción' },
-  { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" checked /> : <input type="checkbox" checked={false} /> },
+  { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked /> : <input type="checkbox" defaultChecked={false} /> },
   {
     key: 'Acciones', title: 'Acciones', render: (_, record) => {
       return <div className="flex flex-row justify-between">

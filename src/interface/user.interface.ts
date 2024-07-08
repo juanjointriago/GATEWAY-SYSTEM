@@ -1,6 +1,6 @@
 import { User } from "firebase/auth";
 
-type role = 'admin' | 'student' | 'teacher';
+export type role = 'admin' | 'student' | 'teacher';
 // interface levels {
 
 // }

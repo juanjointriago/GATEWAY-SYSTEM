@@ -8,6 +8,8 @@ import { SubLevelById } from "../sublevels/SubLevelById"
 
 export const UsersPage = () => {
 
+
+
   const userCols: Array<ColumnProps<FirestoreUser>> = [
     { key: 'cc', title: 'CC' },
     { key: 'name', title: 'Nombres' },
@@ -16,8 +18,13 @@ export const UsersPage = () => {
     // { key: 'address', title: 'Dirección' },
     // { key: 'city', title: 'Ciudad' },
     // { key: 'country', title: 'País' },
-    { key: 'level', title: 'Modalidad', render:(_,record)=><LevelById levelId={record.level!}/> },
-    { key: 'subLevel', title: 'Curso',  render:(_,record)=><SubLevelById subLevelId={record.subLevel!}/> },
+    { key: 'level', title: 'Modalidad', render: (_, record) => <LevelById levelId={record.level!} /> },
+    { key: 'subLevel', title: 'Curso', render: (_, record) => <SubLevelById subLevelId={record.subLevel!} /> },
+    {
+      key: 'isActive', title: 'Estado', render: (_, record) => <div onClick={() => changeActivationStatus(record.id!)}>
+        {record.isActive ? <span className="text-green-500">Activo</span> : <span className="text-red-500">Inactivo</span>}
+      </div>
+    },
     // { key: 'phone', title: 'Teléfono' },
     // { key: 'role', title: 'Rol' },
     // { key: 'createdAt', title: 'Fecha Alta' },
@@ -26,6 +33,14 @@ export const UsersPage = () => {
 
 
   const users = useUserStore(state => state.users);
+  const updateUserById = useUserStore(state => state.updateUser);
+
+  const changeActivationStatus = (id: string) => {
+    const currentUser = users.find((_,) => _.id === id)
+    if (currentUser) {
+      updateUserById({ ...currentUser, isActive: !currentUser.isActive })
+    }
+  }
 
   const [filteredData, setFilteredDat6a] = useState<FirestoreUser[]>(users)
   const [searchTerms, setSearchTerms] = useState('')
