@@ -12,7 +12,7 @@ type Props<T> = {
 
 
 
-export const TableContainer = <T,>({ data, columns, modalChildren,modalTitle }: Props<T>) => {
+export const TableContainer = <T,>({ data, columns, modalChildren, modalTitle }: Props<T>) => {
   const [showModal, setShowModal] = useState(false);
   const headers = columns.map((column, index) => {
     return (
@@ -46,14 +46,13 @@ export const TableContainer = <T,>({ data, columns, modalChildren,modalTitle }: 
 
   return (
     <div className="w-[97%] mx-auto overflow-auto">
-      {/* <div className="bg-green-100"> */}
       <div className="flex flex-col">
         <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
           <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-            {/* boton de nuevo registro */}
             {<button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
               onClick={() => setShowModal(true)}>+ </button>}
             <div className="overflow-hidden">
+             
               <table className="min-w-full ">
                 <thead className="bg-gray-200 border-b">
                   <tr>{headers}</tr>

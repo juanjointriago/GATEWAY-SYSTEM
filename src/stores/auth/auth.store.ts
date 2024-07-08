@@ -2,13 +2,14 @@ import { StateCreator } from "zustand";
 import { AuthService } from "../../services";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { FirestoreUser } from "../../interface";
+import { FirestoreUser, newUSer } from "../../interface";
 import { immer } from "zustand/middleware/immer";
 import { useLevelStore } from "../level/level.store";
 
 export interface AuthState {
     status: 'pending' | 'unauthorized' | 'authorized';
     user?: FirestoreUser
+    sigUpUser: (user:newUSer) => Promise<void>;
     loginUser: (email: string, password: string) => Promise<void>;
     loginGoogle: () => Promise<void>;
     checkAuthStatus: () => Promise<void>;
@@ -18,6 +19,7 @@ export interface AuthState {
 export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     status: 'pending',
     user: undefined,
+    sigUpUser: async (user:newUSer) =>  await AuthService.signUp(user),
 
     loginUser: async (email: string, password: string) => {
         const user = await AuthService.login(email, password);

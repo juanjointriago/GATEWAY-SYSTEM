@@ -30,7 +30,7 @@ export const UnitsPage = () => {
           <span className="text-sm uppercase text-blue-500 hidden md:block">🔍 WorkSheet</span>
         </NavLink> </div>
     },
-    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" checked /> : <input type="checkbox" checked={false} /> },
+    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked={true} /> : <input type="checkbox" defaultChecked={false} /> },
     {
       key: 'Acciones', title: 'Acciones', render: (_, record) => {
         return <div className="flex flex-row justify-between">
@@ -41,18 +41,33 @@ export const UnitsPage = () => {
       }
     },
   ]
-
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
+  const [filteredData, setFilteredDat6a] = useState<unit[]>(units)
+  const [searchTerms, setSearchTerms] = useState('')
   useEffect(() => {
     getAllUnits();
   }, []);
+
 
   return (
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
-        <TableContainer columns={unitsCols} data={units} modalChildren={<FormUnit />} modalTitle="Crear Unidades" />
+        <div className="ml-5 p-4 w-1/4 flex justify-end">
+          <input type="text" id="table-search"
+            placeholder="🔍      Buscar ...   " onChange={(e) => {
+              setSearchTerms(e.target.value)
+              if (searchTerms.length > 0) {
+                const results = units.filter(unit =>
+                  unit["name"].toLowerCase().includes(searchTerms.toLowerCase())
+                )
+                setFilteredDat6a(results)
+              }
+            }}
+          />
+        </div>
+        <TableContainer columns={unitsCols} data={filteredData} modalChildren={<FormUnit />} modalTitle="Crear Unidades" />
       </div>
     </>
   )

@@ -30,7 +30,7 @@ export const LevelsPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Modalidades</h1>
-        <TableContainer columns={levelsCols} data={levels} modalChildren={<FormLevel />} modalTitle="Ccrear Niveles" />
+        <TableContainer columns={levelsCols} data={levels} modalChildren={<FormLevel />} modalTitle="Crear Modalidades" />
       </div>
     </>
   )

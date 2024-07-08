@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import Swal from 'sweetalert2';
 import { adddItem, getItemById } from "../store/firebase/helper";
-import { FirestoreUser } from "../interface";
+import { FirestoreUser, newUSer } from "../interface";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../store/firebase/initialize";
 
@@ -56,6 +56,54 @@ export class AuthService {
 
     }
 
+    static signUp = async (signUpUser: newUSer) => {
+        const { email, password, name, role, address, bornDate, cc, city, country } = signUpUser;
+        const auth = getAuth();
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password!)
+            if (userCredential) {
+                const { photoURL, uid } = userCredential.user;
+                const dataUser = {
+                    uid,
+                    id: uid,
+                    name,
+                    email,
+                    role,
+                    photoUrl: photoURL,
+                    phone: "",
+                    address,
+                    bornDate,
+                    cc,
+                    city,
+                    country,
+                    isActive: false,
+                    createdAt: new Date().getTime(),
+                    updatedAt: new Date().getTime(),
+                };
+                await updateProfile(userCredential.user, { displayName: name });
+                await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);
+                Swal.fire({
+                    title: `Registro completo`,
+                    text: `Su cuenta se encuentra en proceso de activación`,
+                    icon: "success",
+                    allowOutsideClick: true,
+                    backdrop: true,
+                })
+                await signOut(auth);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            Swal.fire({
+                title: `Error al registrar usuario`,
+                text: `${error.message}`,
+                icon: "warning",
+                allowOutsideClick: true,
+                backdrop: true,
+            })
+            await signOut(auth);
+        }
+
+    }
     /**
      * @description Login with Google and set on user collection if not exists if exists continue
      * @param action 
