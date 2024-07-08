@@ -54,6 +54,7 @@ export const UnitsPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
+        {/* searchInput */}
         <div className="ml-5 p-4 w-1/4 flex justify-end">
           <input type="text" id="table-search"
             placeholder="🔍      Buscar ...   " onChange={(e) => {
@@ -67,6 +68,7 @@ export const UnitsPage = () => {
             }}
           />
         </div>
+        {/**Table comp */}
         <TableContainer columns={unitsCols} data={filteredData} modalChildren={<FormUnit />} modalTitle="Crear Unidades" />
       </div>
     </>
