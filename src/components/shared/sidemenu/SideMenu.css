@@ -9,3 +9,25 @@
   #nav a.active {
     @apply  bg-blue-800;
   }
+
+  /* Estilo global */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Estilo de la barra lateral */
+/* .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+} */
+
+/* Estilo de los elementos del menú */
+/* .sidebar .menu-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+} */
+

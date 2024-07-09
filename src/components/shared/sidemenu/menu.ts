@@ -37,7 +37,7 @@ const teacher: MenuItem[] = [
 ]
 
 
-export const menuItems = (typeUser: role) => {
+export const menuItemsByRole = (typeUser: role):MenuItem[] => {
   switch (typeUser) {
     case 'admin':
       return admin;

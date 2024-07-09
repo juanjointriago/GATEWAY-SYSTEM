@@ -27,7 +27,11 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         }
     },
 
-    getUserById: async (id: string) => get().users.find(user => user.id === id),
+    getUserById: async (id: string) => {
+        const user = await get().users.find(user => user.id === id)
+        console.log('FOUND USER =>',{user})
+        return user;
+    },
 
     createUser: async (user: FirestoreUser) => {
         try {

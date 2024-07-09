@@ -5,7 +5,7 @@ import { useAuthStore } from "../../../stores/auth/auth.store";
 import { Navigate } from "react-router-dom";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import { useEffect } from "react";
-import { menuItems } from './menu';
+import { menuItemsByRole } from './menu';
 // import { useNavigate } from "react-router-dom";
 
 
@@ -58,7 +58,7 @@ export const SideMenu = () => {
       {/* Menu Items */}
       <nav id="nav" className="w-full px-6">
         {
-          menuItems(user?.role ?? 'student').map(item => (
+          menuItemsByRole(user?.role ?? 'student').map(item => (
             <SideMenuItem key={item.href} {...item} />
           ))
         }

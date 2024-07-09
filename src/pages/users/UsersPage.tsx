@@ -24,7 +24,7 @@ export const UsersPage = () => {
         {record && <div className="flex:1 flex-row justify-center">
           {/* <CheckBox action={() => updateUserById({ ...record, isActive: !record.isActive })} isActive={record.isActive} /> */}
           <FabButton isActive action={()=>updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive?IoCheckmarkDone:IoCheckmarkCircle} iconSize={18}/>
-          <FabButton isActive action={()=>console.log('Abrir modal para ver datos y en modal poder ver contraseña')} Icon={IoEye}/>
+          <FabButton isActive action={()=>{console.log(getUserById(record.id!))}} Icon={IoEye}/>
         </div>
         }
       </>
@@ -40,6 +40,7 @@ export const UsersPage = () => {
   const users = useUserStore(state => state.users);
   const getAllUsers = useUserStore(state => state.getAllUsers);
   const updateUserById = useUserStore(state => state.updateUser);
+  const getUserById = useUserStore(state => state.getUserById);
 
   useEffect(() => {
     getAllUsers();

@@ -1,10 +1,11 @@
+import { FC } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { SideMenu } from "../components";
 import { Loading } from "../components/shared/ui/Loading";
-import { useAuthStore } from "../stores/auth/auth.store";
-// import { SideBar } from "../components/shared/sidemenu/SideBar";
 
-export const DashboardLayout = () => {
+import { useAuthStore } from "../stores/auth/auth.store";
+import { SideMenu } from "../components";
+// import { SideBar } from "../components/shared/sidemenu/SideBar";
+export const DashboardLayout: FC = () => {
   const authStatus = useAuthStore(state => state.status);
   const checkAuthStatus = useAuthStore(state => state.checkAuthStatus);
 
@@ -16,13 +17,14 @@ export const DashboardLayout = () => {
     return <Navigate to="/auth/signin" />
   }
 
-  
+
+
   // console.log(JSON.stringify(authStatus))
   return (
     <div className="overflow-hidden bg-slate-200 overflow-y-scroll w-screen h-screen antialiased text-slate-900 selection:bg-blue-900 selection:text-white">
       <div className="flex flex-row relative w-screen">
         <SideMenu />
-        {/* <SideBar/> */}
+        {/* <SideBar /> */}
         <div className="w-full">
           <Outlet />
         </div>
