@@ -20,7 +20,7 @@ export const SubLevelById:FC<Props> = ({subLevelId}) => {
 
     useEffect(() => {
         setSubLevel();
-    }, )
+    }, [])
   return (
     
     <>

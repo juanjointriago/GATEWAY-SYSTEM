@@ -18,7 +18,7 @@ export const LevelById: FC<Props> = ({ levelId }) => {
 
     useEffect(() => {
         setLevelFounded();
-    }, )
+    }, [])
     // console.log('LevelById', { foundLevel })
     return (
         <>

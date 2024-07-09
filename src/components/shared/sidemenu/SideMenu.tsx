@@ -29,7 +29,7 @@ export const SideMenu = () => {
   if (authStatus === 'unauthorized') {
     return <Navigate to="/auth/signin" />
   }
-  console.log({ user })
+  // console.log({ user })
 
   return (
     <div id="menu" className=" min-w-[20rem] bg-gray-900 min-h-screen z-10 text-slate-300 w-80 left-0 overflow-y-scroll">

@@ -8,15 +8,16 @@ type Props<T> = {
   data?: T[];
   modalChildren: ReactElement;
   modalTitle: string;
+  hasAddBtn?: boolean;
 };
 
 
 
-export const TableContainer = <T,>({ data, columns, modalChildren, modalTitle }: Props<T>) => {
+export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
   const [showModal, setShowModal] = useState(false);
   const headers = columns.map((column, index) => {
     return (
-      <th key={`headCell-${index}`} scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+      <th key={`headCell-${index}`} scope="col" className="text-sm font-medium text-gray-900 px-2 py-4 text-left">
         {column.title}
       </th>
     );
@@ -37,7 +38,7 @@ export const TableContainer = <T,>({ data, columns, modalChildren, modalTitle }:
               ? column.render(column, row as T)
               : (row[column.key as keyof typeof row] as string);
 
-            return <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap" key={`cell-${index2}`}>{value}</td>;
+            return <td className="text-sm text-gray-900 font-light px-2 py-4 whitespace-nowrap" key={`cell-${index2}`}>{value}</td>;
           })}
         </tr>
       );
@@ -49,10 +50,10 @@ export const TableContainer = <T,>({ data, columns, modalChildren, modalTitle }:
       <div className="flex flex-col">
         <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
           <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-            {<button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
+            {hasAddBtn && <button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
               onClick={() => setShowModal(true)}>+ </button>}
             <div className="overflow-hidden">
-             
+
               <table className="min-w-full ">
                 <thead className="bg-gray-200 border-b">
                   <tr>{headers}</tr>

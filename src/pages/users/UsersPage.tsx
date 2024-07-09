@@ -1,15 +1,14 @@
-import { useState } from "react"
-import { TableContainer } from "../../components/shared/tables/TableContainer"
-import { FirestoreUser } from "../../interface"
-import { ColumnProps } from "../../interface/ui/tables.interface"
-import { useUserStore } from "../../stores"
-import { LevelById } from "../levels/LevelById"
-import { SubLevelById } from "../sublevels/SubLevelById"
+import { useEffect, useState } from "react";
+import { TableContainer } from "../../components/shared/tables/TableContainer";
+import { FirestoreUser } from "../../interface";
+import { ColumnProps } from "../../interface/ui/tables.interface";
+import { useUserStore } from "../../stores";
+import { LevelById } from "../levels/LevelById";
+import { SubLevelById } from "../sublevels/SubLevelById";
+import { FabButton } from "../../components/shared/buttons/FabButton";
+import { IoCheckmarkCircle, IoCheckmarkDone, IoEye } from "react-icons/io5";
 
 export const UsersPage = () => {
-
-
-
   const userCols: Array<ColumnProps<FirestoreUser>> = [
     { key: 'cc', title: 'CC' },
     { key: 'name', title: 'Nombres' },
@@ -21,9 +20,14 @@ export const UsersPage = () => {
     { key: 'level', title: 'Modalidad', render: (_, record) => <LevelById levelId={record.level!} /> },
     { key: 'subLevel', title: 'Curso', render: (_, record) => <SubLevelById subLevelId={record.subLevel!} /> },
     {
-      key: 'isActive', title: 'Estado', render: (_, record) => <div onClick={() => changeActivationStatus(record.id!)}>
-        {record.isActive ? <span className="text-green-500">Activo</span> : <span className="text-red-500">Inactivo</span>}
-      </div>
+      key: 'isActive', title: 'Estado', render: (_, record) => <>
+        {record && <div className="flex:1 flex-row justify-center">
+          {/* <CheckBox action={() => updateUserById({ ...record, isActive: !record.isActive })} isActive={record.isActive} /> */}
+          <FabButton isActive action={()=>updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive?IoCheckmarkDone:IoCheckmarkCircle} iconSize={18}/>
+          <FabButton isActive action={()=>console.log('Abrir modal para ver datos y en modal poder ver contraseña')} Icon={IoEye}/>
+        </div>
+        }
+      </>
     },
     // { key: 'phone', title: 'Teléfono' },
     // { key: 'role', title: 'Rol' },
@@ -32,15 +36,15 @@ export const UsersPage = () => {
   ]
 
 
+  // const usersShallow = useUserStore(useShallow(state => state.users));
   const users = useUserStore(state => state.users);
+  const getAllUsers = useUserStore(state => state.getAllUsers);
   const updateUserById = useUserStore(state => state.updateUser);
 
-  const changeActivationStatus = (id: string) => {
-    const currentUser = users.find((_,) => _.id === id)
-    if (currentUser) {
-      updateUserById({ ...currentUser, isActive: !currentUser.isActive })
-    }
-  }
+  useEffect(() => {
+    getAllUsers();
+  }, [])
+
 
   const [filteredData, setFilteredDat6a] = useState<FirestoreUser[]>(users)
   const [searchTerms, setSearchTerms] = useState('')
@@ -63,7 +67,7 @@ export const UsersPage = () => {
             }}
           />
         </div>
-        <TableContainer columns={userCols} data={filteredData} modalChildren={<></>} modalTitle="Registrar usuarios" />
+        <TableContainer hasAddBtn={false} columns={userCols} data={filteredData} modalChildren={<></>} modalTitle="Registrar usuarios" />
       </div>
     </>
   )

@@ -16,15 +16,13 @@ interface LevelStore {
 const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     levels: [],
     getLevelById:   (id: string) => {
-        // const foundLevel = await LevelService.getLevelById(id);
         const foundLevel =  get().levels.find(level => level.id = id)
-        console.log(foundLevel)
         return foundLevel
     },
     getAndSetLevels: async () => {
         try {
             const levels = await LevelService.getLevels()
-            console.log('NIVELES ENCONTRADOS', { levels })
+            // console.log('NIVELES ENCONTRADOS', { levels })
             set({ levels: [...levels] })
         } catch (error) {
             console.warn(error)

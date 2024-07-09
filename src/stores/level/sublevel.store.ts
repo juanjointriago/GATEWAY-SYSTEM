@@ -17,7 +17,7 @@ const storeAPI:StateCreator<SubLevelsStore, [["zustand/devtools", never], ["zust
     getAndSetSubLevels: async () => {
         try {
             const sublevels = await SubLevelService.getSubLevels();
-            console.log('SUBNIVELES ENCONTRADOS', { sublevels })
+            // console.log('SUBNIVELES ENCONTRADOS', { sublevels })
             set({ sublevels: [...sublevels] })
         } catch (error) {
             console.warn(error)
@@ -25,7 +25,7 @@ const storeAPI:StateCreator<SubLevelsStore, [["zustand/devtools", never], ["zust
     },
     getSubLevelById: (id: string) => {
         const foundSubLevel = get().sublevels.find(sublevel => sublevel.id === id);
-        console.log(foundSubLevel)
+        // console.log(foundSubLevel)
         return foundSubLevel
     },
     createSubLevel: async (sublevel: subLevel) => {

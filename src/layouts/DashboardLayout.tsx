@@ -17,7 +17,7 @@ export const DashboardLayout = () => {
   }
 
   
-  console.log(JSON.stringify(authStatus))
+  // console.log(JSON.stringify(authStatus))
   return (
     <div className="overflow-hidden bg-slate-200 overflow-y-scroll w-screen h-screen antialiased text-slate-900 selection:bg-blue-900 selection:text-white">
       <div className="flex flex-row relative w-screen">

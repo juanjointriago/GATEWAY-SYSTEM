@@ -49,7 +49,17 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         try {
             await UserService.updateUsers(user);
             set({ users: get().users.map(u => u.id === user.id ? user : u) });
-            Swal.fire('Usuario actualizado', `El usuario ${user.name} ha sido actualizado`, 'success');
+            Swal.fire({
+                title: 'Usuario actualizado',
+                text: `El usuario ${user.name} ha sido actualizado`,
+                icon: 'success',
+                confirmButtonText: 'Continuar',
+            }).then((result) => {
+                result.isConfirmed &&
+                    window.location.reload();
+                    // location.reload();
+            });
+
         } catch (error) {
             console.warn(error);
         }
