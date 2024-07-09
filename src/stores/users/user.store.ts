@@ -27,14 +27,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         }
     },
 
-    getUserById: async (id: string) => {
-        try {
-            const user = await UserService.getUserById(id);
-            console.log({ user });
-        } catch (error) {
-            console.warn(error);
-        }
-    },
+    getUserById: async (id: string) => get().users.find(user => user.id === id),
 
     createUser: async (user: FirestoreUser) => {
         try {
@@ -48,7 +41,6 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
     updateUser: async (user: FirestoreUser) => {
         try {
             await UserService.updateUsers(user);
-            set({ users: get().users.map(u => u.id === user.id ? user : u) });
             Swal.fire({
                 title: 'Usuario actualizado',
                 text: `El usuario ${user.name} ha sido actualizado`,
@@ -56,8 +48,9 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
                 confirmButtonText: 'Continuar',
             }).then((result) => {
                 result.isConfirmed &&
-                    window.location.reload();
-                    // location.reload();
+                    set({ users: get().users.map(u => u.id === user.id ? user : u) });
+                window.location.reload();
+                // location.reload();
             });
 
         } catch (error) {

@@ -9,16 +9,14 @@ interface LevelStore {
     getLevelById: (id: string) => level | undefined;
     getAndSetLevels: () => Promise<void>;
     createLevel: (level: level) => Promise<void>;
-    updateLevel: (level: level) => void;
-    deleteLevel: (id: string) => void;
+    updateLevel: (level: level) => Promise<void>;
+    deleteLevel: (id: string) => Promise<void>;
 }
 
 const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     levels: [],
-    getLevelById:   (id: string) => {
-        const foundLevel =  get().levels.find(level => level.id = id)
-        return foundLevel
-    },
+    getLevelById:   (id: string) =>   get().levels.find(level => level.id = id)
+,
     getAndSetLevels: async () => {
         try {
             const levels = await LevelService.getLevels()
@@ -32,11 +30,13 @@ const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand
         await LevelService.createLevel(level);
         set({ levels: [...get().levels, level] })
     },
-    updateLevel: (level: level) => {
-        console.log('updateLevel', level)
+    updateLevel: async (level: level) => {
+        await LevelService.updateLevel(level);
+        set({ levels: [...get().levels.map(l => l.id === level.id ? level : l)] })
     },
-    deleteLevel: (id: string) => {
-        console.log('deleteLevel', id)
+    deleteLevel: async (id: string) => {
+        await LevelService.deleteLevelById(id);
+        set({ levels: [...get().levels.filter(level => level.id !== id)] })
     }
 });
 
