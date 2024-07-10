@@ -57,15 +57,15 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
   const headers = columns.map((column, index) => {
     return (
       <th key={`headCell-${index}`} scope="col" className="py-3 px-3 text-[#212B36] sm:text-base font-bold whitespace-nowrap">
-        {column.title}
+        {column.title}{" "}
       </th>
     );
   });
 
   const rows = !data?.length ? (
-    <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
+    <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200">
       <td colSpan={columns.length} className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-        No hay registros
+        No hay registros{" "}
       </td>
     </tr>
   ) : (
@@ -94,7 +94,9 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
               onClick={() => setShowModal(true)}>+ </button>}
             <div className="w-full overflow-x-scroll md:overflow-auto  max-w-7xl 2xl:max-w-none mt-2">
               <table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border ">
-                <thead className="rounded-lg text-base text-white font-semibold w-full"> <tr className="bg-[#222E3A]/[6%]">{headers}</tr></thead>
+                <thead className="rounded-lg text-base text-white font-semibold w-full">
+                  <tr className="bg-[#222E3A]/[6%]">{headers}</tr>
+                </thead>
                 <tbody>{rows}</tbody>
               </table>
             </div>
@@ -133,8 +135,8 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                     ))}
                   <li
                     className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
-                        ? "bg-[#cccccc] pointer-events-none"
-                        : " cursor-pointer"
+                      ? "bg-[#cccccc] pointer-events-none"
+                      : " cursor-pointer"
                       }`}
                     onClick={nextPage}
                   >

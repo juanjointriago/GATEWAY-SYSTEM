@@ -16,10 +16,7 @@ export interface Level {
     subLevels: string[];
 }
 
-export interface students {
-    [key: string]: { status: status }
-
-}
+export interface students { [key: string]: { status: status } }
 
 
 export interface event {
@@ -38,10 +35,7 @@ export interface event {
 }
 
 
-
-export interface Student {
-    status: string;
-}
+export interface Student { status: string; }
 
 
 export interface EventPrev {
