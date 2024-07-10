@@ -4,9 +4,12 @@ export interface unit {
     description: string;
     sublevel: string;
     photoUrl: string;
-    supportMaterial: string;
+    supportMaterial?: string;
     workSheetUrl: string;
     isActive: boolean;
     createdAt?: number;
     updatedAt?: number;
 }
+
+
+export type  unitFile  = Blob |ArrayBuffer;

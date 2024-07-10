@@ -2,16 +2,19 @@ import { useForm } from "react-hook-form";
 import { unit } from "../../../interface";
 import { useSubLevelStore, useUnitStore } from "../../../stores";
 import { v4 as uuid } from 'uuid'
+import { useRef, useState } from "react";
 
 export const FormUnit = () => {
+  const fileRef = useRef(null)
   const createUnit = useUnitStore(state => state.createUnit);
   const subLevels = useSubLevelStore(state => state.sublevels);
+  const [fileIpload, setFileIpload] = useState<FileList | null>(null)
   const defaultValues: unit = {
     name: '',
     description: '',
     sublevel: '',
     photoUrl: '',
-    supportMaterial: '',
+    // supportMaterial: '',
     workSheetUrl: '',
     isActive: false,
     createdAt: new Date().getTime(),
@@ -20,9 +23,13 @@ export const FormUnit = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<unit>({ defaultValues });
   const onSubmit = handleSubmit(async (data: unit) => {
     const unitRecord = { id: uuid(), ...data }
-    await createUnit(unitRecord);
-    console.log({ data })
-    reset();
+    if (fileIpload) {
+      const inputFile = fileRef.current as HTMLInputElement | null;
+      await createUnit(unitRecord, fileIpload[0]);
+      console.log({ data })
+      reset();
+      inputFile!.value = ''
+    }
   })
 
   return (
@@ -56,14 +63,26 @@ export const FormUnit = () => {
           </div>
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="supportMaterial">
-              Link de material de apoyo *
+              Material de apoyo *
             </label>
-            <input
+            {/* <input
               {...register("supportMaterial", { required: "La descripción es obligatoria 👀" })}
               className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               id="supportMaterial"
               type="text"
               placeholder="Aqui suba el enlace de material de apoyo" />
+            {errors.supportMaterial && <p className="text-red-500 text-xs italic">{errors.supportMaterial.message}</p>}
+          </div> */}
+            <input
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              ref={fileRef}
+              id="image"
+              type="file"
+              placeholder="Subir archivo"
+              accept=".pdf"
+              onChange={(e) => setFileIpload(e.target.files)}
+              required
+            />
             {errors.supportMaterial && <p className="text-red-500 text-xs italic">{errors.supportMaterial.message}</p>}
           </div>
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">

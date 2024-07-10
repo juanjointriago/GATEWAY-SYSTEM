@@ -12,34 +12,34 @@ import { NavLink } from "react-router-dom";
 
 
 export const UnitsPage = () => {
-  const [isVisibleSupportMaterial, setIsVisibleSupportMaterial] = useState(false);
-  // const [isVisibleWorkSheet, setIsVisibleWorkSheet] = useState(false);
   const unitsCols: Array<ColumnProps<unit>> = [
     { key: 'name', title: 'Nombre' },
     { key: 'description', title: 'Descripción' },
     { key: 'level', title: 'Curso', render: (_, record) => <LevelById levelId={record.sublevel} /> },
     {
       key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) => <>
-        <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => setIsVisibleSupportMaterial(true)}>🔍 Support Material</button>
-        <UrlIframe title="Gateway Support Material" isVisible={isVisibleSupportMaterial} setIsVisible={setIsVisibleSupportMaterial} src={record.supportMaterial} errorMsg="Error al cargar el archivo" />
+        <UrlIframe 
+        title={record.name}
+        src={record.supportMaterial!} errorMsg="Error al cargar el archivo" />
       </>
     },
     {
-      key: 'workSheetUrl', title: 'Wrork Sheet', render: (_, record) => <div className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+      key: 'workSheetUrl', title: 'Work Sheet', render: (_, record) => 
+      <div className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
         <NavLink to={record.workSheetUrl} target="_blank" end>
           <span className="text-sm uppercase text-blue-500 hidden md:block">🔍 WorkSheet</span>
         </NavLink> </div>
     },
-    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked={true} /> : <input type="checkbox" defaultChecked={false} /> },
-    {
-      key: 'Acciones', title: 'Acciones', render: (_, record) => {
-        return <div className="flex flex-row justify-between">
-          <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
-          <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
-          <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
-        </div>;
-      }
-    },
+    // { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked={true} /> : <input type="checkbox" defaultChecked={false} /> },
+    // {
+    //   key: 'Acciones', title: 'Acciones', render: (_, record) => {
+    //     return <div className="flex flex-row justify-between">
+    //       <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
+    //       <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
+    //       <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
+    //     </div>;
+    //   }
+    // },
   ]
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
