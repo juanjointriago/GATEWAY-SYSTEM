@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { unit } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useUnitStore } from "../../stores";
-import { LevelById } from "../levels/LevelById";
 import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
 import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
 import { NavLink } from "react-router-dom";
+import { SubLevelById } from "../sublevels/SubLevelById";
 
 
 
@@ -15,7 +15,7 @@ export const UnitsPage = () => {
   const unitsCols: Array<ColumnProps<unit>> = [
     { key: 'name', title: 'Nombre' },
     { key: 'description', title: 'Descripción' },
-    { key: 'level', title: 'Curso', render: (_, record) => <LevelById levelId={record.sublevel} /> },
+    { key: 'level', title: 'Curso', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
     {
       key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) => <>
         <UrlIframe 
@@ -26,7 +26,9 @@ export const UnitsPage = () => {
     {
       key: 'workSheetUrl', title: 'Work Sheet', render: (_, record) => 
       <div className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-        <NavLink to={record.workSheetUrl} target="_blank" end>
+        <NavLink to={record.workSheetUrl} target="_blank" end 
+        rel="noreferrer noopener"
+        >
           <span className="text-sm uppercase text-blue-500 hidden md:block">🔍 WorkSheet</span>
         </NavLink> </div>
     },

@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, DocumentData, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, DocumentData, getDoc, getDocs, query, setDoc, updateDoc, where, WhereFilterOp } from "firebase/firestore"
 import { db } from "./initialize"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,6 +47,19 @@ export const getDocsFromCollection = async <T>(collectionName: string) => {
     });
     return data
 }
+
+export const getDocsFromCollectionQuery = async <T>(collectionName: string, field: string, clausule: WhereFilterOp, compareValue: string | number | boolean ) => {
+    const data: T[] = [];
+    const q =  query(collection(db, collectionName), where(field,clausule,compareValue));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as T)
+        // data.push({ ...doc.data() } as T)
+
+    });
+    return data
+}
+
 
 /**
  * 

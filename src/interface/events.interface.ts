@@ -1,22 +1,58 @@
-import { level, subLevel } from "./levels.interface";
 
-type status = 'COMMING' | 'MAYBE' | 'CONFIRMED' |  'DECLINED';
+type status = 'COMMING' | 'MAYBE' | 'CONFIRMED' | 'DECLINED';
 
 interface user {
     id: string;
     status: status;
 }
 
+interface levelSubLevel {
+    level: string
+    sublevels: string[]
+}
+
+export interface Level {
+    level: string;
+    subLevels: string[];
+}
+
+export interface students {
+    [key: string]: { status: status }
+
+}
+
+
 export interface event {
+    id: string;
+    isActive: boolean;
+    levels: levelSubLevel[];
+    maxAssistantsNumber: number;
+    minAssistantsNumber: number;
+    name: string;
+    status: string;
+    students: students;
+    teacher: string;
+    updatedAt: number;
+    createdAt: number;
+    date: number;
+}
+
+
+
+export interface Student {
+    status: string;
+}
+
+
+export interface EventPrev {
     id: string;
     name: string;
     maxAssistantsNumber: number;
     minAssistantsNumber: number;
     status: status
-    students: user[]
-    teacher: user[]
-    levels:level[]
-    sublevels: subLevel[]
+    students: students[]
+    teacher: user[] | user | string
+    levels: levelSubLevel
     isActive: boolean;
     date: number;
     createdAt: number;

@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 interface UsersStore {
     users: FirestoreUser[];
     getAllUsers: () => void;
-    getUserById: (id: string) => void;
+    getUserById: (id: string) => FirestoreUser | undefined;
     createUser: (user: FirestoreUser) => void;
     updateUser: (user: FirestoreUser) => void;
     deleteUserById: (id: string) => void;
@@ -27,9 +27,9 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         }
     },
 
-    getUserById: async (id: string) => {
-        const user = await get().users.find(user => user.id === id)
-        console.log('FOUND USER =>',{user})
+    getUserById:  (id: string) => {
+        const user = get().users.find(user => user.id === id)
+        // console.log('FOUND USER =>',{user})
         return user;
     },
 

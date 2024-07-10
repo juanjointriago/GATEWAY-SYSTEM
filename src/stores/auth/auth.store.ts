@@ -8,6 +8,7 @@ import { useLevelStore } from "../level/level.store";
 import { useSubLevelStore } from "../level/sublevel.store";
 import { useUnitStore } from "../units/unit.store";
 import { useUserStore } from "../users/user.store";
+import { useEventStore } from "../events/event.store";
 
 export interface AuthState {
     status: 'pending' | 'unauthorized' | 'authorized';
@@ -69,6 +70,7 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
         useSubLevelStore.persist.clearStorage();
         useUnitStore.persist.clearStorage();
         useUserStore.persist.clearStorage();
+        useEventStore.persist.clearStorage();
         
     }
 })

@@ -6,6 +6,7 @@ import { Navigate } from "react-router-dom";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import { useEffect } from "react";
 import { menuItemsByRole } from './menu';
+import { useEventStore } from '../../../stores/events/event.store';
 // import { useNavigate } from "react-router-dom";
 
 
@@ -15,6 +16,7 @@ export const SideMenu = () => {
   const getAllUsers = useUserStore(state => state.getAllUsers);
   const getAllLevels = useLevelStore(state => state.getAndSetLevels);
   const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
+  const getAllEvents = useEventStore(state => state.getEventsQuery);
 
   const authStatus = useAuthStore(state => state.status);
   const logoutUser = useAuthStore(state => state.logoutUser);
@@ -23,6 +25,7 @@ export const SideMenu = () => {
     getAllUsers();
     getAllLevels();
     getAllSubLevels();
+    getAllEvents();
   }, [])
 
 

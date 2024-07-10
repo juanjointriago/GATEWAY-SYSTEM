@@ -18,7 +18,7 @@ const storeAPI: StateCreator<UnitStore, [["zustand/devtools", never], ["zustand/
     getAndSetUnits: async () => {
         try {
             const units = await UnitService.getUnits()
-            console.log('UNIDADES ENCONTRADAS', { units })
+            // console.log('UNIDADES ENCONTRADAS', { units })
             set({ units: [...units] });
         } catch (error) {
             console.warn(error)

@@ -6,6 +6,7 @@ import { devtools, persist } from "zustand/middleware";
 interface EventStore {
     events: event[],
     getAndSetEvents: () => Promise<void>;
+    getEventsQuery: () => Promise<void>;
     getEventById: (id: string) => event | undefined;
     createEvent: (event: event) => Promise<void>;
     updateEvent: (event: event) => Promise<void>;
@@ -20,9 +21,18 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
         try {
             const events = await EventService.getEvents();
             set({ events: [...events] })
+            console.log('ALL EVENT FOUNDED ===>', { events })
         } catch (error) {
             console.warn(error);
         }
+    },
+    getEventsQuery: async () => {
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth() - 4;
+        const day = new Date().getDate();
+        const date = new Date(year, month, day);
+        const events = await EventService.getEventsQuery('date', '>=', date.getTime());
+        set({ events: [...events] })
     },
     getEventById: (id: string) => get().events.find(event => event.id = id),
 
