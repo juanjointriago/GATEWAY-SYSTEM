@@ -51,7 +51,9 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
     setCustomPagination(
       Array(Math.ceil(data!.length / rowsLimit)).fill(null)
     );
-  }, []);
+  }, [data, rowsLimit]);
+
+  
 
   const [showModal, setShowModal] = useState(false);
   const headers = columns.map((column, index) => {
@@ -62,7 +64,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
     );
   });
 
-  const rows = !data?.length ? (
+  const rows = !rowsToShow?.length ? (
     <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200">
       <td colSpan={columns.length} className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
         No hay registros{" "}
@@ -132,7 +134,8 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                         key={index}>
                         {index + 1}
                       </li>
-                    ))}
+                    )
+                    )}
                   <li
                     className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
                       ? "bg-[#cccccc] pointer-events-none"

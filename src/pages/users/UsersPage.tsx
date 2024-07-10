@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FirestoreUser } from "../../interface";
 import { ColumnProps } from "../../interface/ui/tables.interface";
@@ -12,7 +12,7 @@ export const UsersPage = () => {
   const userCols: Array<ColumnProps<FirestoreUser>> = [
     { key: 'cc', title: 'CC' },
     { key: 'name', title: 'Nombres' },
-    // { key: 'email', title: 'Correo' },
+    { key: 'email', title: 'Correo' },
     // { key: 'bornDate', title: 'Cumpleaños' },
     // { key: 'address', title: 'Dirección' },
     // { key: 'city', title: 'Ciudad' },
@@ -38,20 +38,24 @@ export const UsersPage = () => {
 
   // const usersShallow = useUserStore(useShallow(state => state.users));
   const users = useUserStore(state => state.users);
-  const getAllUsers = useUserStore(state => state.getAllUsers);
+  // const getAllUsers = useUserStore(state => state.getAllUsers);
   const updateUserById = useUserStore(state => state.updateUser);
   const getUserById = useUserStore(state => state.getUserById);
 
-  useEffect(() => {
-    getAllUsers();
-  }, [])
+  // useEffect(() => {
+  //   getAllUsers();
+  // }, [])
 
 
   const [filteredData, setFilteredDat6a] = useState<FirestoreUser[]>(users)
-  const [searchTerms, setSearchTerms] = useState('')
+  const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
+  useEffect(() => {
+
+  }, [filteredData])
 
   return (
     <>
+
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
         {/* searchInput */}
@@ -61,8 +65,9 @@ export const UsersPage = () => {
               setSearchTerms(e.target.value)
               if (searchTerms.length > 0) {
                 const results = users.filter(user =>
-                  user["name"].toLowerCase().includes(searchTerms.toLowerCase())
+                  user.name.toLowerCase().includes(searchTerms.toLowerCase())
                 )
+                console.log("resultados encontrados: ", results)
                 setFilteredDat6a(results)
               }
             }}

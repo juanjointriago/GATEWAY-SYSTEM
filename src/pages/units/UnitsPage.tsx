@@ -32,17 +32,19 @@ export const UnitsPage = () => {
           <span className="text-sm uppercase text-blue-500 hidden md:block">🔍 WorkSheet</span>
         </NavLink> </div>
     },
-    // { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked={true} /> : <input type="checkbox" defaultChecked={false} /> },
-    // {
-    //   key: 'Acciones', title: 'Acciones', render: (_, record) => {
-    //     return <div className="flex flex-row justify-between">
-    //       <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
-    //       <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
-    //       <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
-    //     </div>;
-    //   }
-    // },
+    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked={true} /> : <input type="checkbox" defaultChecked={false} /> },
+    {
+      key: 'Acciones', title: 'Acciones', render: (_, record) => {
+        return <div className="flex flex-row justify-between">
+          <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
+          <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
+          <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
+        </div>;
+      }
+    },
   ]
+
+  
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
   const [filteredData, setFilteredDat6a] = useState<unit[]>(units)
