@@ -14,6 +14,9 @@ type Props<T> = {
 
 
 export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
+  const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
+
+
   const [rowsLimit] = useState(20);
   const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,19 +50,20 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
     }
   };
 
+
   useMemo(() => {
     setCustomPagination(
       Array(Math.ceil(data!.length / rowsLimit)).fill(null)
     );
   }, [data, rowsLimit]);
 
-  
+
 
   const [showModal, setShowModal] = useState(false);
   const headers = columns.map((column, index) => {
     return (
-      <th key={`headCell-${index}`} scope="col" className="py-3 px-3 text-[#212B36] sm:text-base font-bold whitespace-nowrap">
-        {column.title}{" "}
+      <th key={`headCell-${index}`} scope="col" className="py-3 px-3 text-[#212B36] sm:text-base max-w-40 font-bold whitespace-nowrap">
+        {column.title}
       </th>
     );
   });
@@ -74,7 +78,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
     rowsToShow?.map((row, index) => {
       return (
         <tr key={`row-${index}`}
-          className={`bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200`}>
+          className={`bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200 `}>
           {columns.map((column, index2) => {
             const value = column.render
               ? column.render(column, row as T)
@@ -88,71 +92,89 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
   );
 
   return (
-    <div className="w-[97%] mx-auto overflow-auto">
-      <div className="flex flex-col">
-        <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
-          <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-            {hasAddBtn && <button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
-              onClick={() => setShowModal(true)}>+ </button>}
-            <div className="w-full overflow-x-scroll md:overflow-auto  max-w-7xl 2xl:max-w-none mt-2">
-              <table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border ">
-                <thead className="rounded-lg text-base text-white font-semibold w-full">
-                  <tr className="bg-[#222E3A]/[6%]">{headers}</tr>
-                </thead>
-                <tbody>{rows}</tbody>
-              </table>
-            </div>
-            {/* Pagination */}
-            <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
-              <div className="tex-lg">
-                👁️ {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} /
-                {currentPage === totalPage - 1
-                  ? data?.length
-                  : (currentPage + 1) * rowsLimit}{" "}
-                = {data?.length} registros
+    <>
+      <div className="ml-5 p-4 w-1/4 flex justify-end">
+        {/* searchInput */}
+        <input type="text" id="table-search"
+          placeholder="🔍      Buscar ...   " onChange={(e) => {
+            setSearchTerms(e.target.value)
+            if (searchTerms.length > 0) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const results = data && data.filter((data: any) =>
+                data["name"].toLowerCase().includes(searchTerms.toLowerCase())
+              )
+              console.log("resultados encontrados: ", results)
+              setRowsToShow(results as T[])
+            }
+          }}
+        />
+      </div>
+      <div className="w-[97%] mx-auto overflow-auto">
+        <div className="flex flex-col">
+          <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
+            <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+              {hasAddBtn && <button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
+                onClick={() => setShowModal(true)}>+ </button>}
+              <div className="w-full overflow-x-scroll md:overflow-auto  max-w-7xl 2xl:max-w-none mt-2">
+                <table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border ">
+                  <thead className="rounded-lg text-base text-white font-semibold w-full">
+                    <tr className="bg-[#222E3A]/[6%]">{headers}</tr>
+                  </thead>
+                  <tbody>{rows}</tbody>
+                </table>
               </div>
-              <div className="flex">
-                <ul className="flex justify-center items-center gap-x-[10px] z-30"
-                  role="navigation"
-                  aria-label="Pagination">
-                  <li className={` prev-btn flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${currentPage == 0
-                    ? "bg-[#cccccc] pointer-events-none"
-                    : " cursor-pointer"
-                    }`}
-                    onClick={previousPage}>
-                    <img src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg" />
-                  </li>
-                  {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    customPagination?.map((data: any, index: number) => (
-                      console.log(data),
-                      <li className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid border-[2px] bg-[#FFFFFF] cursor-pointer ${currentPage == index
-                        ? "text-blue-600  border-sky-500"
-                        : "border-[#E4E4EB] "
-                        }`}
-                        onClick={() => changePage(index)}
-                        key={index}>
-                        {index + 1}
-                      </li>
-                    )
-                    )}
-                  <li
-                    className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
+              {/* Pagination */}
+              <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
+                <div className="tex-lg">
+                  👁️ {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} /
+                  {currentPage === totalPage - 1
+                    ? data?.length
+                    : (currentPage + 1) * rowsLimit}{" "}
+                  = {data?.length} registros
+                </div>
+                <div className="flex">
+                  <ul className="flex justify-center items-center gap-x-[10px] z-30"
+                    role="navigation"
+                    aria-label="Pagination">
+                    <li className={` prev-btn flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${currentPage == 0
                       ? "bg-[#cccccc] pointer-events-none"
                       : " cursor-pointer"
                       }`}
-                    onClick={nextPage}
-                  >
-                    <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
-                  </li>
-                </ul>
+                      onClick={previousPage}>
+                      <img src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg" />
+                    </li>
+                    {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      customPagination?.map((data: any, index: number) => (
+                        console.log(data),
+                        <li className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid bg-[#FFFFFF] cursor-pointer ${currentPage == index
+                          ? "text-blue-600  border-sky-500"
+                          : "border-[#E4E4EB] "
+                          }`}
+                          onClick={() => changePage(index)}
+                          key={index}>
+                          {index + 1}
+                        </li>
+                      )
+                      )}
+                    <li
+                      className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
+                        ? "bg-[#cccccc] pointer-events-none"
+                        : " cursor-pointer"
+                        }`}
+                      onClick={nextPage}
+                    >
+                      <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
+          {/* Modal */}
+          <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={modalTitle} children={modalChildren} />
         </div>
-        {/* Modal */}
-        <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={modalTitle} children={modalChildren} />
       </div>
-    </div>
+    </>
   )
 }

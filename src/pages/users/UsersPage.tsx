@@ -1,4 +1,3 @@
-import {  useEffect, useState } from "react";
 import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FirestoreUser } from "../../interface";
 import { ColumnProps } from "../../interface/ui/tables.interface";
@@ -47,11 +46,11 @@ export const UsersPage = () => {
   // }, [])
 
 
-  const [filteredData, setFilteredDat6a] = useState<FirestoreUser[]>(users)
-  const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
-  useEffect(() => {
+  // const [filteredData, setFilteredDat6a] = useState<FirestoreUser[]>(users)
+  // const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
+  // useEffect(() => {
 
-  }, [filteredData])
+  // }, [filteredData])
 
   return (
     <>
@@ -59,7 +58,7 @@ export const UsersPage = () => {
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
         {/* searchInput */}
-        <div className="ml-5 p-4 w-1/4 flex justify-end">
+        {/* <div className="ml-5 p-4 w-1/4 flex justify-end">
           <input type="text" id="table-search"
             placeholder="🔍      Buscar ...   " onChange={(e) => {
               setSearchTerms(e.target.value)
@@ -72,8 +71,8 @@ export const UsersPage = () => {
               }
             }}
           />
-        </div>
-        <TableContainer hasAddBtn={false} columns={userCols} data={filteredData} modalChildren={<></>} modalTitle="Registrar usuarios" />
+        </div> */}
+        <TableContainer hasAddBtn={false} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />
       </div>
     </>
   )

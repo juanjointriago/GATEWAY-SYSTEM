@@ -1,5 +1,5 @@
 
-type status = 'COMMING' | 'MAYBE' | 'CONFIRMED' | 'DECLINED';
+export type status = 'COMMING' | 'MAYBE' | 'CONFIRMED' | 'DECLINED';
 
 interface user {
     id: string;
