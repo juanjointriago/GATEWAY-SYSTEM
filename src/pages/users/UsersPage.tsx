@@ -6,13 +6,13 @@ import { useUserStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoCheckmarkCircle, IoCheckmarkDone, IoEye } from "react-icons/io5";
+import { IoEye, IoKey, IoLockClosed} from "react-icons/io5";
 
 export const UsersPage = () => {
   const userCols: Array<ColumnProps<FirestoreUser>> = [
     { key: 'cc', title: 'CC' },
     { key: 'name', title: 'Nombres' },
-    { key: 'email', title: 'Correo' },
+    // { key: 'email', title: 'Correo' },
     // { key: 'bornDate', title: 'Cumpleaños' },
     // { key: 'address', title: 'Dirección' },
     // { key: 'city', title: 'Ciudad' },
@@ -22,9 +22,9 @@ export const UsersPage = () => {
     {
       key: 'isActive', title: 'Estado', render: (_, record) => <>
         {record && <div className="flex:1 flex-row justify-center">
-          {/* <CheckBox action={() => updateUserById({ ...record, isActive: !record.isActive })} isActive={record.isActive} /> */}
-          <FabButton isActive action={()=>updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive?IoCheckmarkDone:IoCheckmarkCircle} iconSize={18}/>
-          <FabButton isActive action={()=>{console.log(getUserById(record.id!))}} Icon={IoEye}/>
+          {/* TODO validate update with swal confirm */}
+          <FabButton isActive action={()=>updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive?IoKey:IoLockClosed} iconSize={18}/>
+          <FabButton isActive tootTipText={record.password} action={()=>{console.log(getUserById(record.id!))}} Icon={IoEye}/>
         </div>
         }
       </>
