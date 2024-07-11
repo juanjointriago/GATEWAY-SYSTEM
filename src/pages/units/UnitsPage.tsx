@@ -10,12 +10,11 @@ import { SubLevelById } from "../sublevels/SubLevelById";
 
 
 
-
 export const UnitsPage = () => {
   const unitsCols: Array<ColumnProps<unit>> = [
+    { key: 'sublevel', title: 'Unidad', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
     { key: 'name', title: 'Nombre' },
-    { key: 'description', title: 'Descripción' },
-    { key: 'level', title: 'Curso', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
+    // { key: 'description', title: 'Descripción' },
     {
       key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) => <>
         <UrlIframe 
@@ -57,7 +56,7 @@ export const UnitsPage = () => {
   return (
     <>
       <div className="pt-5">
-        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/* searchInput */}
         <div className="ml-5 p-4 w-1/4 flex justify-end">
           <input type="text" id="table-search"

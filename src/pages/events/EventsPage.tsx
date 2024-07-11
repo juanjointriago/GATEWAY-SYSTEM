@@ -15,7 +15,7 @@ const eventCols: Array<ColumnProps<event>> = [
   { key: 'date', title: 'Fecha', render: (_, record) => <>{new Date(record.date).toLocaleDateString()}</> },
   { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
   { key: 'maxAssistantsNumber', title: 'Max Est.' },
-  { key: 'minAssistantsNumber', title: 'Max Est.' },
+  { key: 'minAssistantsNumber', title: 'Min Est.' },
   { key: 'teacher', title: 'Profesor', render: (_, record) => <UserInfoTooltip userId={record.teacher as string} /> },
   {
     key: 'students', title: 'Estudiantes', render: (_, record) => <>

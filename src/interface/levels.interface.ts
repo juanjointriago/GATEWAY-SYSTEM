@@ -8,7 +8,7 @@ export interface level {
 }
 
 export interface subLevel {
-    id: string;
+    id?: string;
     name: string;
     parentLevel:string;
     maxAssistantsNumber: number;

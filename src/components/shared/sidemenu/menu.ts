@@ -12,27 +12,25 @@ interface MenuItem {
 
 const admin: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
-  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook, active: true },
+  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
   { title: 'Usuarios', subTitle: 'Gestión de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
   { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
-  { title: 'Cursos', subTitle: 'Gestion de Cursos', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
+  { title: 'Unidades', subTitle: 'Gestión de unidades', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
   { title: 'Reservaciones', subTitle: 'Creación de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
-
 ]
 
 const student: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Welcome teacher', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
-  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook, active: true },
+  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
   { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
-  { title: 'Cursos', subTitle: 'Gestion de Cursos', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
-
+  { title: 'Unidades', subTitle: 'Gestión de unidades', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
 ]
 
 const teacher: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Welcome student', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
-  { title: 'Unidades', subTitle: 'Unidades de trabajo', href: '/dashboard/units', Icon: IoBook, active: true },
+  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
   { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
-  { title: 'Cursos', subTitle: 'Gestion de Cursos', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
+  { title: 'Unidades', subTitle: 'Gestión de unidades', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
 
 ]
 

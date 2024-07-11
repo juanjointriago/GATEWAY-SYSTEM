@@ -24,7 +24,7 @@ export const UsersPage = () => {
         {record && <div className="flex:1 flex-row justify-center">
           {/* TODO validate update with swal confirm */}
           <FabButton isActive action={()=>updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive?IoKey:IoLockClosed} iconSize={18}/>
-          <FabButton isActive tootTipText={record.password} action={()=>{console.log(getUserById(record.id!))}} Icon={IoEye}/>
+          <FabButton isActive tootTipText={record.password?? 'ssss'} action={()=>{console.log(getUserById(record.id!))}} Icon={IoEye}/>
         </div>
         }
       </>

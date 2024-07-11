@@ -38,6 +38,22 @@ export const FormUnit = () => {
 
         <div className="flex flex-wrap mx-3 mb-6">
           <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
+            <label htmlFor="sublevel" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Unidad a la que pertenece</label>
+            <select
+              {...register("sublevel", { required: "La unidad es obligatorio 👀" })}
+              id="sublevel"
+              defaultValue={''}
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
+              <option value={''}>Seleccione la Unidad</option>
+              {
+                subLevels.map((sublevel) => {
+                  return <option key={sublevel.id} value={sublevel.id}>{sublevel.name}</option>
+                })
+              }
+            </select>
+            {errors.sublevel && <p className="text-red-500 text-xs italic">{errors.sublevel.message}</p>}
+          </div>
+          <div className="w-full md:w-1/1 px-3 mt-2 mb-6 md:mb-0">
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="name">
               Nombre *
             </label>
@@ -49,6 +65,7 @@ export const FormUnit = () => {
               placeholder="Ej. Unidad 1" />
             {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
           </div>
+
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="description">
               Descripción *
@@ -98,22 +115,7 @@ export const FormUnit = () => {
             {errors.workSheetUrl && <p className="text-red-500 text-xs italic">{errors.workSheetUrl.message}</p>}
           </div>
 
-          <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
-            <label htmlFor="sublevel" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Sub-nivel al que pertenece</label>
-            <select
-              {...register("sublevel", { required: "El Sub-nivel es obligatorio 👀" })}
-              id="sublevel"
-              defaultValue={''}
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-              <option value={''}>Seleccione un Sub-nivel</option>
-              {
-                subLevels.map((sublevel) => {
-                  return <option key={sublevel.id} value={sublevel.id}>{sublevel.name}</option>
-                })
-              }
-            </select>
-            {errors.sublevel && <p className="text-red-500 text-xs italic">{errors.sublevel.message}</p>}
-          </div>
+
           <div className="w-full md:w-1/1 mt-2 px-3">
             <label className="inline-flex items-center cursor-pointer">
               <input
