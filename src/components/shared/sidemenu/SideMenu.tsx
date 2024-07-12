@@ -61,7 +61,7 @@ export const SideMenu = () => {
       {/* Menu Items */}
       <nav id="nav" className="w-full px-6">
         {
-          menuItemsByRole(user?.role ?? 'student').map(item => (
+          menuItemsByRole(user!.role).map(item => (
             <SideMenuItem key={item.href} {...item} />
           ))
         }

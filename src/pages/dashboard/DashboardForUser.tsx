@@ -17,7 +17,6 @@ export const DashboardForUser: FC<Props> = ({ user }) => {
             return <DashboardStudent user={user}/>
         case 'teacher':
             return <DashboardTeacher />
-
         default:
             return <DashboardStudent user={user}/>
     }

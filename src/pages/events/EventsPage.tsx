@@ -4,16 +4,19 @@ import { event } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useEventStore } from "../../stores/events/event.store"
 import { StudentsList } from "../users/StudentsList"
-import { useUserStore } from "../../stores"
+import { useAuthStore, useUserStore } from "../../stores"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton"
-
-
-
-
+import { StudentActions } from "./StudentActions"
+import { IoCalendarClearOutline } from "react-icons/io5"
 
 
 export const EventsPage = () => {
   const users = useUserStore(state => state.users);
+  const user = useAuthStore(state => state.user);
+  const updateEvent = useEventStore(state => state.updateEvent);
+  
+  // const updateEvent = useEventStore(state => state.updateEvent);
+  const isAdmin = user && user.role === 'admin';
   const eventCols: Array<ColumnProps<event>> = [
     { key: 'name', title: 'Nombre', render: (_, record) => <p className="truncate">{record.name}</p> },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
@@ -27,9 +30,24 @@ export const EventsPage = () => {
     },
     {
       key: 'students', title: 'Estudiantes', render: (_, record) => <>
-        {record.students
-          ? <StudentsList record={record.students} />
-          : <div>Sin asistentes</div>}</>
+        {isAdmin
+          ?
+          <>
+            {
+              record.students
+                ? <StudentsList record={record.students} />
+                : <div>Sin asistentes</div>
+            }
+          </>
+          : <>
+            {user && <StudentActions action={
+              () => {
+                const student = record.students[user.id!]
+                updateEvent({ ...record, students: { ...record.students, [user.id!]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
+              }
+            } students={record.students} Icon={IoCalendarClearOutline}/>}
+          </>
+        }</>
     },
     //TODO OPEN LIST ON TABLE FOR STUDENTS
     // { key: 'levels', title: 'Es Público' },
@@ -40,7 +58,8 @@ export const EventsPage = () => {
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
-      <TableContainer columns={eventCols} data={events} modalChildren={<FormEvent />} modalTitle="Crear Reservación" />
+      <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={user && events.filter((event) => event.students[user.id!])} modalChildren={<FormEvent />} modalTitle="Crear Reservación" />
+      {/* <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={events} modalChildren={<FormEvent />} modalTitle="Crear Reservación" /> */}
     </div>
   )
 }

@@ -15,7 +15,7 @@ type Props<T> = {
 
 export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
   const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
-
+console.log('EVENTO',{data})
 
   const [rowsLimit] = useState(20);
   const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
