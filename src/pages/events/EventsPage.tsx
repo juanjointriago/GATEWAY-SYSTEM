@@ -13,8 +13,7 @@ import { IoCalendarClearOutline } from "react-icons/io5"
 export const EventsPage = () => {
   const users = useUserStore(state => state.users);
   const user = useAuthStore(state => state.user);
-  const updateEvent = useEventStore(state => state.updateEvent);
-  
+
   // const updateEvent = useEventStore(state => state.updateEvent);
   const isAdmin = user && user.role === 'admin';
   const eventCols: Array<ColumnProps<event>> = [
@@ -29,7 +28,7 @@ export const EventsPage = () => {
       }
     },
     {
-      key: 'students', title: 'Estudiantes', render: (_, record) => <>
+      key: 'students', title: isAdmin?'Estudiantes':'Gestión clase', render: (_, record) => <>
         {isAdmin
           ?
           <>
@@ -40,12 +39,7 @@ export const EventsPage = () => {
             }
           </>
           : <>
-            {user && <StudentActions action={
-              () => {
-                const student = record.students[user.id!]
-                updateEvent({ ...record, students: { ...record.students, [user.id!]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
-              }
-            } students={record.students} Icon={IoCalendarClearOutline}/>}
+            {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />}
           </>
         }</>
     },

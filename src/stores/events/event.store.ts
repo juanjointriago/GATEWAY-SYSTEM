@@ -2,6 +2,7 @@ import { create, StateCreator } from "zustand";
 import { event } from "../../interface";
 import { EventService } from "../../services/events.service";
 import { devtools, persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 interface EventStore {
     events: event[],
@@ -53,6 +54,8 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
 
 export const useEventStore = create<EventStore>()(
     devtools(
-        persist(storeAPI, { name: 'event-store' })
+        immer(
+            persist(storeAPI, { name: 'event-store' })
+        )
     )
 );
