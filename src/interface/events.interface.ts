@@ -20,9 +20,9 @@ export interface students { [key: string]: { status: status } }
 
 
 export interface event {
-    id: string;
+    id?: string;
     isActive: boolean;
-    levels: levelSubLevel[];
+    levels: levelSubLevel;
     maxAssistantsNumber: number;
     minAssistantsNumber: number;
     name: string;
@@ -31,6 +31,8 @@ export interface event {
     teacher: string;
     updatedAt: number;
     createdAt: number;
+    limitDate?: number;
+    meetLink?:string;
     date: number;
 }
 

@@ -37,6 +37,7 @@ export interface FirestoreUser extends User {
     city: string;
     country: string;
     level?: string;
+    teacherLink?: string;
     subLevel?: string;
     phone: string;
     photoUrl: string;
