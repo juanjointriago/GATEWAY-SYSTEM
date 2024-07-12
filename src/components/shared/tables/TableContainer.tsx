@@ -145,8 +145,7 @@ console.log('EVENTO',{data})
                     </li>
                     {
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      customPagination?.map((data: any, index: number) => (
-                        console.log(data),
+                      customPagination?.map((_: any, index: number) => (
                         <li className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid bg-[#FFFFFF] cursor-pointer ${currentPage == index
                           ? "text-blue-600  border-sky-500"
                           : "border-[#E4E4EB] "

@@ -9,10 +9,10 @@ export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
   const isAdmin = user && user.role === 'admin';
 
-  const subLevelsCols:Array<ColumnProps<subLevel>> = [
+  const subLevelsCols: Array<ColumnProps<subLevel>> = [
     { key: 'name', title: 'Nombre' },
     // { key: 'description', title: 'Descripción' },
-    { key: 'parentLevel', title: 'Modalidad', render: (_, record) => record.isActive ? <LevelById levelId={record.parentLevel}/>: <div>No asignado</div> },
+    { key: 'parentLevel', title: 'Modalidad', render: (_, record) => record.isActive ? <LevelById levelId={record.parentLevel} /> : <div>No asignado</div> },
     { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked /> : <input type="checkbox" defaultChecked={false} /> },
     {
       key: 'Acciones', title: 'Acciones', render: (_, record) => {
@@ -28,10 +28,13 @@ export const SubLevelsPage = () => {
   const subLevels = useSubLevelStore(state => state.sublevels);
   return (
     <>
-    <div className="pt-5">
-    <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
-      <TableContainer hasAddBtn={isAdmin} columns={subLevelsCols} data={subLevels} modalChildren={<SublevelForm/>} modalTitle="Crear Unidad"/>
-    </div>
+      <div className="pt-5">
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
+        <TableContainer hasAddBtn={isAdmin}
+          columns={subLevelsCols}
+          data={user && ((user.role === 'admin') ? subLevels : subLevels.filter((sublevel) => sublevel.id === user.subLevel))}
+          modalChildren={<SublevelForm />} modalTitle="Crear Unidad" />
+      </div>
     </>
   )
 }

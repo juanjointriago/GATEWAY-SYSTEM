@@ -22,37 +22,26 @@ export const EventsPage = () => {
     { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
-        return <>
-          {users.find(user => user.id === record.teacher) && <AvatarButton tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}
-        </>
+        return <> {users.find(user => user.id === record.teacher) && <AvatarButton tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
       }
     },
     {
-      key: 'students', title: isAdmin?'Estudiantes':'Gestión clase', render: (_, record) => <>
-        {isAdmin
-          ?
-          <>
-            {
-              record.students
-                ? <StudentsList record={record.students} />
-                : <div>Sin asistentes</div>
-            }
-          </>
-          : <>
-            {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />}
-          </>
-        }</>
+      key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
+        <>
+          {isAdmin
+            //TODO editable form for students
+            ? <> {record.students ? <StudentsList record={record.students} /> : <div>Sin asistentes</div>} </>
+            : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
+        </>
     },
-    //TODO OPEN LIST ON TABLE FOR STUDENTS
-    // { key: 'levels', title: 'Es Público' },
-    // { key: 'Acciones', title: 'Acciones' },
+
   ]
 
   const events = useEventStore(state => state.events);
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
-      <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={user && events.filter((event) => event.students[user.id!])} modalChildren={<FormEvent />} modalTitle="Crear Reservación" />
+      <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={user && ((user.role === 'admin') ? events : events.filter((event) => event.students[user.id!]))} modalChildren={<FormEvent />} modalTitle="Crear Reservación" />
       {/* <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={events} modalChildren={<FormEvent />} modalTitle="Crear Reservación" /> */}
     </div>
   )

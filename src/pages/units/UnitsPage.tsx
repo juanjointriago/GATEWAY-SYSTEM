@@ -8,7 +8,7 @@ import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
 import { NavLink } from "react-router-dom";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoEye, IoEyeOff} from "react-icons/io5";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 
 
@@ -28,7 +28,7 @@ export const UnitsPage = () => {
     {
       key: 'isActive', title: 'Activo', render: (_, record) => (
         //TODO component for generic actions on all tables
-       <FabButton  isActive={record.isActive} Icon={record.isActive?IoEye:IoEyeOff} action={isAdmin?()=>updateUnit({ ...record, isActive: !record.isActive }):()=>console.log('')}/>
+        <FabButton isActive={record.isActive} Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
       )
     },
 
@@ -46,9 +46,13 @@ export const UnitsPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
-
         {/**Table comp */}
-        <TableContainer hasAddBtn={isAdmin} columns={unitsCols} data={units} modalChildren={<FormUnit />} modalTitle="Crear Unidades" />
+        <TableContainer
+          hasAddBtn={isAdmin}
+          columns={unitsCols}
+          data={user && ((user.role === 'admin') ? units : units.filter((unit) => unit.sublevel === user.subLevel))}
+          modalChildren={<FormUnit />}
+          modalTitle="Crear Unidades" />
       </div>
     </>
   )
