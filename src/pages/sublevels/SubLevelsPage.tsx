@@ -18,7 +18,8 @@ export const SubLevelsPage = () => {
     { key: 'parentLevel', title: 'Modalidad', render: (_, record) => record.isActive ? <LevelById levelId={record.parentLevel} /> : <div>No asignado</div> },
     {
       key: 'isActive', title: 'Público', render: (_, record) => {
-        return         <FabButton isActive={record.isActive} Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        //TODO component for generic actions on all tables
+        return <FabButton isActive={record.isActive} Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
         ;
       }
     },

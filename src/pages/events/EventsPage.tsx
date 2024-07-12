@@ -1,5 +1,3 @@
-import { FormEvent } from "../../components/shared/forms"
-import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { event } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useEventStore } from "../../stores/events/event.store"
@@ -8,6 +6,9 @@ import { useAuthStore, useUserStore } from "../../stores"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton"
 import { StudentActions } from "./StudentActions"
 import { IoCalendarClearOutline } from "react-icons/io5"
+import { NavLink } from "react-router-dom"
+import { FormEvent } from "../../components/shared/forms"
+import { TableContainer } from "../../components/shared/tables/TableContainer"
 
 
 export const EventsPage = () => {
@@ -26,6 +27,16 @@ export const EventsPage = () => {
       }
     },
     {
+      key: 'meetLink', title: 'Enlace de Meet', render: (_, record) =>
+        <>{record.meetLink
+          ? <NavLink to={record.meetLink} target="_blank" end rel="noreferrer noopener" >
+            <span className="text-sm text-blue-500 hidden md:block">🧑‍💻 Ir a reunión</span>
+          </NavLink>
+          : <span className="text-sm  text-blue-500 hidden md:block">Sin enlace configurado</span>
+        }
+        </>
+    },
+    {
       key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
         <>
           {isAdmin
@@ -42,7 +53,6 @@ export const EventsPage = () => {
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
       <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={user && ((user.role === 'admin') ? events : events.filter((event) => event.students[user.id!]))} modalChildren={<FormEvent />} modalTitle="Crear Reservación" />
-      {/* <TableContainer hasAddBtn={isAdmin} columns={eventCols} data={events} modalChildren={<FormEvent />} modalTitle="Crear Reservación" /> */}
     </div>
   )
 }
