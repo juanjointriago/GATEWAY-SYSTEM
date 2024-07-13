@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^3.7.0",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
+    "@react-pdf/renderer": "^3.4.4",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "firebase": "^10.12.2",
@@ -27,6 +28,7 @@
     "sonner": "^1.5.0",
     "sweetalert2": "^11.12.0",
     "uuid": "^10.0.0",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0",
     "zustand": "^4.5.2"
   },
