@@ -4,6 +4,7 @@ import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import { useState } from "react";
+import {environment} from '../../../../environment'
 
 
 export const FormEvent = () => {
@@ -140,6 +141,7 @@ export const FormEvent = () => {
               <div className="bg-indigo-300 w-[auto]">
                 {
                   //selected aditional users
+                  environment.production &&
                   aditionalStudents && aditionalStudents.map((student) => (
                     <span key={Object.keys(student)[0]} className="px-2 py-0.5 mt-2 mb-2 ml-1 mr-1 items-center  rounded-full bg-indigo-700 text-white text-xs">{users.find((item) => item.id === Object.keys(student)[0])!.name}</span>
                   ))
@@ -149,6 +151,7 @@ export const FormEvent = () => {
                 id="students"
                 defaultValue={''}
                 onChange={(e) => {
+                  if(!environment.production) return
                   console.log(' STUDENT-ADITIONAL-ID', e.target.value);
                   // setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
                   // setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))

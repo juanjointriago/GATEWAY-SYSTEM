@@ -8,6 +8,7 @@ import { SubLevelsPage } from '../pages/sublevels/SubLevelsPage'
 import { EventsPage } from '../pages/events/EventsPage'
 import { FaqPage } from '../pages/faq/FaqPage'
 import { SupportPage } from '../pages/support/SupportPage'
+import { LocationsPage } from '../pages/locations/LocationsPage'
 
 export const router = createBrowserRouter([
     {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'units',
                         element: <UnitsPage />
+                    },
+                    {
+                        path: 'locations',
+                        element: <LocationsPage />
                     },
                 ],
             },
