@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
-import { event, subLevel } from "../../../interface";
+import { event, students, subLevel } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
-import { useLevelStore, useSubLevelStore } from "../../../stores";
+import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import { useState } from "react";
 
 
@@ -28,10 +28,12 @@ export const FormEvent = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<event>({ defaultValues })
   const [levelEvent, setLevelEvent] = useState<string>();
   const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
-  const [selectedSublevels, setSelectedSublevels] = useState<string[]>([])
+  const [selectedSublevels, setSelectedSublevels] = useState<string[]>([]);
+  const [aditionalStudents, setAditionalStudents] = useState<students[]>()
 
   const levels = useLevelStore(state => state.levels);
   const sublevels = useSubLevelStore(state => state.sublevels);
+  const users = useUserStore(state => state.users);
 
   const onSubmit = handleSubmit(async (data: event) => {
     if (!levelEvent) return;
@@ -105,16 +107,21 @@ export const FormEvent = () => {
             {/*SubLevels*/}
             <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
               {/*TODO select level and render sublevels */}
-              {
-                selectedSublevels && selectedSublevels.map((sublevel) => (
-                  <span key={sublevel} className="m-2 items-center border px-1.5 rounded-full bg-gray-200 text-base text-gray-700 font-sans">{sublevels.find((item)=>item.id===sublevel)!.name}</span>
-                ))
-              }
+              <div className="bg-indigo-300 w-[auto]">
+                {
+                  //selected sublevels
+                  selectedSublevels && selectedSublevels.map((sublevel) => (
+                    <span key={sublevel} className="px-2 py-0.5 mt-2 mb-2 ml-1 mr-1 items-center  rounded-full bg-indigo-700 text-white text-xs">
+                      {sublevels.find((item) => item.id === sublevel)!.name}
+                    </span>
+                  ))
+                }
+              </div>
               <select
                 id="sublevels"
                 defaultValue={''}
                 onChange={(e) => {
-                  console.log('SUB-LEVELID', e.target.value);
+                  // console.log('SUB-LEVELID', e.target.value);
                   setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
                   setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
                 }}
@@ -123,6 +130,35 @@ export const FormEvent = () => {
                 {
                   subLevelslEvent?.map((level) => {
                     return <option key={level.id} value={level.id}>{level.name}</option>
+                  })
+                }
+              </select>
+            </div>
+            {/*Aditional Student*/}
+            <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+              {/*TODO select level and render sublevels */}
+              <div className="bg-indigo-300 w-[auto]">
+                {
+                  //selected aditional users
+                  aditionalStudents && aditionalStudents.map((student) => (
+                    <span key={Object.keys(student)[0]} className="px-2 py-0.5 mt-2 mb-2 ml-1 mr-1 items-center  rounded-full bg-indigo-700 text-white text-xs">{users.find((item) => item.id === Object.keys(student)[0])!.name}</span>
+                  ))
+                }
+              </div>
+              <select
+                id="students"
+                defaultValue={''}
+                onChange={(e) => {
+                  console.log(' STUDENT-ADITIONAL-ID', e.target.value);
+                  // setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
+                  // setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
+                  setAditionalStudents(aditionalStudents => [...aditionalStudents!, { [e.target.value]: { status: 'COMMING' } }])
+                }}
+                className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
+                <option value={''}>Estudiante adicional</option>
+                {
+                  users?.map((user) => {
+                    return <option key={user.id} value={user.id}>{user.name}</option>
                   })
                 }
               </select>
