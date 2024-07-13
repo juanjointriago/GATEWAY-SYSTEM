@@ -16,6 +16,13 @@ export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
   const user = useAuthStore(state => state.user);
   const isAdmin = user && user.role === 'admin';
+  const getAllUnits = useUnitStore(state => state.getAndSetUnits);
+  const units = useUnitStore(state => state.units);
+  
+  useEffect(() => {
+    getAllUnits();
+  }, []);
+  // console.log('UNIDADES', units);
   const unitsCols: Array<ColumnProps<unit>> = [
     { key: 'sublevel', title: 'Unidad', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
     { key: 'name', title: 'Nombre' },
@@ -28,18 +35,12 @@ export const UnitsPage = () => {
     {
       key: 'isActive', title: 'Activo', render: (_, record) => (
         //TODO component for generic actions on all tables
-        <FabButton isActive={record.isActive} Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
       )
     },
 
   ]
 
-
-  const getAllUnits = useUnitStore(state => state.getAndSetUnits);
-  const units = useUnitStore(state => state.units);
-  useEffect(() => {
-    getAllUnits();
-  }, []);
 
 
   return (

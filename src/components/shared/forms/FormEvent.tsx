@@ -1,14 +1,13 @@
 import { useForm } from "react-hook-form";
-import { event } from "../../../interface";
+import { event, subLevel } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
-import { SelectMultiple } from "../selectors/SelectMultiple";
-import { useLevelStore } from "../../../stores";
+import { useLevelStore, useSubLevelStore } from "../../../stores";
+import { useState } from "react";
 
 
 export const FormEvent = () => {
   const createEvent = useEventStore(state => state.createEvent);
-
   const defaultValues: event = {
     id: '',
     name: '',
@@ -27,9 +26,18 @@ export const FormEvent = () => {
   }
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<event>({ defaultValues })
+  const [levelEvent, setLevelEvent] = useState<string>();
+  const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
+  const [selectedSublevels, setSelectedSublevels] = useState<string[]>([])
 
   const levels = useLevelStore(state => state.levels);
+  const sublevels = useSubLevelStore(state => state.sublevels);
+
   const onSubmit = handleSubmit(async (data: event) => {
+    if (!levelEvent) return;
+    data.levels.level = levelEvent;
+    if ((sublevels.length === 0) && (selectedSublevels.length === 0)) return;
+    data.levels.sublevels = selectedSublevels;
     const unitRecord = { id: uuid(), ...data }
     await createEvent(unitRecord);
     console.log({ data })
@@ -74,10 +82,51 @@ export const FormEvent = () => {
               type="number" maxLength={10} minLength={1} />
             {errors.minAssistantsNumber && <p className="text-red-500 text-xs italic">{errors.minAssistantsNumber.message}</p>}
           </div>
-          {/*Level And SubLevels*/}
+          {/*Level*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-          {/*TODO select level and render sublevels */}
-          <SelectMultiple data={levels}/>
+            {/*TODO select level and render sublevels */}
+            <select
+              id="levels"
+              defaultValue={''}
+              onChange={(e) => {
+                console.log('LEVELID', e.target.value);
+                setLevelEvent(e.target.value);
+                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e.target.value);
+                if (sublv) setSubLevelslEvent(sublv);
+              }}
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
+              <option value={''}>Seleccione la Modalidad</option>
+              {
+                levels.map((level) => {
+                  return <option key={level.id} value={level.id}>{level.name}</option>
+                })
+              }
+            </select>
+            {/*SubLevels*/}
+            <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+              {/*TODO select level and render sublevels */}
+              {
+                selectedSublevels && selectedSublevels.map((sublevel) => (
+                  <span key={sublevel} className="m-2 items-center border px-1.5 rounded-full bg-gray-200 text-base text-gray-700 font-sans">{sublevels.find((item)=>item.id===sublevel)!.name}</span>
+                ))
+              }
+              <select
+                id="sublevels"
+                defaultValue={''}
+                onChange={(e) => {
+                  console.log('SUB-LEVELID', e.target.value);
+                  setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
+                  setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
+                }}
+                className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
+                <option value={''}>Seleccione la Unidad</option>
+                {
+                  subLevelslEvent?.map((level) => {
+                    return <option key={level.id} value={level.id}>{level.name}</option>
+                  })
+                }
+              </select>
+            </div>
           </div>
         </div>
       </form>

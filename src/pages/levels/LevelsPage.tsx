@@ -2,28 +2,30 @@
 import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { level } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
-import { useLevelStore } from "../../stores";
+import { useAuthStore, useLevelStore } from "../../stores";
 import { FormLevel } from "../../components/shared/forms";
+import { FabButton } from "../../components/shared/buttons/FabButton";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
-const levelsCols: Array<ColumnProps<level>> = [
-  // { key: 'id', title: 'Código' },
-  { key: 'name', title: 'Nombre' },
-  { key: 'description', title: 'Descripción' },
-  { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked /> : <input type="checkbox" defaultChecked={false} /> },
-  {
-    key: 'Acciones', title: 'Acciones', render: (_, record) => {
-      return <div className="flex flex-row justify-between">
-        <div className="text-blue-500 font-bold" onClick={() => console.log("Editar", { record })}>✚ </div>
-        <div className="text-blue-500 font-bold" onClick={() => console.log('Activar registro por id', record.id)}>✅ </div>
-        <div className="text-blue-500 font-bold" onClick={() => console.log('Eliminar por id', record.id)}>🗑️ </div>
-      </div>;
-    }
-  },
-]
 
 export const LevelsPage = () => {
-
+  const user = useAuthStore(state => state.user);
+  const isAdmin = user && user.role === 'admin';
   const levels = useLevelStore(state => state.levels);
+  const updateLevel = useLevelStore(state => state.updateLevel);
+  
+  // console.log("LEVELS", levels);
+  const levelsCols: Array<ColumnProps<level>> = [
+    // { key: 'id', title: 'Código' },
+    { key: 'name', title: 'Nombre' },
+    { key: 'description', title: 'Descripción' },
+    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked /> : <input type="checkbox" defaultChecked={false} /> },
+    { key: 'isActive', title: 'Activo', render: (_, record) => (
+      //TODO component for generic actions on all tables
+      <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateLevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+    )
+  },
+  ]
 
   // console.log({getAllLevels})
   return (

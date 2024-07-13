@@ -11,7 +11,8 @@ export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
   const updateSublevel = useSubLevelStore(state => state.updateSubLevel);
   const isAdmin = user && user.role === 'admin';
-
+  const subLevels = useSubLevelStore(state => state.sublevels);
+  // console.log('SUBLEVELS', subLevels)
   const subLevelsCols: Array<ColumnProps<subLevel>> = [
     { key: 'name', title: 'Nombre' },
     // { key: 'description', title: 'Descripción' },
@@ -19,13 +20,12 @@ export const SubLevelsPage = () => {
     {
       key: 'isActive', title: 'Público', render: (_, record) => {
         //TODO component for generic actions on all tables
-        return <FabButton isActive={record.isActive} Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
-        ;
+        return <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+          ;
       }
     },
   ]
 
-  const subLevels = useSubLevelStore(state => state.sublevels);
   return (
     <>
       <div className="pt-5">
