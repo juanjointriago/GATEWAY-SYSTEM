@@ -19,7 +19,10 @@ export const EventsPage = () => {
   const isAdmin = user && user.role === 'admin';
 
   const eventCols: Array<ColumnProps<event>> = [
-    { key: 'name', title: 'Nombre', render: (_, record) => <p className="truncate">{record.name}</p> },
+    { key: 'name', title: 'Nombre', render: (_, record) => <div className="truncate  w-[10rem] max-w-[10rem]"> 
+      <p className="">{record.name}</p>
+      </div>
+     },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
     { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
     {

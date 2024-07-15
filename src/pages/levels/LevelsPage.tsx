@@ -19,7 +19,6 @@ export const LevelsPage = () => {
     // { key: 'id', title: 'Código' },
     { key: 'name', title: 'Nombre' },
     { key: 'description', title: 'Descripción' },
-    { key: 'isActive', title: 'Activo', render: (_, record) => record.isActive ? <input type="checkbox" defaultChecked /> : <input type="checkbox" defaultChecked={false} /> },
     { key: 'isActive', title: 'Activo', render: (_, record) => (
       //TODO component for generic actions on all tables
       <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateLevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />

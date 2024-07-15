@@ -16,7 +16,7 @@ type Props<T> = {
 export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
   const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
 
-  const [rowsLimit] = useState(20);
+  const [rowsLimit] = useState(50);
   const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [customPagination, setCustomPagination] = useState<any>([]);
@@ -119,7 +119,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                   <thead className="rounded-lg text-base text-white font-semibold w-full">
                     <tr className="bg-[#222E3A]/[6%]">{headers}</tr>
                   </thead>
-                  <tbody>{rows}</tbody>
+                  <tbody className="overflow-x-auto">{rows}</tbody>
                 </table>
               </div>
               {/* Pagination */}
@@ -135,7 +135,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                   <ul className="flex justify-center items-center gap-x-[10px] z-30"
                     role="navigation"
                     aria-label="Pagination">
-                    <li className={` prev-btn flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${currentPage == 0
+                    <li className={` prev-btn flex items-center justify-center w-[30px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${currentPage == 0
                       ? "bg-[#cccccc] pointer-events-none"
                       : " cursor-pointer"
                       }`}
@@ -145,7 +145,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                     {
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       customPagination?.map((_: any, index: number) => (
-                        <li className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid bg-[#FFFFFF] cursor-pointer ${currentPage == index
+                        <li className={`flex items-center justify-center w-[30px] rounded-[6px] h-[34px] border-[1px] border-solid bg-[#FFFFFF] cursor-pointer ${currentPage == index
                           ? "text-blue-600  border-sky-500"
                           : "border-[#E4E4EB] "
                           }`}
@@ -156,7 +156,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                       )
                       )}
                     <li
-                      className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
+                      className={`flex items-center justify-center w-[30px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
                         ? "bg-[#cccccc] pointer-events-none"
                         : " cursor-pointer"
                         }`}
