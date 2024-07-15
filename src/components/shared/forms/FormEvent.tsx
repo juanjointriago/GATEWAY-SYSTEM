@@ -1,14 +1,17 @@
+import { useState } from "react";
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 import { useForm } from "react-hook-form";
 import { event, students, subLevel } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
-import { useState } from "react";
 import { environment } from '../../../../environment'
 
 
 export const FormEvent = () => {
   const createEvent = useEventStore(state => state.createEvent);
+  const animatedComponents = makeAnimated();
   const defaultValues: event = {
     id: '',
     name: '',
@@ -28,6 +31,7 @@ export const FormEvent = () => {
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<event>({ defaultValues })
   const [levelEvent, setLevelEvent] = useState<string>();
+  console.log(levelEvent)
   const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
   const [selectedSublevels, setSelectedSublevels] = useState<string[]>([]);
   const [aditionalStudents, setAditionalStudents] = useState<students[]>()
@@ -87,8 +91,22 @@ export const FormEvent = () => {
           </div>
           {/*Level*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+            <Select
+              components={animatedComponents}
+              defaultValue={''}
+              placeholder="Seleccione la Modalidad"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              options={levels.map(level => ({ value: level.id, label: level.name })) as any}
+              onChange={(e) => {
+                console.log('LEVELID', e);
+                if (!e) return
+                setLevelEvent(e[0]);
+                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e[0]);
+                if (sublv) setSubLevelslEvent(sublv);
+              }}
+            />
             {/*TODO select level and render sublevels */}
-            <select
+            {/* <select
               id="levels"
               defaultValue={''}
               onChange={(e) => {
@@ -104,21 +122,21 @@ export const FormEvent = () => {
                   return <option key={level.id} value={level.id}>{level.name}</option>
                 })
               }
-            </select>
+            </select> */}
           </div>
           {/*SubLevels*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <div className="bg-indigo-300 w-[auto] rounded-sm ">
               {
                 //selected sublevels
-                selectedSublevels && selectedSublevels.map((sublevel) => (
-                  <span key={sublevel} className="px-2.5 py-0.5 mt-2 mb-2 ml-2 mr-1 items-center rounded-full bg-indigo-700 text-white text-xs">
-                    {sublevels.find((item) => item.id === sublevel)!.name + '   '} <span
-                      onClick={() => { 
-                        console.log('Quit selected sublevels', sublevels.find((item) => item.id === sublevel)!.id);
-                        setSelectedSublevels(selectedSublevels => [...selectedSublevels.filter((item) => item !== sublevel)])
-                        setSubLevelslEvent(subLevelslEvent => [...subLevelslEvent, sublevels.find((item) => item.id === sublevel)!])
-        
+                selectedSublevels && selectedSublevels.map((sublevelId) => (
+                  <span key={sublevelId} className="px-2.5 py-0.5 mt-2 mb-2 ml-2 mr-1 items-center rounded-full bg-indigo-700 text-white text-xs">
+                    {sublevels.find((item) => item.id === sublevelId)!.name + '   '} <span
+                      onClick={() => {
+                        console.log('Quit selected sublevels', sublevels.find((item) => item.id === sublevelId)!.id);
+                        setSelectedSublevels(selectedSublevels => [...selectedSublevels.filter((item) => item !== sublevelId)])
+                        setSubLevelslEvent(subLevelslEvent => [...subLevelslEvent, sublevels.find((item) => item.id === sublevelId)!])
+
                       }}
                       className="bg-slate-100 text-black h-2 w-min-[3] rounded-full justify-center items-center">x</span>
                   </span>
@@ -154,7 +172,23 @@ export const FormEvent = () => {
                 ))
               }
             </div>
-            <select
+            <Select 
+              components={animatedComponents}
+              defaultValue={''}
+              placeholder="Seleccione Estudiantes adicionales"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              options={users.map(user => ({ value: user.id, label: user.name })) as any}
+              onChange={(e) => {
+                if (!environment.production) return
+                console.log(' STUDENT-ADITIONAL-ID', e);
+                if(!e)return
+                // setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
+                // setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
+                // setAditionalStudents(aditionalStudents => [...aditionalStudents!, { [e.target.value]: { status: 'COMMING' } }])
+                setAditionalStudents(aditionalStudents => [...aditionalStudents!, { [e[0]]: { status: 'COMMING' } }])
+              }}
+            />
+            {/* <select
               id="students"
               defaultValue={''}
               onChange={(e) => {
@@ -171,7 +205,7 @@ export const FormEvent = () => {
                   return <option key={user.id} value={user.id}>{user.name}</option>
                 })
               }
-            </select>
+            </select> */}
           </div>
         </div>
       </form>
