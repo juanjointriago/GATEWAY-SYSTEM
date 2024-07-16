@@ -5,11 +5,19 @@ import { useAuthStore, useUserStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoEye, IoKey, IoLockClosed } from "react-icons/io5";
+import { IoKey, IoLockClosed, IoPencil } from "react-icons/io5";
+import { useState } from "react";
+import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
+import { EditUserform } from "../../components/shared/forms/EditUserform";
 
 export const UsersPage = () => {
+  const [openModal, setOpenModal] = useState(false);
   const user = useAuthStore(state => state.user);
   const isAdmin = user && user.role === 'admin';
+  const users = useUserStore(state => state.users);
+  // const getAllUsers = useUserStore(state => state.getAllUsers);
+  const updateUserById = useUserStore(state => state.updateUser);
+  // const getUserById = useUserStore(state => state.getUserById);
   const userCols: Array<ColumnProps<FirestoreUser>> = [
     { key: 'cc', title: 'CC' },
     { key: 'name', title: 'Nombres' },
@@ -20,16 +28,14 @@ export const UsersPage = () => {
         {record && <div className="flex:1 flex-row justify-center">
           {/* TODO validate update with swal confirm */}
           <FabButton isActive action={() => updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive ? IoKey : IoLockClosed} iconSize={18} />
-          <FabButton isActive tootTipText={record.password ?? 'ssss'} action={() => { console.log(getUserById(record.id!)) }} Icon={IoEye} />
+          <FabButton isActive tootTipText={''} action={() => { setOpenModal(true) }} Icon={IoPencil} />
+          <ModalGeneric isVisible={openModal} setIsVisible={setOpenModal} key={record.id} children={<EditUserform user={record} />} />
         </div>
         }
       </>
     },
   ]
-  const users = useUserStore(state => state.users);
-  // const getAllUsers = useUserStore(state => state.getAllUsers);
-  const updateUserById = useUserStore(state => state.updateUser);
-  const getUserById = useUserStore(state => state.getUserById);
+
   return (
     <>
       <div className="pt-5">
