@@ -12,6 +12,7 @@ import { EditUserform } from "../../components/shared/forms/EditUserform";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<string>()
   const user = useAuthStore(state => state.user);
   const isAdmin = user && user.role === 'admin';
   const users = useUserStore(state => state.users);
@@ -28,8 +29,10 @@ export const UsersPage = () => {
         {record && <div className="flex:1 flex-row justify-center">
           {/* TODO validate update with swal confirm */}
           <FabButton isActive action={() => updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive ? IoKey : IoLockClosed} iconSize={18} />
-          <FabButton isActive tootTipText={''} action={() => { setOpenModal(true) }} Icon={IoPencil} />
-          <ModalGeneric isVisible={openModal} setIsVisible={setOpenModal} key={record.id} children={<EditUserform user={record} />} />
+          <FabButton isActive tootTipText={''} action={() => {
+            setOpenModal(true);
+            setUserToEdit(record.id)
+          }} Icon={IoPencil} />
         </div>
         }
       </>
@@ -40,6 +43,7 @@ export const UsersPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
+        {userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
         <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />
       </div>
     </>
