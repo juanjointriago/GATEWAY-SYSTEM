@@ -3,14 +3,13 @@ import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { useForm } from "react-hook-form";
 import { event, students, subLevel } from "../../../interface";
-import { useEventStore } from "../../../stores/events/event.store"
+// import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
-import { environment } from '../../../../environment'
 
 
 export const FormEvent = () => {
-  const createEvent = useEventStore(state => state.createEvent);
+  // const createEvent = useEventStore(state => state.createEvent);
   const animatedComponents = makeAnimated();
   const defaultValues: event = {
     id: '',
@@ -21,8 +20,8 @@ export const FormEvent = () => {
     students: {},
     status: '',
     isActive: true,
-    maxAssistantsNumber: 0,
-    minAssistantsNumber: 0,
+    maxAssistantsNumber: 10,
+    minAssistantsNumber: 1,
     limitDate: 0,
     meetLink: '',
     createdAt: new Date().getTime(),
@@ -33,8 +32,10 @@ export const FormEvent = () => {
   const [levelEvent, setLevelEvent] = useState<string>();
   console.log(levelEvent)
   const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
-  const [selectedSublevels, setSelectedSublevels] = useState<string[]>([]);
-  const [aditionalStudents, setAditionalStudents] = useState<students[]>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [selectedSublevels, setSelectedSublevels] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [aditionalStudents, setAditionalStudents] = useState<any[]>([])
 
   const levels = useLevelStore(state => state.levels);
   const sublevels = useSubLevelStore(state => state.sublevels);
@@ -44,16 +45,28 @@ export const FormEvent = () => {
     if (!levelEvent) return;
     data.levels.level = levelEvent;
     if ((sublevels.length === 0) && (selectedSublevels.length === 0)) return;
-    data.levels.sublevels = selectedSublevels;
-    const unitRecord = { id: uuid(), ...data }
-    await createEvent(unitRecord);
-    console.log({ data })
-    reset();
+    const sublevelsToSave: string[] = selectedSublevels.map((sublevel) => sublevel.value);
+    data.levels.sublevels = sublevelsToSave;
+    // const aditionalStudentsToSave: students = aditionalStudents.map((aditionalStd) => ({ [aditionalStd.value]: { status: 'COMMING' } }));
+    const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
+    console.log(aditionalStudentsToSave)
+    const studentByLevel = users.map((user) => { if (sublevelsToSave.includes(user.subLevel!)) { return { [user.id!]: { status: 'COMMING' } } } });
+    const studentsToSave = studentByLevel.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+    const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data.students = allstudents as any;
+    if (data.teacher) {
+      data.meetLink = users.find((user) => user.id === data.teacher)!.teacherLink!;
+      const unitRecord = { id: uuid(), ...data }
+      // await createEvent(unitRecord);
+      console.log({ unitRecord })
+      reset();
+    }
   })
   return (
     <div className="flex">
       <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
-        <div className="flex flex-wrap mx-3 mb-6 bg-slate-500">
+        <div className="flex flex-wrap mx-3 mb-6">
           {/*Name*/}
           <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
             <label htmlFor="name" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Nombre</label>
@@ -78,7 +91,7 @@ export const FormEvent = () => {
             {errors.maxAssistantsNumber && <p className="text-red-500 text-xs italic">{errors.maxAssistantsNumber.message}</p>}
           </div>
           {/*MinAssitantNumber*/}
-          <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+          <div className="mb-3 md:w-1/1 px-3 mt-2">
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="minAssistantsNumber">
               Número mínimo de estudiantes *
             </label>
@@ -89,124 +102,90 @@ export const FormEvent = () => {
               type="number" maxLength={10} minLength={1} />
             {errors.minAssistantsNumber && <p className="text-red-500 text-xs italic">{errors.minAssistantsNumber.message}</p>}
           </div>
+          {/*Teacher*/}
+          <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+            <Select
+              components={animatedComponents}
+              defaultValue={''}
+              placeholder="Teacher"
+              isMulti
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              options={users.filter(user => user.role === 'teacher').map(user => ({ value: user.id, label: user.name }))}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onChange={(e: any) => {
+                console.log(' TEACHER-ID', e);
+                if (!e) return
+                setAditionalStudents(e)
+              }}
+            />
+          </div>
           {/*Level*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <Select
               components={animatedComponents}
               defaultValue={''}
-              placeholder="Seleccione la Modalidad"
+              placeholder="Modalidad"
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               options={levels.map(level => ({ value: level.id, label: level.name })) as any}
-              onChange={(e) => {
-                console.log('LEVELID', e);
-                if (!e) return
-                setLevelEvent(e[0]);
-                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e[0]);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onChange={(e: any) => {
+                console.log('LEVELID', e.value);
+                if (!e.value) return
+                setLevelEvent(e.value);
+                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
                 if (sublv) setSubLevelslEvent(sublv);
               }}
             />
-            {/*TODO select level and render sublevels */}
-            {/* <select
-              id="levels"
-              defaultValue={''}
-              onChange={(e) => {
-                console.log('LEVELID', e.target.value);
-                setLevelEvent(e.target.value);
-                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e.target.value);
-                if (sublv) setSubLevelslEvent(sublv);
-              }}
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-              <option value={''}>Seleccione la Modalidad</option>
-              {
-                levels.map((level) => {
-                  return <option key={level.id} value={level.id}>{level.name}</option>
-                })
-              }
-            </select> */}
           </div>
           {/*SubLevels*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <div className="bg-indigo-300 w-[auto] rounded-sm ">
-              {
-                //selected sublevels
-                selectedSublevels && selectedSublevels.map((sublevelId) => (
-                  <span key={sublevelId} className="px-2.5 py-0.5 mt-2 mb-2 ml-2 mr-1 items-center rounded-full bg-indigo-700 text-white text-xs">
-                    {sublevels.find((item) => item.id === sublevelId)!.name + '   '} <span
-                      onClick={() => {
-                        console.log('Quit selected sublevels', sublevels.find((item) => item.id === sublevelId)!.id);
-                        setSelectedSublevels(selectedSublevels => [...selectedSublevels.filter((item) => item !== sublevelId)])
-                        setSubLevelslEvent(subLevelslEvent => [...subLevelslEvent, sublevels.find((item) => item.id === sublevelId)!])
-
-                      }}
-                      className="bg-slate-100 text-black h-2 w-min-[3] rounded-full justify-center items-center">x</span>
-                  </span>
-                ))
-              }
             </div>
-            <select
+            <Select
               id="sublevels"
               defaultValue={''}
-              onChange={(e) => {
-                // console.log('SUB-LEVELID', e.target.value);
-                setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
-                setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
+              components={animatedComponents}
+              placeholder="Unidad "
+              isMulti
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              options={subLevelslEvent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onChange={(e: any) => {
+                console.log('SUB-LEVELID', { e });
+                setSelectedSublevels(e)
               }}
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-              <option value={''}>Seleccione la Unidad</option>
-              {
-                subLevelslEvent?.map((level) => {
-                  return <option key={level.id} value={level.id}>{level.name}</option>
-                })
-              }
-            </select>
+            />
           </div>
           {/*Aditional Student*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-            {/*TODO select level and render sublevels */}
-            <div className="bg-indigo-300 w-[auto]">
-              {
-                //selected aditional users
-                environment.production &&
-                aditionalStudents && aditionalStudents.map((student) => (
-                  <span key={Object.keys(student)[0]} className="px-2 py-0.5 mt-2 mb-2 ml-1 mr-1 items-center  rounded-full bg-indigo-700 text-white text-xs">{users.find((item) => item.id === Object.keys(student)[0])!.name}</span>
-                ))
-              }
-            </div>
-            <Select 
+            <Select
               components={animatedComponents}
               defaultValue={''}
-              placeholder="Seleccione Estudiantes adicionales"
+              placeholder="Estudiantes adicionales"
+              isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               options={users.map(user => ({ value: user.id, label: user.name })) as any}
-              onChange={(e) => {
-                if (!environment.production) return
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onChange={(e: any) => {
+                // if (!environment.production) return
                 console.log(' STUDENT-ADITIONAL-ID', e);
-                if(!e)return
-                // setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
-                // setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
-                // setAditionalStudents(aditionalStudents => [...aditionalStudents!, { [e.target.value]: { status: 'COMMING' } }])
-                setAditionalStudents(aditionalStudents => [...aditionalStudents!, { [e[0]]: { status: 'COMMING' } }])
+                if (!e) return
+                setAditionalStudents(e)
               }}
             />
-            {/* <select
-              id="students"
-              defaultValue={''}
-              onChange={(e) => {
-                if (!environment.production) return
-                console.log(' STUDENT-ADITIONAL-ID', e.target.value);
-                // setSelectedSublevels(selectedSublevels => [...selectedSublevels, sublevels.find(sublevel => sublevel.id === e.target.value)!.id!])
-                // setSubLevelslEvent(subLevelslEvent => subLevelslEvent.filter(sublevel => sublevel.id !== e.target.value))
-                setAditionalStudents(aditionalStudents => [...aditionalStudents!, { [e.target.value]: { status: 'COMMING' } }])
-              }}
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-              <option value={''}>Estudiante adicional</option>
-              {
-                users?.map((user) => {
-                  return <option key={user.id} value={user.id}>{user.name}</option>
-                })
-              }
-            </select> */}
           </div>
+          {/*SelectTime*/}
+          <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+            <label htmlFor="time" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Hora</label>
+            <input type="time" id="time" value="00:00" required />
+          </div>
+        </div>
+        {/*Submit button*/}
+        <div className="flex h-[10%] justify-`end` ]">
+          <button
+            className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
+            type="submit"
+          >💾</button>
         </div>
       </form>
     </div>

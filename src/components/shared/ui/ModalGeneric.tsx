@@ -15,10 +15,10 @@ export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Moda
         <>
             {isVisible ? (
                 <>
-                    <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                    <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none max-w-full w-full">
                         <div className="relative w-auto my-6 mx-auto max-w-3xl">
                             {/*content*/}
-                            <div className=" border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                            <div className=" border-0 rounded-lg shadow-lg relative flex flex-col w-full h-full bg-white outline-none focus:outline-none ">
                                 {/*header*/}
                                 <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
                                     <h3 className="text-3xl font-semibold">
@@ -43,7 +43,7 @@ export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Moda
                                     </button>
                                 </div>
                                 {/*body*/}
-                                <div className="h-[30rem] relative p-6 flex-auto">
+                                <div className="h-[80%] relative p-6 flex-auto">
                                     {children}
                                 </div>
                                 {/*footer*/}
