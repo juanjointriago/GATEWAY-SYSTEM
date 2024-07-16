@@ -3,13 +3,13 @@ import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { useForm } from "react-hook-form";
 import { event, students, subLevel } from "../../../interface";
-// import { useEventStore } from "../../../stores/events/event.store"
+import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 
 
 export const FormEvent = () => {
-  // const createEvent = useEventStore(state => state.createEvent);
+  const createEvent = useEventStore(state => state.createEvent);
   const animatedComponents = makeAnimated();
   const defaultValues: event = {
     id: '',
@@ -36,7 +36,7 @@ export const FormEvent = () => {
   const [selectedSublevels, setSelectedSublevels] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [aditionalStudents, setAditionalStudents] = useState<any[]>([])
-
+const [teacher, setTeacher] = useState<string>()
   const levels = useLevelStore(state => state.levels);
   const sublevels = useSubLevelStore(state => state.sublevels);
   const users = useUserStore(state => state.users);
@@ -55,10 +55,12 @@ export const FormEvent = () => {
     const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.students = allstudents as any;
+    if(!teacher)return;
+    data.teacher = teacher;
     if (data.teacher) {
-      data.meetLink = users.find((user) => user.id === data.teacher)!.teacherLink!;
+      data.meetLink = users.find((user) => user.id === data.teacher)?users.find((user) => user.id === data.teacher)?.teacherLink:'';
       const unitRecord = { id: uuid(), ...data }
-      // await createEvent(unitRecord);
+      await createEvent(unitRecord);
       console.log({ unitRecord })
       reset();
     }
@@ -108,14 +110,14 @@ export const FormEvent = () => {
               components={animatedComponents}
               defaultValue={''}
               placeholder="Teacher"
-              isMulti
+              // isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               options={users.filter(user => user.role === 'teacher').map(user => ({ value: user.id, label: user.name }))}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
-                console.log(' TEACHER-ID', e);
+                console.log(' TEACHER-ID', e.value);
                 if (!e) return
-                setAditionalStudents(e)
+                setTeacher(e.value)
               }}
             />
           </div>
@@ -127,6 +129,7 @@ export const FormEvent = () => {
               placeholder="Modalidad"
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               options={levels.map(level => ({ value: level.id, label: level.name })) as any}
+              // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
                 console.log('LEVELID', e.value);
@@ -176,8 +179,37 @@ export const FormEvent = () => {
           </div>
           {/*SelectTime*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-            <label htmlFor="time" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Hora</label>
-            <input type="time" id="time" value="00:00" required />
+            <label htmlFor="date-time" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">FEcha y hora</label>
+            <input
+              {...register("date", { required: "Debe seleccionar fecha y hora👀" })}
+              type="datetime-local" id="date" required
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            />
+            {errors.date && <p className="text-red-500 text-xs italic">{errors.date.message}</p>}
+          </div>
+          {/*Limit Date*/}
+          <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+            <label htmlFor="limit-date" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Límite de aprobación de estudiantes </label>
+            <input
+              {...register("limitDate", { required: "Debe seleccionar fecha y hora limite de aprobdación👀" })}
+              type="datetime-local" id="limit-date" required
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            />
+            {errors.limitDate && <p className="text-red-500 text-xs italic">{errors.limitDate.message}</p>}
+          </div>
+          {/*IsActive*/}
+          <div className="w-full md:w-1/1 mt-2 px-3">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                {...register("isActive", { required: "Este campo debe registrarse por primera vez como Activo 👀" })}
+                id="isActive"
+                type="checkbox"
+                className="sr-only peer"
+              />
+              <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Activo</span>
+            </label>
+            {errors.isActive && <p className="text-red-500 text-xs italic">{errors.isActive.message}</p>}
           </div>
         </div>
         {/*Submit button*/}
