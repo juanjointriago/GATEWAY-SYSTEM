@@ -19,10 +19,11 @@ export const EventsPage = () => {
   const isAdmin = user && user.role === 'admin';
 
   const eventCols: Array<ColumnProps<event>> = [
-    { key: 'name', title: 'Nombre', render: (_, record) => <div className="truncate  w-[10rem] max-w-[10rem]"> 
-      <p className="">{record.name}</p>
+    {
+      key: 'name', title: 'Nombre', render: (_, record) => <div className="truncate  w-[10rem] max-w-[10rem]">
+        <p className="">{record.name}</p>
       </div>
-     },
+    },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
     { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
     {
@@ -65,7 +66,11 @@ export const EventsPage = () => {
       <TableContainer
         hasAddBtn={isAdmin}
         columns={eventCols}
-        data={user && ((user.role === 'admin') ? events : events.filter((event) => event.students[user.id!]))}
+        data={user && ((user.role === 'admin')
+          ? events
+          : (user.role === 'teacher')
+            ? events.filter((event => event.teacher === user.id))
+            : events.filter((event) => event.students[user.id!]))}
         modalChildren={<FormEvent />}
         modalTitle="Crear Reservación" />
     </div>

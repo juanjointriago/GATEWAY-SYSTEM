@@ -29,9 +29,8 @@ const student: MenuItem[] = [
 
 const teacher: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Welcome Teacher', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
+  { title: 'Reservaciones', subTitle: 'Gestión de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
   { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
-  { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
-  { title: 'Unidades', subTitle: 'Gestión de unidades', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
 
 ]
 
