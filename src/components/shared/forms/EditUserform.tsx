@@ -8,6 +8,7 @@ interface Props {
 }
 export const EditUserform: FC<Props> = ({ userId }) => {
     const updateUser = useUserStore(state => state.updateUser);
+    const resetPasswordByEmail = useUserStore(state => state.resetPasswordByEmail);
     const getUserById = useUserStore(state => state.getUserById);
     const user = getUserById(userId)!;
 
@@ -336,10 +337,17 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     {errors.phone && <p className="text-red-500 text-xs italic">{errors.phone.message}</p>}
                 </div>
                 {/** Button*/}
+
                 <button type="submit" className="text-white w-full  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2">Guardar Cambios 🤘🏻</button>
                 <div className="flex mt-5 underline justify-end text-blue-500">
                 </div>
             </form>
+            <button
+                type="button"
+                className="text-white w-[70%]  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2"
+                onClick={() => resetPasswordByEmail(user.email)}>
+                 Enviar correo para reinicio de contraseña 🔑
+            </button>
         </div>
     )
 }
