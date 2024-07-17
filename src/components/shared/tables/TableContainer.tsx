@@ -1,6 +1,11 @@
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useMemo, useRef, useState } from "react";
 import { ColumnProps } from "../../../interface/ui/tables.interface";
 import { ModalGeneric } from "../ui/ModalGeneric";
+import { WorkBook, utils, writeFileXLSX } from 'xlsx';
+import { IoBarChart } from "react-icons/io5";
+import { MdPictureAsPdf } from "react-icons/md";
+import { useAuthStore } from "../../../stores";
+
 
 
 type Props<T> = {
@@ -15,7 +20,16 @@ type Props<T> = {
 
 export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
   const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
-
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  const user = useAuthStore(state => state.user);
+  const handleDownloadExcel = () => {
+    const wb: WorkBook = utils.table_to_book(tableRef.current);
+    writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
+  }
+  const handleDownloadPDF = () => {
+    const wb: WorkBook = utils.table_to_book(tableRef.current);
+    writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
+  }
   const [rowsLimit] = useState(50);
   const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,10 +126,17 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
         <div className="flex flex-col">
           <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
             <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-              {hasAddBtn && <button className="bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
-                onClick={() => setShowModal(true)}>+ </button>}
+              <div className="flex flex-row">
+                {user && hasAddBtn && user.role === 'admin' && <button className="mr-1 ml-q bg-blue-500 mb-5 text-white px-4 py-2 rounded" type="button"
+                  onClick={() => setShowModal(true)}>+ </button>}
+                {user && user.role === 'admin' && <button className="mr-1 ml-q bg-green-800 mb-5 text-white px-4 py-2 rounded hover:bg-green-700" type="button"
+                  onClick={handleDownloadExcel}><IoBarChart /> </button>}
+                  {user && user.role === 'admin' && <button className="bg-red-800 mb-5 text-white px-4 py-2 rounded hover:bg-red-700" type="button"
+                  onClick={handleDownloadPDF}><MdPictureAsPdf /> </button>}
+              </div>
+
               <div className="w-full overflow-x-scroll md:overflow-auto  max-w-7xl 2xl:max-w-none mt-2">
-                <table className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border ">
+                <table ref={tableRef} className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border ">
                   <thead className="rounded-lg text-base text-white font-semibold w-full">
                     <tr className="bg-[#222E3A]/[6%]">{headers}</tr>
                   </thead>
