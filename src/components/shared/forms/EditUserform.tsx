@@ -303,18 +303,18 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     />
                     {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
                 </div>
-                <div className='flex flex-row justify-between'>
+                {user.role === 'teacher' && <div className='flex flex-row justify-between'>
                     {/** TeacherLink*/}
                     <div className="mb-4 w-full">
                         <label className="block text-gray-600">Teacher Link</label>
                         <input
-                            {...register("teacherLink", { required: "La contraseña es obligatoria 👀", minLength: { value: 6, message: 'La contraseña debe tener al menos 6 caracteres' } })}
+                            {...register("teacherLink")}
                             type="text"
                             name="teacherLink"
                         />
                         {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                     </div>
-                </div>
+                </div>}
                 {/** Dirección*/}
                 <div className="mb-4">
                     <label className="block text-gray-600">Dirección</label>

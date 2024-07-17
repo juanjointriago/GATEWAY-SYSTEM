@@ -44,7 +44,8 @@ export const UsersPage = () => {
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
         {userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
-        <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />
+        {isAdmin ? <TableContainer hasAddBtn={false}  columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />
+          : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />}
       </div>
     </>
   )

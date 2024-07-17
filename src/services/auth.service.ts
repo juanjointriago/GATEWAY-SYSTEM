@@ -1,11 +1,11 @@
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import Swal from 'sweetalert2';
 import { adddItem, getItemById } from "../store/firebase/helper";
 import { FirestoreUser, newUSer } from "../interface";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../store/firebase/initialize";
 
-
+2
 export class AuthService {
     static login = async (email: string, password: string): Promise<FirestoreUser | undefined> => {
         const auth = getAuth();
@@ -54,6 +54,29 @@ export class AuthService {
         }
 
 
+    }
+
+    static resetPassword = async (email: string) => {
+        const auth = getAuth();
+        try {
+            await sendPasswordResetEmail(auth, email);
+            Swal.fire({
+                title: `Reinicio de Contraseña`,
+                text: `Revise la bandeja de ${email}`,
+                icon: "success",
+                allowOutsideClick: true,
+                backdrop: true,
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            Swal.fire({
+                title: `Error al enviar correo`,
+                text: `${error.message}`,
+                icon: "warning",
+                allowOutsideClick: true,
+                backdrop: true,
+            })
+        }
     }
 
     static signUp = async (signUpUser: newUSer) => {

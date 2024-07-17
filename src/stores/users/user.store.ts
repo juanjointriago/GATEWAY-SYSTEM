@@ -1,6 +1,6 @@
 import { create, StateCreator } from "zustand";
 import { FirestoreUser } from "../../interface";
-import { UserService } from "../../services";
+import { AuthService, UserService } from "../../services";
 import { devtools, persist } from "zustand/middleware";
 import Swal from "sweetalert2";
 
@@ -11,6 +11,7 @@ interface UsersStore {
     createUser: (user: FirestoreUser) => void;
     updateUser: (user: FirestoreUser) => void;
     deleteUserById: (id: string) => void;
+    resetPasswordByEmail : (email:string) => void;
 }
 
 
@@ -69,6 +70,9 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         } catch (error) {
             console.warn(error);
         }
+    },
+    resetPasswordByEmail: async (email:string) => {
+        AuthService.resetPassword(email);
     }
 })
 
