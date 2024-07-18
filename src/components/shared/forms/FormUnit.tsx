@@ -29,7 +29,16 @@ export const FormUnit = () => {
       return;
     }
     const inputFile = fileRef.current as HTMLInputElement | null;
+    Swal.fire({
+      title: "Actualizando Material",
+      text: "Espera un poco...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
     await createUnit(unitRecord, fileUpload[0]);
+    Swal.close();
     Swal.fire('Material almacenado', 'Material de apoyo creado con éxito', 'success');
     console.log({ data })
     inputFile!.value = ''
