@@ -39,7 +39,6 @@ export const UnitsPage = () => {
     },
     {
       key: 'isActive', title: 'Publico?', render: (_, record) => (<>
-        //TODO component for generic actions on all tables
         <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
         {isAdmin && <FabButton isActive tootTipText={''} action={() => {
           setOpenModal(true);
