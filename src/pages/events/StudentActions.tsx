@@ -9,7 +9,7 @@ interface Props {
     event: event
     students: students;
     Icon: IconType;
-    userId:string
+    userId: string
 }
 
 const changeVisualAction = (status: status) => {
@@ -48,37 +48,43 @@ const changeVisualStatus = (status: status) => {
     }
 
 }
-export const StudentActions: FC<Props> = ({ event, students,Icon, userId }) => {
+export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
     const keys = Object.keys(students);
-  const updateEvent = useEventStore(state => state.updateEvent);
-
+    const updateEvent = useEventStore(state => state.updateEvent);
+    const today = new Date().getTime();
+    const isEditable = event!.limitDate! <= today;
     return (
         <div className="flex flex-row">
             {
-                keys.map((key:string) => (
+
+                keys.map((key: string) => (
                     <div key={key} className="flex flex-row">
-                    <TootipBase   title="" tootTipText={changeVisualAction(`${students[key].status}`)}>
-                        <div onClick={()=>{
-                        const student = event.students[userId];
-                        Swal.fire({
-                            title: '¿Estás seguro?',
-                            text: `Estás a punto de ${student.status === 'CONFIRMED' ? 'CANCELAR' : 'ACEPTAR'} la clase`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Sí, estoy seguro',
-                            cancelButtonText: 'No, cancelar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
-                                Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success')
-                            }
-                        })
-                      }} style={{backgroundColor:changeVisualColor(`${event.students[key].status}`)}} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
-                            <Icon size={20} color='white' />
-                        </div>
-                        
-                    </TootipBase>
-                    <p className="self-center">{changeVisualStatus(event.students[key].status)}</p>
+                        <TootipBase title="" tootTipText={changeVisualAction(`${students[key].status}`)}>
+                            <div onClick={() => {
+                                const student = event.students[userId];
+                                if (!isEditable) {
+                                    Swal.fire('¡Lo senmtimos!', 'El tiempo de espera terminó', 'error')
+                                    return
+                                }
+                                Swal.fire({
+                                    title: '¿Estás seguro?',
+                                    text: `Estás a punto de ${student.status === 'CONFIRMED' ? 'CANCELAR' : 'ACEPTAR'} la clase`,
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Sí, estoy seguro',
+                                    cancelButtonText: 'No, cancelar',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
+                                        Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success')
+                                    }
+                                })
+                            }} style={{ backgroundColor: changeVisualColor(`${event.students[key].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
+                                <Icon size={20} color='white' />
+                            </div>
+
+                        </TootipBase>
+                        <p className="self-center">{changeVisualStatus(event.students[key].status)}</p>
                     </div>
 
                 ))
