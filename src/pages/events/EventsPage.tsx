@@ -5,11 +5,14 @@ import { StudentsList } from "../users/StudentsList"
 import { useAuthStore, useUserStore } from "../../stores"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton"
 import { StudentActions } from "./StudentActions"
-import { IoCalendarClearOutline, IoEye, IoEyeOff } from "react-icons/io5"
+import { IoCalendarClearOutline, IoEye, IoEyeOff, IoPencil } from "react-icons/io5"
 import { NavLink } from "react-router-dom"
 import { FormEvent } from "../../components/shared/forms"
 import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { FabButton } from "../../components/shared/buttons/FabButton"
+import { useState } from "react"
+import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
+import { EditEventForm } from "../../components/shared/forms/EditEventForm"
 
 
 export const EventsPage = () => {
@@ -17,6 +20,9 @@ export const EventsPage = () => {
   const user = useAuthStore(state => state.user);
   const updateEvent = useEventStore(state => state.updateEvent);
   const isAdmin = user && user.role === 'admin';
+  const [openModal, setOpenModal] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState<string>()
+
 
   const eventCols: Array<ColumnProps<event>> = [
     {
@@ -55,7 +61,14 @@ export const EventsPage = () => {
     {
       key: 'isActive', title: 'Público', render: (_, record) => (
         //TODO component for generic actions on all tables
+        <>
         <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateEvent({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        {isAdmin && <FabButton isActive tootTipText={''} action={() => {
+          setOpenModal(true);
+          setEventToEdit(record.id)
+        }} Icon={IoPencil} />}
+        </>
+
       )
     },
 
@@ -65,6 +78,7 @@ export const EventsPage = () => {
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
+      {eventToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditEventForm eventId={eventToEdit} />} />}
       <TableContainer
         hasAddBtn={isAdmin}
         columns={eventCols}

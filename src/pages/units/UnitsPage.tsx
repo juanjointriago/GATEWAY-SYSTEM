@@ -57,7 +57,6 @@ export const UnitsPage = () => {
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/**Table comp */}
         {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unitId={unitToEdit} />} />}
-
         <TableContainer
           hasAddBtn={isAdmin}
           columns={unitsCols}
