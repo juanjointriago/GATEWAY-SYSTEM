@@ -18,10 +18,27 @@ export class UnitService {
         const supportMaterial = await getDownloadURL(imageRef);
         const newUnit = { ...unit, supportMaterial }
         await setItem(import.meta.env.VITE_COLLECTION_UNITS, newUnit);
+        return newUnit;
     };
 
 
-    static updateUnitById = async (unit: unit) => await updateItem(import.meta.env.VITE_COLLECTION_UNITS, unit);
+    static updateUnitById = async (unit: unit, unitFile: unitFile | null) => {
+        if (unitFile) {
+            const imageRef = ref(storage, `units/${unit.name}`);
+            const uploadImage = await uploadBytes(imageRef, unitFile);
+            const newMetadata = {
+                cacheControl: 'public,max-age=2629800000', // 1 month
+                contentType: uploadImage.metadata.contentType,
+            }
+            await updateMetadata(imageRef, newMetadata);
+            const supportMaterial = await getDownloadURL(imageRef);
+            const newUnit = { ...unit, supportMaterial }
+
+            await updateItem(import.meta.env.VITE_COLLECTION_UNITS, newUnit);
+            return;
+        }
+        await updateItem(import.meta.env.VITE_COLLECTION_UNITS, unit);
+    };
 
     static deleteUnitById = async (id: string) => await deleteItem(import.meta.env.VITE_COLLECTION_UNITS, id);
 }

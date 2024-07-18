@@ -7,7 +7,7 @@ interface UnitStore {
     units: unit[];
     getUnitById: (id: string) => void;
     getAndSetUnits: () => Promise<void>;
-    createUnit: (unit: unit, file:unitFile) => Promise<void>;
+    createUnit: (unit: unit, file: unitFile) => Promise<void>;
     updateUnit: (unit: unit) => Promise<void>;
     deleteUnit: (id: string) => Promise<void>;
 }
@@ -26,12 +26,12 @@ const storeAPI: StateCreator<UnitStore, [["zustand/devtools", never], ["zustand/
         // console.log('getAndSetUnits')
     },
     createUnit: async (unit: unit, file: unitFile) => {
-        await UnitService.createUnit(unit, file);
-        set({ units: [...get().units, unit] });
+        const newUnit = await UnitService.createUnit(unit, file);
+        set({ units: [...get().units, newUnit] });
         // console.log('createUnit', unit)
     },
-    updateUnit: async(unit: unit) => await UnitService.updateUnitById(unit),
-    deleteUnit: async(id: string) => await UnitService.deleteUnitById(id)
+    updateUnit: async (unit: unit, file: unitFile | null | undefined = null) => await UnitService.updateUnitById(unit, file),
+    deleteUnit: async (id: string) => await UnitService.deleteUnitById(id)
 })
 
 export const useUnitStore = create<UnitStore>()(

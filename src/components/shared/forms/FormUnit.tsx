@@ -3,12 +3,13 @@ import { unit } from "../../../interface";
 import { useSubLevelStore, useUnitStore } from "../../../stores";
 import { v4 as uuid } from 'uuid'
 import { useRef, useState } from "react";
+import Swal from "sweetalert2";
 
 export const FormUnit = () => {
-  const fileRef = useRef(null)
+  const fileRef = useRef(null);
   const createUnit = useUnitStore(state => state.createUnit);
   const subLevels = useSubLevelStore(state => state.sublevels);
-  const [fileIpload, setFileIpload] = useState<FileList | null>(null)
+  const [fileUpload, setFileUpload] = useState<FileList | null>(null)
   const defaultValues: unit = {
     name: '',
     description: '',
@@ -23,13 +24,17 @@ export const FormUnit = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<unit>({ defaultValues });
   const onSubmit = handleSubmit(async (data: unit) => {
     const unitRecord = { id: uuid(), ...data }
-    if (fileIpload) {
-      const inputFile = fileRef.current as HTMLInputElement | null;
-      await createUnit(unitRecord, fileIpload[0]);
-      console.log({ data })
-      reset();
-      inputFile!.value = ''
+    if (!fileUpload) {
+      Swal.fire('Ups!', 'Debe subir un archivo', 'warning');
+      return;
     }
+    const inputFile = fileRef.current as HTMLInputElement | null;
+    await createUnit(unitRecord, fileUpload[0]);
+
+    console.log({ data })
+    inputFile!.value = ''
+    fileRef.current = null;
+    reset();
   })
 
   return (
@@ -97,7 +102,7 @@ export const FormUnit = () => {
               type="file"
               placeholder="Subir archivo"
               accept=".pdf"
-              onChange={(e) => setFileIpload(e.target.files)}
+              onChange={(e) => setFileUpload(e.target.files)}
               required
             />
             {errors.supportMaterial && <p className="text-red-500 text-xs italic">{errors.supportMaterial.message}</p>}
