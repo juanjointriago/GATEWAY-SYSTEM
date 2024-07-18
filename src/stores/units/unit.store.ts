@@ -5,10 +5,10 @@ import { UnitService } from "../../services";
 
 interface UnitStore {
     units: unit[];
-    getUnitById: (id: string) => void;
+    getUnitById: (id: string) => unit | undefined;
     getAndSetUnits: () => Promise<void>;
     createUnit: (unit: unit, file: unitFile) => Promise<void>;
-    updateUnit: (unit: unit) => Promise<void>;
+    updateUnit: (unit: unit, file?: unitFile) => Promise<void>;
     deleteUnit: (id: string) => Promise<void>;
 }
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { unit } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useAuthStore, useUnitStore } from "../../stores";
@@ -8,7 +8,9 @@ import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
 import { NavLink } from "react-router-dom";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoEye, IoEyeOff } from "react-icons/io5";
+import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
+import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
+import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
 
 
 
@@ -18,6 +20,9 @@ export const UnitsPage = () => {
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
+  const [openModal, setOpenModal] = useState(false);
+  const [unitToEdit, setUnitToEdit] = useState<string>()
+
   
   useEffect(() => {
     getAllUnits();
@@ -30,15 +35,19 @@ export const UnitsPage = () => {
     {
       key: 'workSheetUrl', title: 'Work Sheet', render: (_, record) =>
         <div className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-          <NavLink to={record.workSheetUrl} target="_blank" end rel="noreferrer noopener" > <span className="text-sm uppercase text-blue-500 hidden md:block">🔍 WorkSheet</span></NavLink> </div>
+          <NavLink to={record.workSheetUrl} target="_blank" end rel="noreferrer noopener" > <span className="text-sm uppercase text-white-500 hidden md:block">🔍 WorkSheet</span></NavLink> </div>
     },
     {
-      key: 'isActive', title: 'Activo', render: (_, record) => (
+      key: 'isActive', title: 'Publico?', render: (_, record) => (<>
         //TODO component for generic actions on all tables
         <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        <FabButton isActive tootTipText={''} action={() => {
+            setOpenModal(true);
+            setUnitToEdit(record.id)
+          }} Icon={IoPencil} />
+      </>
       )
     },
-
   ]
 
 
@@ -48,6 +57,8 @@ export const UnitsPage = () => {
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/**Table comp */}
+        {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unitId={unitToEdit} />} />}
+
         <TableContainer
           hasAddBtn={isAdmin}
           columns={unitsCols}

@@ -30,7 +30,7 @@ export const FormUnit = () => {
     }
     const inputFile = fileRef.current as HTMLInputElement | null;
     await createUnit(unitRecord, fileUpload[0]);
-
+    Swal.fire('Material almacenado', 'Material de apoyo creado con éxito', 'success');
     console.log({ data })
     inputFile!.value = ''
     fileRef.current = null;
