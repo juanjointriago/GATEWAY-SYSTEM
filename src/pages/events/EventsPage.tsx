@@ -26,6 +26,8 @@ export const EventsPage = () => {
     },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
     { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
+    { key: 'limitDate', title: 'Fecah Limite', render: (_, record) => <>{ record.limitDate ?new Date(record.limitDate.toLocaleString()): 'No asignado'}</> },
+
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
         return <> {users.find(user => user.id === record.teacher) && <AvatarButton tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>

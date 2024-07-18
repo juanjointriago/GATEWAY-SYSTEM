@@ -52,7 +52,6 @@ export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => 
     const keys = Object.keys(students);
     const updateEvent = useEventStore(state => state.updateEvent);
     const today = new Date().getTime();
-    const isEditable = event!.limitDate! <= today;
     return (
         <div className="flex flex-row">
             {
@@ -62,8 +61,12 @@ export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => 
                         <TootipBase title="" tootTipText={changeVisualAction(`${students[key].status}`)}>
                             <div onClick={() => {
                                 const student = event.students[userId];
-                                if (!isEditable) {
-                                    Swal.fire('¡Lo senmtimos!', 'El tiempo de espera terminó', 'error')
+                                if (!event.limitDate) {
+                                    Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite para esta clase', 'warning')
+                                    return
+                                }
+                                if (today > event.limitDate) {
+                                    Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite', 'error')
                                     return
                                 }
                                 Swal.fire({
