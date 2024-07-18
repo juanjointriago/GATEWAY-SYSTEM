@@ -1,7 +1,8 @@
 import { FC } from "react"
 import { FirestoreUser } from "../../../interface"
-import { useForm } from "react-hook-form"
-import { useUserStore } from "../../../stores"
+import { useForm } from "react-hook-form";
+import { useUserStore } from "../../../stores";
+
 
 interface Props {
     userId: string
@@ -11,6 +12,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const resetPasswordByEmail = useUserStore(state => state.resetPasswordByEmail);
     const getUserById = useUserStore(state => state.getUserById);
     const user = getUserById(userId)!;
+
 
     const cities = [
         'Guayaquil',
@@ -236,6 +238,11 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         'Tiputini',
 
     ]
+    const roles = [
+        { value: 'teacher', label: 'Teacher' },
+        { value: 'student', label: 'Student' },
+        { value: 'admin', label: 'admin' }
+    ]
     console.log(user)
     const defaultValues: FirestoreUser = { ...user };
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
@@ -277,6 +284,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                         />
                         {errors.cc && <p className="text-red-500 text-xs italic">{errors.cc.message}</p>}
                     </div>
+
                     {/** Ciudad*/}
                     <div className="mb-4 ml-2">
                         <label htmlFor="sublevel" className="block text-gray-600">Ciudad</label>
@@ -285,7 +293,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                             id="sublevel"
                             defaultValue={''}
                             className="appearance-none block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-                            <option value={''}>Seleccione ciudad</option>
+                            <option value={''}>Seleccione rol</option>
                             {
                                 cities.map((city, index) => {
                                     return <option key={index} value={city}>{city}</option>
@@ -293,6 +301,23 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                             }
                         </select>
                     </div>
+                </div>
+                {/*Role*/}
+                <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <label className="block text-gray-600">Rol:</label>
+
+                    <select
+                        {...register("role", { required: "Debe Seleciconar un rol 👀" })}
+                        id="sublevel"
+                        defaultValue={user.role}
+                        className="appearance-none block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
+                        <option value={''}>Seleccione ciudad</option>
+                        {
+                            roles.map((role, index) => {
+                                return <option key={index} value={role.value}>{role.label}</option>
+                            })
+                        }
+                    </select>
                 </div>
                 {/** Email */}
                 <div className="mb-4">
@@ -346,7 +371,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 type="button"
                 className="text-white w-[70%]  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2"
                 onClick={() => resetPasswordByEmail(user.email)}>
-                 Enviar correo para reinicio de contraseña 🔑
+                Enviar correo para reinicio de contraseña 🔑
             </button>
         </div>
     )
