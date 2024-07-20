@@ -68,13 +68,12 @@ export const EventsPage = () => {
           setEventToEdit(record.id)
         }} Icon={IoPencil} />}
         </>
-
       )
     },
-
   ]
 
   const events = useEventStore(state => state.events);
+  const filteredEvents = events.sort((a, b) => a.date - b.date);
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
@@ -83,10 +82,10 @@ export const EventsPage = () => {
         hasAddBtn={isAdmin}
         columns={eventCols}
         data={user && ((user.role === 'admin')
-          ? events
+          ? filteredEvents
           : (user.role === 'teacher')
-            ? events.filter((event => event.teacher === user.id))
-            : events.filter((event) => event.students[user.id!]))}
+            ? filteredEvents.filter((event => event.teacher === user.id))
+            : filteredEvents.filter((event) => event.students[user.id!]))}
         modalChildren={<FormEvent />}
         modalTitle="Crear Reservación" />
     </div>

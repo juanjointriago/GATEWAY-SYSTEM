@@ -270,7 +270,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         }
         await updateUser(updatedUser);
         console.log('👀====>',{updatedUser});
-        reset()
+        reset();
     }))
 
     return (

@@ -2,9 +2,8 @@ import { FC } from "react";
 import { FirestoreUser } from "../../interface";
 import { useEventStore } from "../../stores/events/event.store";
 import { WhiteCard } from "../../components";
-import { IoBarChart, IoBook, IoCalendar, IoPieChart } from "react-icons/io5";
+import { IoBook, IoCalendar, IoPieChart } from "react-icons/io5";
 import { LevelById } from "../levels/LevelById";
-import { SubLevelById } from "../sublevels/SubLevelById";
 import { useUnitStore } from "../../stores";
 
 interface Props {
@@ -25,11 +24,11 @@ export const DashboardStudent: FC<Props> = ({ user }) => {
                 <h2>Modalidad</h2>
                 {user && user.level ?<LevelById levelId={user.level} />: "Sin modalidad asignada"}
             </WhiteCard>
-            <WhiteCard centered>
+            {/* <WhiteCard centered>
                 <IoBarChart size={48} className="text-indigo-600" />
                 <h2>Unidades</h2>
                 <>{user && user.subLevel?<SubLevelById subLevelId={user.subLevel}/>: 'Sin asignar'}</>
-            </WhiteCard>
+            </WhiteCard> */}
             <WhiteCard centered>
                 <IoCalendar size={48} className="text-indigo-600" />
                 <h2>Clases reserv. </h2>
