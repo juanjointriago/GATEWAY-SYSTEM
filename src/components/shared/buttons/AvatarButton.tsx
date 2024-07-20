@@ -8,8 +8,9 @@ interface Props {
     tootTipText?: string
     initialLetter?:string
 }
+// `${tootTipText?.split(" ")[0][0].toUpperCase()}${tootTipText?.split(" ")[1][0].toUpperCase()}`
 
-export const AvatarButton: FC<Props> = ({ isActive, action = ()=>console.log('Press AvatarButton'), tootTipText, initialLetter = `${tootTipText?.split(" ")[0][0].toUpperCase()}${tootTipText?.split(" ")[1][0].toUpperCase()}`}) => {
+export const AvatarButton: FC<Props> = ({ isActive, action = ()=>console.log('Press AvatarButton'), tootTipText, initialLetter = 'AB'}) => {
     return (
         <>
             {isActive && <>

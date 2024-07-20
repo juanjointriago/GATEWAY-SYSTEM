@@ -70,9 +70,13 @@ const [teacher, setTeacher] = useState<string>()
           Swal.showLoading()  //swal loading
         },
       })
-      await createEvent(unitRecord);
+      await createEvent(unitRecord).catch((error) => {
+        Swal.fire('Error', `${error.message}`, 'error');
+        console.error(error);
+      });
       Swal.close();
       Swal.fire('Evento creado', 'Evento creado con éxito', 'success');
+      
       console.log({ unitRecord })
       reset();
     }
