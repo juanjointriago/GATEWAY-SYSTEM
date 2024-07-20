@@ -19,7 +19,7 @@ const storeAPI: StateCreator<UnitStore, [["zustand/devtools", never], ["zustand/
         try {
             const units = await UnitService.getUnits()
             // console.log('UNIDADES ENCONTRADAS', { units })
-            set({ units: [...units] });
+            set({ units: [...units.filter((unit) => unit.isActive === true)] });
         } catch (error) {
             console.warn(error)
         }
