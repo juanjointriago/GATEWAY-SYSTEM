@@ -5,10 +5,11 @@ import { useAuthStore, useUserStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoKey, IoLockClosed, IoPencil } from "react-icons/io5";
+import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
 import { useState } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
+import Swal from "sweetalert2";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -28,7 +29,29 @@ export const UsersPage = () => {
       key: 'isActive', title: 'Estado', render: (_, record) => <>
         {record && <div className="flex:1 flex-row justify-center">
           {/* TODO validate update with swal confirm */}
-          <FabButton isActive action={() => updateUserById({ ...record, isActive: !record.isActive })} Icon={record.isActive ? IoKey : IoLockClosed} iconSize={18} />
+          <FabButton isActive action={() => {
+            Swal.fire({
+              title: '¿Estas seguro?',
+              text: `Deseas ${record.isActive ? 'desactivar' : 'activar'} el usuario ${record.name}`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Si, estoy seguro'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                updateUserById({ ...record, isActive: !record.isActive });
+                Swal.fire(
+                  'Actualizado!',
+                  'El usuario ha sido actualizado.',
+                  'success'
+                )
+              }
+            
+            })
+            // updateUserById({ ...record, isActive: !record.isActive });
+            
+            }} Icon={record.isActive ? IoEye : IoEyeOff} iconSize={18} />
           <FabButton isActive tootTipText={''} action={() => {
             setOpenModal(true);
             setUserToEdit(record.id)

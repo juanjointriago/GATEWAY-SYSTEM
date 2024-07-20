@@ -1,7 +1,10 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import { FirestoreUser } from "../../../interface"
 import { useForm } from "react-hook-form";
-import { useUserStore } from "../../../stores";
+import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+
 
 
 interface Props {
@@ -12,6 +15,16 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const resetPasswordByEmail = useUserStore(state => state.resetPasswordByEmail);
     const getUserById = useUserStore(state => state.getUserById);
     const user = getUserById(userId)!;
+    const animatedComponents = makeAnimated();
+    const levels = useLevelStore(state => state.levels);
+    const sublevels = useSubLevelStore(state => state.sublevels);
+    const [levelStudent, setLevelStudent] = useState<string>();
+    console.log(levelStudent)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [subLevelslStudent, setSubLevelsStudent] = useState<any[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [selectedSublevels, setSelectedSublevels] = useState<any>();
+
 
 
     const cities = [
@@ -247,12 +260,16 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const defaultValues: FirestoreUser = { ...user };
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
     const onSubmit = handleSubmit((async (data) => {
+        if (!levelStudent) return;
+        data.level = levelStudent;
+        if ((sublevels.length === 0) && (selectedSublevels)) return;
+        data.subLevel = selectedSublevels.value;
         const updatedUser = {
             ...defaultValues,
             ...data
         }
         await updateUser(updatedUser);
-        console.log(updatedUser);
+        console.log('👀====>',{updatedUser});
         reset()
     }))
 
@@ -360,6 +377,43 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                         id="phone"
                     />
                     {errors.phone && <p className="text-red-500 text-xs italic">{errors.phone.message}</p>}
+                </div>
+                {/*Level*/}
+                <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <Select
+                        components={animatedComponents}
+                        defaultValue={''}
+                        placeholder="Modalidad"
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        options={levels.map(level => ({ value: level.id, label: level.name })) as any}
+                        // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        onChange={(e: any) => {
+                            console.log('LEVELID', e.value);
+                            if (!e.value) return
+                            setLevelStudent(e.value);
+                            const sublvs = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
+                            if (sublvs) setSubLevelsStudent(sublvs);
+                        }}
+                    />
+                </div>
+                {/*SubLevels*/}
+                <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="bg-indigo-300 w-[auto] rounded-sm ">
+                    </div>
+                    <Select
+                        id="sublevels"
+                        defaultValue={''}
+                        components={animatedComponents}
+                        placeholder="Unidad "
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        options={subLevelslStudent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        onChange={(e: any) => {
+                            console.log('SUB-LEVELID', { e });
+                            setSelectedSublevels(e);
+                        }}
+                    />
                 </div>
                 {/** Button*/}
 
