@@ -6,6 +6,7 @@ import { event, students, subLevel } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
 import { v4 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
+import Swal from "sweetalert2";
 
 
 export const FormEvent = () => {
@@ -60,7 +61,18 @@ const [teacher, setTeacher] = useState<string>()
     if (data.teacher) {
       data.meetLink = users.find((user) => user.id === data.teacher)?users.find((user) => user.id === data.teacher)?.teacherLink:'';
       const unitRecord = { id: uuid(), ...data }
+      //loading swal 
+      Swal.fire({
+        title: 'Creando evento',
+        html: 'Espere un momento por favor',
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading()  //swal loading
+        },
+      })
       await createEvent(unitRecord);
+      Swal.close();
+      Swal.fire('Evento creado', 'Evento creado con éxito', 'success');
       console.log({ unitRecord })
       reset();
     }
