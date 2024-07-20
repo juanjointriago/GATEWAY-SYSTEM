@@ -112,7 +112,7 @@ const [teacher, setTeacher] = useState<string>()
               placeholder="Teacher"
               // isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              options={users.filter(user => user.role === 'teacher').map(user => ({ value: user.id, label: user.name }))}
+              options={users.filter(user =>( (user.role === 'teacher')||(user.role === 'admin'))).map(user => ({ value: user.id, label: user.name }))}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
                 console.log(' TEACHER-ID', e.value);
