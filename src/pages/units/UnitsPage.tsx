@@ -51,7 +51,7 @@ export const UnitsPage = () => {
     },
   ]
 
-  const sortedUnits = units.sort((a, b) => b.orderNumber! - a.orderNumber! ? 1 : -1).filter(unit => unit.isActive);
+  const sortedUnits = units.sort((a, b) => b.orderNumber - a.orderNumber ? 1 : -1).filter(unit => unit.isActive);
 
 
   return (

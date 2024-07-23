@@ -8,7 +8,9 @@ import Swal from "sweetalert2";
 export const FormUnit = () => {
   const fileRef = useRef(null);
   const createUnit = useUnitStore(state => state.createUnit);
+  const unitQTY = useUnitStore(state => state.units.length);
   const subLevels = useSubLevelStore(state => state.sublevels);
+  
   const [fileUpload, setFileUpload] = useState<FileList | null>(null)
   const defaultValues: unit = {
     name: '',
@@ -18,6 +20,7 @@ export const FormUnit = () => {
     // supportMaterial: '',
     workSheetUrl: '',
     isActive: false,
+    orderNumber: unitQTY+1,
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
   }
