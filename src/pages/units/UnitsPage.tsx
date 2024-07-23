@@ -21,7 +21,7 @@ export const UnitsPage = () => {
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
   const [openModal, setOpenModal] = useState(false);
-  const [unitToEdit, setUnitToEdit] = useState<string>()
+  const [unitToEdit, setUnitToEdit] = useState<unit>()
 
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export const UnitsPage = () => {
   }, []);
   // console.log('UNIDADES', units);
   const unitsCols: Array<ColumnProps<unit>> = [
+    { key: 'orderNumber', title: 'Nro', render: (_, record) => <>{record.orderNumber}</> },
     { key: 'sublevel', title: 'Unidad', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
     { key: 'name', title: 'Nombre' },
     { key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) => <UrlIframe title={record.name} src={record.supportMaterial!} errorMsg="Error al cargar el archivo" /> },
@@ -42,13 +43,23 @@ export const UnitsPage = () => {
         <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
         {isAdmin && <FabButton isActive tootTipText={''} action={() => {
           setOpenModal(true);
-          setUnitToEdit(record.id)
+          // setUnitToEdit(record.id)
+          setUnitToEdit(record)
         }} Icon={IoPencil} />}
       </>
       )
     },
   ]
 
+  const sortedUnits = units.sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  } ).filter(unit => unit.isActive);
 
 
   return (
@@ -56,11 +67,11 @@ export const UnitsPage = () => {
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/**Table comp */}
-        {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unitId={unitToEdit} />} />}
+        {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unit={unitToEdit} />} />}
         <TableContainer
           hasAddBtn={isAdmin}
           columns={unitsCols}
-          data={user && ((user.role === 'admin') ? units : units.filter((unit) => unit.sublevel === user.subLevel))}
+          data={user && ((user.role === 'admin') ? sortedUnits : sortedUnits.filter((unit) => unit.sublevel === user.subLevel))}
           modalChildren={<FormUnit />}
           modalTitle="Crear Unidades" />
       </div>

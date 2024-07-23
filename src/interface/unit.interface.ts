@@ -7,6 +7,7 @@ export interface unit {
     supportMaterial?: string;
     workSheetUrl: string;
     isActive: boolean;
+    orderNumber?: number;
     createdAt?: number;
     updatedAt?: number;
 }

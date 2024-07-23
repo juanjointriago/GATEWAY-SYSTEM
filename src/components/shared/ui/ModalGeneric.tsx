@@ -24,7 +24,7 @@ export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Moda
                                     <h3 className="text-3xl font-semibold">
                                         {title}
                                     </h3>
-                                    <div className="ml-80 flex items-center justify-end  border-t border-solid border-blueGray-200 rounded-b">
+                                    {/* <div className="ml-80 flex items-center justify-end  border-t border-solid border-blueGray-200 rounded-b">
                                         <button
                                             className="bg-blue-700 text-white active:bg-emerald-600 font-bold uppercase text-sm px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                             type="button"
@@ -32,12 +32,12 @@ export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Moda
                                         >
                                             X
                                         </button>
-                                    </div>
+                                    </div> */}
                                     <button
-                                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                                        className="p-1 ml-auto bg-blue-700 border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                                         onClick={() => setIsVisible(false)}
                                     >
-                                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                                        <span className="bg-transparent text-white h-8 w-8 text-2xl block outline-none focus:outline-none">
                                             ×
                                         </span>
                                     </button>

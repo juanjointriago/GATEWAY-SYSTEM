@@ -1,21 +1,33 @@
-import { FC, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { useSubLevelStore, useUnitStore } from "../../../stores";
 import { unit } from "../../../interface";
 import Swal from "sweetalert2";
 import { useForm } from "react-hook-form";
 
 interface Props {
-    unitId: string
+    unit: unit
 }
-export const EditUnitForm: FC<Props> = ({ unitId }) => {
+export const EditUnitForm: FC<Props> = ({ unit }) => {
     const fileRef = useRef(null);
     const updateUnit = useUnitStore(state => state.updateUnit);
     const subLevels = useSubLevelStore(state => state.sublevels);
-    const getUnitById = useUnitStore(state => state.getUnitById);
-    const currentUnit = getUnitById(unitId)!;
+    // const getUnitById = useUnitStore(state => state.getUnitById);
+    const [currentUnit, setCurrentUnit] = useState<unit>(unit);
+    // const currentUnit = getUnitById(unitId)!;
+    // useEffect(() => {
+    //     if(!currentUnit)return;
+    //     setCurrentUnit(getUnitById(unitId)!);
+    // }, [getUnitById, unitId])
+
+    useEffect(() => {
+        setCurrentUnit(unit);
+    }, [unit]);
+
+
+
 
     const [fileUpload, setFileUpload] = useState<FileList | null>(null)
-    console.log(currentUnit)
+    console.log('👀====> ', { currentUnit });
 
     const defaultValues: unit = { ...currentUnit }
     const { register, handleSubmit, reset, formState: { errors } } = useForm<unit>({ defaultValues });
@@ -52,7 +64,7 @@ export const EditUnitForm: FC<Props> = ({ unitId }) => {
             });
             await updateUnit(unitRecord, fileUpload[0]);
             Swal.close();
-            Swal.fire('Material almacenado', 'Material de apoyo creado con éxito', 'success');
+            Swal.fire('Material Actualizado', 'Material de actualizado creado con éxito', 'success');
             console.log({ data })
             inputFile!.value = ''
             fileRef.current = null;
@@ -74,7 +86,7 @@ export const EditUnitForm: FC<Props> = ({ unitId }) => {
                             className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
                             <option value={''}>Seleccione la Unidad</option>
                             {
-                                subLevels.map((sublevel) => {
+                                subLevels.filter((item) => item.isActive).map((sublevel) => {
                                     return <option key={sublevel.id} value={sublevel.id}>{sublevel.name}</option>
                                 })
                             }
@@ -107,17 +119,21 @@ export const EditUnitForm: FC<Props> = ({ unitId }) => {
                         {errors.description && <p className="text-red-500 text-xs italic">{errors.description.message}</p>}
                     </div>
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="orderNumber">
+                            Orden
+                        </label>
+                        <input
+                            {...register("orderNumber", { required: "Seleccione el orden 👀" })}
+                            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                            id="orderNumber"
+                            type="number"
+                        />
+                        {errors.orderNumber && <p className="text-red-500 text-xs italic">{errors.orderNumber.message}</p>}
+                    </div>
+                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="supportMaterial">
                             Material de apoyo *
                         </label>
-                        {/* <input
-                {...register("supportMaterial", { required: "La descripción es obligatoria 👀" })}
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="supportMaterial"
-                type="text"
-                placeholder="Aqui suba el enlace de material de apoyo" />
-              {errors.supportMaterial && <p className="text-red-500 text-xs italic">{errors.supportMaterial.message}</p>}
-            </div> */}
                         <input
                             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                             ref={fileRef}
@@ -126,7 +142,6 @@ export const EditUnitForm: FC<Props> = ({ unitId }) => {
                             placeholder="Subir archivo"
                             accept=".pdf"
                             onChange={(e) => setFileUpload(e.target.files)}
-                            required
                         />
                         {errors.supportMaterial && <p className="text-red-500 text-xs italic">{errors.supportMaterial.message}</p>}
                     </div>
@@ -135,14 +150,13 @@ export const EditUnitForm: FC<Props> = ({ unitId }) => {
                             Link de LiveWorkSheet *
                         </label>
                         <input
-                            {...register("workSheetUrl", { required: "La descripción es obligatoria 👀" })}
+                            {...register("workSheetUrl")}
                             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                             id="workSheetUrl"
                             type="text"
                             placeholder="Aqui suba el enlace de material de apoyo" />
                         {errors.workSheetUrl && <p className="text-red-500 text-xs italic">{errors.workSheetUrl.message}</p>}
                     </div>
-
 
                     <div className="w-full md:w-1/1 mt-2 px-3">
                         <label className="inline-flex items-center cursor-pointer">
