@@ -48,7 +48,7 @@ export const EditUnitForm: FC<Props> = ({ unit }) => {
             inputFile!.value = ''
             fileRef.current = null;
             Swal.close();
-            Swal.fire('Material almacenado', 'Material de apoyo creado con éxito', 'success');
+            Swal.fire('Material actualizado', 'Material de apoyo actualizado con éxito', 'success');
             reset();
             return;
         }
