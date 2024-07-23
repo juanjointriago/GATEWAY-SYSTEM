@@ -6,10 +6,10 @@ interface Props {
     subLevelId: string;
 }
 
-export const SubLevelById:FC<Props> = ({subLevelId}) => {
+export const SubLevelById: FC<Props> = ({ subLevelId }) => {
     const getSubLevelById = useSubLevelStore(state => state.getSubLevelById);
     const [foundSubLevel, setFoundSubLevel] = useState<subLevel>();
-    
+
     const setSubLevel = async () => {
         const newLevel = await getSubLevelById(subLevelId)
         if (newLevel) {
@@ -20,12 +20,12 @@ export const SubLevelById:FC<Props> = ({subLevelId}) => {
 
     useEffect(() => {
         setSubLevel();
-    }, [])
-  return (
-    
-    <>
-        {foundSubLevel && <div>{foundSubLevel.name}</div>}
+    }, [subLevelId])
+    return (
 
-    </>
-  )
+        <>
+            {foundSubLevel && <div>{foundSubLevel.name}</div>}
+
+        </>
+    )
 }
