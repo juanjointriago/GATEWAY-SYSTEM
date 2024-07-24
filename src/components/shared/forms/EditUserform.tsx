@@ -261,13 +261,14 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const defaultValues: FirestoreUser = { ...user };
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
     const onSubmit = handleSubmit((async (data) => {
-        if (!levelStudent) {
+        if (!levelStudent && user.role === 'student') {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
                 text: 'Debe seleccionar una modalidad',
             })
-            return;}
+            return;
+        }
         data.level = levelStudent;
         if ((sublevels.length === 0) && (selectedSublevels)) return;
         data.subLevel = selectedSublevels.value;
@@ -276,7 +277,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             ...data
         }
         await updateUser(updatedUser);
-        console.log('👀====>',{updatedUser});
+        console.log('👀====>', { updatedUser });
         reset();
     }))
 
@@ -344,42 +345,45 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     </select>
                 </div>
                 {/*Level*/}
-                <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                    <Select
-                        components={animatedComponents}
-                        defaultValue={''}
-                        placeholder="Modalidad"
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        options={levels.map(level => ({ value: level.id, label: level.name })) as any}
-                        // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        onChange={(e: any) => {
-                            console.log('LEVELID', e.value);
-                            if (!e.value) return
-                            setLevelStudent(e.value);
-                            const sublvs = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
-                            if (sublvs) setSubLevelsStudent(sublvs);
-                        }}
-                    />
-                </div>
                 {/*SubLevels*/}
-                <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                    <div className="bg-indigo-300 w-[auto] rounded-sm ">
+
+                {user && user.role === 'student' && <>
+                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                        <Select
+                            components={animatedComponents}
+                            defaultValue={''}
+                            placeholder="Modalidad"
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            options={levels.map(level => ({ value: level.id, label: level.name })) as any}
+                            // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onChange={(e: any) => {
+                                console.log('LEVELID', e.value);
+                                if (!e.value) return
+                                setLevelStudent(e.value);
+                                const sublvs = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
+                                if (sublvs) setSubLevelsStudent(sublvs);
+                            }}
+                        />
                     </div>
-                    <Select
-                        id="sublevels"
-                        defaultValue={''}
-                        components={animatedComponents}
-                        placeholder="Unidad "
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        options={subLevelslStudent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        onChange={(e: any) => {
-                            console.log('SUB-LEVELID', { e });
-                            setSelectedSublevels(e);
-                        }}
-                    />
-                </div>
+                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                        <div className="bg-indigo-300 w-[auto] rounded-sm ">
+                        </div>
+                        <Select
+                            id="sublevels"
+                            defaultValue={''}
+                            components={animatedComponents}
+                            placeholder="Unidad "
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            options={subLevelslStudent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onChange={(e: any) => {
+                                console.log('SUB-LEVELID', { e });
+                                setSelectedSublevels(e);
+                            }}
+                        />
+                    </div>
+                </>}
                 {/** Email */}
                 <div className="mb-4">
                     <label className="block text-gray-600">Email</label>
@@ -422,7 +426,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     />
                     {errors.phone && <p className="text-red-500 text-xs italic">{errors.phone.message}</p>}
                 </div>
-                
+
                 {/** Button*/}
 
                 <button type="submit" className="text-white w-full  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2">Guardar Cambios 🤘🏻</button>
