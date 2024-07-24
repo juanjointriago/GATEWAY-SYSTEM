@@ -37,7 +37,7 @@ export const FormEvent = () => {
   const [selectedSublevels, setSelectedSublevels] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [aditionalStudents, setAditionalStudents] = useState<any[]>([])
-const [teacher, setTeacher] = useState<string>()
+  const [teacher, setTeacher] = useState<string>()
   const levels = useLevelStore(state => state.levels);
   const sublevels = useSubLevelStore(state => state.sublevels);
   const users = useUserStore(state => state.users);
@@ -56,10 +56,10 @@ const [teacher, setTeacher] = useState<string>()
     const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.students = allstudents as any;
-    if(!teacher)return;
+    if (!teacher) return;
     data.teacher = teacher;
     if (data.teacher) {
-      data.meetLink = users.find((user) => user.id === data.teacher)?users.find((user) => user.id === data.teacher)?.teacherLink:'';
+      data.meetLink = users.find((user) => user.id === data.teacher) ? users.find((user) => user.id === data.teacher)?.teacherLink : '';
       const unitRecord = { id: uuid(), ...data }
       //loading swal 
       Swal.fire({
@@ -76,7 +76,7 @@ const [teacher, setTeacher] = useState<string>()
       });
       Swal.close();
       Swal.fire('Evento creado', 'Evento creado con éxito', 'success');
-      
+
       console.log({ unitRecord })
       reset();
     }
@@ -128,7 +128,7 @@ const [teacher, setTeacher] = useState<string>()
               placeholder="Teacher"
               // isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              options={users.filter(user =>( (user.role === 'teacher')||(user.role === 'admin') && (user.isActive))).map(user => ({ value: user.id, label: user.name }))}
+              options={users.filter(user => ((user.role === 'teacher') || (user.role === 'admin') && (user.isActive))).map(user => ({ value: user.id, label: user.name }))}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
                 console.log(' TEACHER-ID', e.value);

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import Swal from "sweetalert2";
 
 
 
@@ -260,7 +261,13 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const defaultValues: FirestoreUser = { ...user };
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
     const onSubmit = handleSubmit((async (data) => {
-        if (!levelStudent) return;
+        if (!levelStudent) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Debe seleccionar una modalidad',
+            })
+            return;}
         data.level = levelStudent;
         if ((sublevels.length === 0) && (selectedSublevels)) return;
         data.subLevel = selectedSublevels.value;
