@@ -81,3 +81,11 @@ export const getItemById = async <T>(collectionName: string, id: string) => {
 
 }
 
+
+export const sendCustomEmail = async (email: string, subject: string, message: string) => {
+    
+    console.log('Sending email to: ', email);
+    console.log('Subject: ', subject);
+    console.log('Message: ', message);
+}
+
