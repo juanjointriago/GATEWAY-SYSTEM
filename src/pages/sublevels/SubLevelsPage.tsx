@@ -1,4 +1,4 @@
-import { IoEye, IoEyeOff } from "react-icons/io5"
+import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5"
 import { FabButton } from "../../components/shared/buttons/FabButton"
 import { SublevelForm } from "../../components/shared/forms/SublevelForm"
 import { TableContainer } from "../../components/shared/tables/TableContainer"
@@ -6,12 +6,17 @@ import { subLevel } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useAuthStore, useSubLevelStore } from "../../stores"
 import { LevelById } from "../levels/LevelById"
+import { useState } from "react"
+import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
+import { EditSubLEvelForm } from "../../components/shared/forms/EditSubLEvelForm"
 
 export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
   const updateSublevel = useSubLevelStore(state => state.updateSubLevel);
   const isAdmin = user && user.role === 'admin';
   const subLevels = useSubLevelStore(state => state.sublevels);
+  const [openModal, setOpenModal] = useState(false);
+  const [subLevelToEdit, seSsubLevelToEdit] = useState<subLevel>()
   // console.log('SUBLEVELS', subLevels)
   const subLevelsCols: Array<ColumnProps<subLevel>> = [
     { key: 'name', title: 'Nombre' },
@@ -20,7 +25,14 @@ export const SubLevelsPage = () => {
     {
       key: 'isActive', title: 'Público', render: (_, record) => {
         //TODO component for generic actions on all tables
-        return <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        return <>
+        <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        {isAdmin && <FabButton isActive tootTipText={''} action={() => {
+          setOpenModal(true);
+          // setUnitToEdit(record.id)
+          seSsubLevelToEdit(record)
+        }} Icon={IoPencil} />}
+        </>
           ;
       }
     },
@@ -30,6 +42,7 @@ export const SubLevelsPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Unidades</h1>
+        {subLevelToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditSubLEvelForm subLevel={subLevelToEdit} />} />}
         <TableContainer hasAddBtn={isAdmin}
           columns={subLevelsCols}
           data={user && ((user.role === 'admin') ? subLevels : subLevels.filter((sublevel) => sublevel.id === user.subLevel))}

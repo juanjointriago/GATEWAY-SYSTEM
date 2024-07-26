@@ -24,8 +24,6 @@ yarn-error.log*
 
 # archivos de entorno
 .env
-.env.example
-.env.prod
 
 # TypeScript
 *.tsbuildinfo

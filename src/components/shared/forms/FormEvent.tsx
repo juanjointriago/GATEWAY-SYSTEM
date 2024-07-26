@@ -60,24 +60,28 @@ export const FormEvent = () => {
     data.teacher = teacher;
     if (data.teacher) {
       data.meetLink = users.find((user) => user.id === data.teacher) ? users.find((user) => user.id === data.teacher)?.teacherLink : '';
-      const unitRecord = { id: uuid(), ...data }
+      const eventRecord = { id: uuid(), ...data }
       //loading swal 
       Swal.fire({
-        title: 'Creando evento',
+        title: 'Creando Reservación',
         html: 'Espere un momento por favor',
         timerProgressBar: true,
         didOpen: () => {
           Swal.showLoading()  //swal loading
         },
       })
-      await createEvent(unitRecord).catch((error) => {
+      await createEvent(eventRecord).then(() => {
+        console.log('ITS ok');
+        Swal.close();
+        Swal.fire('DATA', `${eventRecord}`, 'info');
+        Swal.fire('Reservación creado', 'Reservación creado con éxito', 'success');
+
+      }).catch((error) => {
         Swal.fire('Error', `${error.message}`, 'error');
         console.error(error);
       });
       Swal.close();
-      Swal.fire('Evento creado', 'Evento creado con éxito', 'success');
-
-      console.log({ unitRecord })
+      console.log({ eventRecord })
       reset();
     }
   })
@@ -183,7 +187,7 @@ export const FormEvent = () => {
               placeholder="Estudiantes adicionales"
               isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              options={users.map(user => ({ value: user.id, label: user.name })) as any}
+              options={users.filter((user) => user.role === 'student').map(user => ({ value: user.id, label: user.name })) as any}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
                 // if (!environment.production) return

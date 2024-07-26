@@ -3,6 +3,7 @@ import { subLevel } from "../../../interface";
 import { v4 as uuid } from 'uuid'
 
 import { useLevelStore, useSubLevelStore } from "../../../stores";
+import Swal from "sweetalert2";
 
 
 
@@ -20,9 +21,27 @@ export const SublevelForm = () => {
     }
     const { register, handleSubmit, reset, formState: { errors } } = useForm<subLevel>({ defaultValues });
     const onSubmit = handleSubmit(async (data: subLevel) => {
-        const unitRecord = { id: uuid(), ...data }
-        await createSublevel(unitRecord);
-        console.log({ data })
+        const unitRecord = { id: uuid(), ...data };
+        Swal.fire({
+            title: 'Creando Unidad',
+            html: 'Espere un momento por favor',
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()  //swal loading
+            },
+        })
+        await createSublevel(unitRecord).then(() => {
+            console.log('ITS ok');
+            Swal.close();
+            Swal.fire('DATA', `${unitRecord}`, 'info');
+            Swal.fire('Unidad creado', 'Unidad creado con éxito', 'success');
+
+        }).catch((error) => {
+            Swal.fire('Error', `${error.message}`, 'error');
+            console.error(error);
+        });
+        Swal.close();
+        console.log({ unitRecord })
         reset();
     })
     return (

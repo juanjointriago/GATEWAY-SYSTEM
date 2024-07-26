@@ -39,7 +39,7 @@ export const UnitsPage = () => {
           <NavLink to={record.workSheetUrl} target="_blank" end rel="noreferrer noopener" > <span className="text-sm uppercase text-white-500 hidden md:block">🔍 WorkSheet</span></NavLink> </div>
     },
     {
-      key: 'isActive', title: 'Publico?', render: (_, record) => (<>
+      key: 'isActive', title: 'Acciones', render: (_, record) => (<>
         <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
         {isAdmin && <FabButton isActive tootTipText={''} action={() => {
           setOpenModal(true);

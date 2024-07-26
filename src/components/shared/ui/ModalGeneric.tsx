@@ -21,7 +21,7 @@ export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Moda
                             <div className=" border-0 rounded-lg shadow-lg relative flex flex-col w-full h-full bg-white outline-none focus:outline-none ">
                                 {/*header*/}
                                 <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-                                    <h3 className="text-3xl font-semibold">
+                                    <h3 className="text-3xl font-semibold mr-5">
                                         {title}
                                     </h3>
                                     {/* <div className="ml-80 flex items-center justify-end  border-t border-solid border-blueGray-200 rounded-b">
