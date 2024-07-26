@@ -30,10 +30,10 @@ export const SublevelForm = () => {
                 Swal.showLoading()  //swal loading
             },
         })
+        console.log({ unitRecord })
+
         await createSublevel(unitRecord).then(() => {
-            console.log('ITS ok');
             Swal.close();
-            Swal.fire('DATA', `${unitRecord}`, 'info');
             Swal.fire('Unidad creado', 'Unidad creado con éxito', 'success');
 
         }).catch((error) => {
@@ -41,7 +41,7 @@ export const SublevelForm = () => {
             console.error(error);
         });
         Swal.close();
-        console.log({ unitRecord })
+        // console.log({ unitRecord })
         reset();
     })
     return (

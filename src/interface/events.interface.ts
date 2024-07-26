@@ -26,7 +26,7 @@ export interface event {
     maxAssistantsNumber: number;
     minAssistantsNumber: number;
     name: string;
-    status: string;
+    status: status;
     students: students;
     teacher: string;
     updatedAt: number;

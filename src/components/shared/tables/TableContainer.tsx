@@ -30,7 +30,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
     const wb: WorkBook = utils.table_to_book(tableRef.current);
     writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
   }
-  const [rowsLimit] = useState(50);
+  const [rowsLimit] = useState(25);
   const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [customPagination, setCustomPagination] = useState<any>([]);
@@ -106,7 +106,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
 
   return (
     <>
-      <div className="ml-5 p-4 w-1/4 flex justify-end">
+      <div className="ml-5 p-4 w-[17rem] flex justify-end">
         {/* searchInput */}
         <input type="text" id="table-search"
           placeholder="🔍      Buscar ...   " onChange={(e) => {

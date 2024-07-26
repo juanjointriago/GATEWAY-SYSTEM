@@ -35,7 +35,7 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
         const events = await EventService.getEventsQuery('date', '>=', date.getTime());
         set({ events: [...events] })
     },
-    getEventById: (id: string) => get().events.find(event => event.id = id),
+    getEventById: (id: string) => get().events.find(event => event.id === id),
 
     createEvent: async (event: event) => {
         await EventService.createEvent(event);

@@ -14,7 +14,7 @@ interface UnitStore {
 
 const storeAPI: StateCreator<UnitStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     units: [],
-    getUnitById: (id: string) => get().units.find(unit => unit.id = id),
+    getUnitById: (id: string) => get().units.find(unit => unit.id === id),
     getAndSetUnits: async () => {
         try {
             const units = await UnitService.getUnits()

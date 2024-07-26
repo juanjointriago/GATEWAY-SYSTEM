@@ -32,7 +32,7 @@ export const EventsPage = () => {
     },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
     { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
-    { key: 'limitDate', title: 'Fecah Limite', render: (_, record) => <>{ record.limitDate ?new Date(record.limitDate.toLocaleString()): 'No asignado'}</> },
+    { key: 'limitDate', title: 'Fecha Limite', render: (_, record) => <>{ record.limitDate ?new Date(record.limitDate.toLocaleString()): 'No asignado'}</> },
 
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
@@ -73,7 +73,8 @@ export const EventsPage = () => {
   ]
 
   const events = useEventStore(state => state.events);
-  const sortedEvents = events.sort((a, b) => b.date - a.date).filter(event => event.isActive);
+  const sortedEvents = events.sort((a, b) => b.date - a.date)
+  // .filter(event => event.isActive);
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>

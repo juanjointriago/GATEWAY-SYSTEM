@@ -9,6 +9,7 @@ import { LevelById } from "../levels/LevelById"
 import { useState } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
 import { EditSubLEvelForm } from "../../components/shared/forms/EditSubLEvelForm"
+import Swal from "sweetalert2"
 
 export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
@@ -26,12 +27,26 @@ export const SubLevelsPage = () => {
       key: 'isActive', title: 'Público', render: (_, record) => {
         //TODO component for generic actions on all tables
         return <>
-        <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateSublevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
-        {isAdmin && <FabButton isActive tootTipText={''} action={() => {
-          setOpenModal(true);
-          // setUnitToEdit(record.id)
-          seSsubLevelToEdit(record)
-        }} Icon={IoPencil} />}
+          <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
+            Swal.fire({
+              title: '¿Estás seguro?',
+              text: `Estás a punto ${record.isActive ? 'Desactivar' : 'Activar'} ${record.name} la unidad`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, estoy seguro',
+              cancelButtonText: 'No, cancelar',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                updateSublevel({ ...record, isActive: !record.isActive })
+                Swal.fire('¡Hecho!', `La unidad ha sido ${record.isActive ? 'desactivada' : 'activada'}`, 'success')
+              }
+            })
+          } : () => console.log('')} />
+          {isAdmin && <FabButton isActive tootTipText={''} action={() => {
+            setOpenModal(true);
+            // seSsubLevelToEdit(record.id)
+            seSsubLevelToEdit(record)
+          }} Icon={IoPencil} />}
         </>
           ;
       }

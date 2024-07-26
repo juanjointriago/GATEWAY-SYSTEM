@@ -15,8 +15,8 @@ interface LevelStore {
 
 const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     levels: [],
-    getLevelById:   (id: string) =>   get().levels.find(level => level.id = id)
-,
+    getLevelById: (id: string) => get().levels.find(level => level.id === id)
+    ,
     getAndSetLevels: async () => {
         try {
             const levels = await LevelService.getLevels()

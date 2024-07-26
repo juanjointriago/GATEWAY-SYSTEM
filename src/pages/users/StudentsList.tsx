@@ -22,13 +22,13 @@ const changeVisualStatus = (status: status) => {
 }
 export const StudentsList: FC<Props> = ({ record }) => {
     const users = useUserStore(state => state.users);
-    const keys = Object.keys(record);
+    const studentIds = Object.keys(record);
     return (
         <div className="flex flex-row">{
-            keys.map((key) =>  (<div key={key}>
-                    <AvatarButton  tootTipText={`${users.find(user=>user.id === key)!.name} ${changeVisualStatus(record[key].status)}`} initialLetter={`${users.find(user=>user.id === key)!.name.split(" ")[0][0].toUpperCase()}${users.find(user=>user.id === key)!.name.split(" ")[1][0].toUpperCase()}`} isActive/>
-                    </div>)
-            )
+            studentIds.length < 4 ? studentIds.map((student) => (<div key={student}>
+                <AvatarButton tootTipText={`${users.find(user => user.id === student)!.name} ${changeVisualStatus(record[student].status)}`} initialLetter={`${users.find(user => user.id === student)!.name.split(" ")[0][0].toUpperCase()}${users.find(user => user.id === student)!.name.split(" ")[1][0].toUpperCase()}`} isActive />
+            </div>)
+            ):<>Select option</>
         }</div>
     )
 }

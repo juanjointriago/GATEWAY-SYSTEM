@@ -4,7 +4,7 @@ import makeAnimated from 'react-select/animated';
 import { useForm } from "react-hook-form";
 import { event, students, subLevel } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
-import { v4 as uuid } from 'uuid'
+import { v6 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import Swal from "sweetalert2";
 
@@ -13,13 +13,12 @@ export const FormEvent = () => {
   const createEvent = useEventStore(state => state.createEvent);
   const animatedComponents = makeAnimated();
   const defaultValues: event = {
-    id: '',
     name: '',
     date: 0,
     teacher: '',
     levels: { level: '', sublevels: [] },
     students: {},
-    status: '',
+    status: 'COMMING',
     isActive: true,
     maxAssistantsNumber: 10,
     minAssistantsNumber: 1,
@@ -60,7 +59,9 @@ export const FormEvent = () => {
     data.teacher = teacher;
     if (data.teacher) {
       data.meetLink = users.find((user) => user.id === data.teacher) ? users.find((user) => user.id === data.teacher)?.teacherLink : '';
-      const eventRecord = { id: uuid(), ...data }
+      const id = uuid();
+      console.log({id})
+      const eventRecord = { id, ...data }
       //loading swal 
       Swal.fire({
         title: 'Creando Reservación',
@@ -70,17 +71,17 @@ export const FormEvent = () => {
           Swal.showLoading()  //swal loading
         },
       })
+      console.log({ eventRecord });
       await createEvent(eventRecord).then(() => {
-        console.log('ITS ok');
-        Swal.close();
+        // console.log('ITS ok');
         Swal.fire('DATA', `${eventRecord}`, 'info');
         Swal.fire('Reservación creado', 'Reservación creado con éxito', 'success');
-
+        
       }).catch((error) => {
         Swal.fire('Error', `${error.message}`, 'error');
         console.error(error);
       });
-      Swal.close();
+      // Swal.close();
       console.log({ eventRecord })
       reset();
     }
