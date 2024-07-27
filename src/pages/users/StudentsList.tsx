@@ -4,8 +4,6 @@ import {
     students } from "../../interface"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton";
 import { useUserStore } from "../../stores";
-import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 
 
@@ -29,7 +27,6 @@ interface Props {
 
 // }
 export const StudentsList: FC<Props> = ({ record }) => {
-    const animatedComponents = makeAnimated();
     const getUserByRole = useUserStore(state => state.getUserByRole);
     const studentIds = Object.keys(record);
     const allStudents = getUserByRole("student");
@@ -53,9 +50,16 @@ export const StudentsList: FC<Props> = ({ record }) => {
                             isActive />
                     ))
                     : <>
-                        <div>
-                            Ver mas...
-                        </div>
+                        {showStudents && showStudents.slice(0, 3).map((student) => (
+                            <AvatarButton key={student?.id}
+                                tootTipText={student?.name ?? 'NO name'}
+                                initialLetter={getInitials(student?.name ?? 'XX')}
+                                isActive />
+                        ))}
+                        <AvatarButton
+                            initialLetter={`+${studentIds.length - 3}`}
+                            isActive
+                            action={() => setIsVisible(true)} />
                     </>
             }
             <ModalGeneric isVisible={isVisible} setIsVisible={setIsVisible} children={<>
