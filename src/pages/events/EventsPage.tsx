@@ -36,7 +36,7 @@ export const EventsPage = () => {
 
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
-        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
+        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton initialLetter={users.find(user => user.id === record.teacher)?.name.slice(0,1).toUpperCase()} tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
       }
     },
     {
@@ -49,15 +49,15 @@ export const EventsPage = () => {
         }
         </>
     },
-    // {
-    //   key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
-    //     <>
-    //       {isAdmin
-    //         //TODO editable form for students
-    //         ? <> {(!!record.students) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
-    //         : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
-    //     </>
-    // },
+    {
+      key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
+        <>
+          {isAdmin
+            //TODO editable form for students
+            ? <> {(!!record.students) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
+            : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
+        </>
+    },
     {
       key: 'isActive', title: 'Público', render: (_, record) => (
         //TODO component for generic actions on all tables
