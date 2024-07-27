@@ -1,10 +1,11 @@
 import { FC } from "react"
-import { status, students } from "../../interface"
+import { 
+    // status, 
+    students } from "../../interface"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton";
 import { useUserStore } from "../../stores";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import { v6 as uuid } from 'uuid';
 
 
 
@@ -13,19 +14,19 @@ interface Props {
     record: students
 }
 
-const changeVisualStatus = (status: status) => {
-    switch (status) {
-        case 'DECLINED':
-            return '❌ Cancelado '
-        case 'MAYBE':
-            return '⁇ Talvez'
-        case 'CONFIRMED':
-            return '✅ Aceptado'
-        default:
-            return 'Talves'
-    }
+// const changeVisualStatus = (status: status) => {
+//     switch (status) {
+//         case 'DECLINED':
+//             return '❌ Cancelado '
+//         case 'MAYBE':
+//             return '⁇ Talvez'
+//         case 'CONFIRMED':
+//             return '✅ Aceptado'
+//         default:
+//             return 'Talves'
+//     }
 
-}
+// }
 export const StudentsList: FC<Props> = ({ record }) => {
     const animatedComponents = makeAnimated();
     const getUserByRole = useUserStore(state => state.getUserByRole);
