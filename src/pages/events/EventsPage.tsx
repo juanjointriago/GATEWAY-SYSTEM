@@ -13,6 +13,7 @@ import { FabButton } from "../../components/shared/buttons/FabButton"
 import { useState } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
 import { EditEventForm } from "../../components/shared/forms/EditEventForm"
+import Swal from "sweetalert2"
 
 
 export const EventsPage = () => {
@@ -62,7 +63,12 @@ export const EventsPage = () => {
       key: 'isActive', title: 'Público', render: (_, record) => (
         //TODO component for generic actions on all tables
         <>
-        <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateEvent({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+        <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
+          // Swal.fire({
+            
+          // })
+          updateEvent({ ...record, isActive: !record.isActive })
+          } : () => {}} />
         {isAdmin && <FabButton isActive tootTipText={''} action={() => {
           setOpenModal(true);
           setEventToEdit(record.id)

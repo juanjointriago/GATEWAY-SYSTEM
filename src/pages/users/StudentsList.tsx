@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import { 
     // status, 
     students } from "../../interface"
@@ -6,6 +6,7 @@ import { AvatarButton } from "../../components/shared/buttons/AvatarButton";
 import { useUserStore } from "../../stores";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 
 
 
@@ -32,7 +33,8 @@ export const StudentsList: FC<Props> = ({ record }) => {
     const getUserByRole = useUserStore(state => state.getUserByRole);
     const studentIds = Object.keys(record);
     const allStudents = getUserByRole("student");
-    const showStudents = studentIds.map((studentId) => allStudents.find((student) => student.id === studentId))
+    const showStudents = studentIds.map((studentId) => allStudents.find((student) => student.id === studentId));
+    const [isVisible, setIsVisible] = useState(false);
     const getInitials = (name: string) => {
         // `${allStudents.find(user => user.id === student)!.name.split(" ")[0][0].toUpperCase()}${allStudents.find(user => user.id === student)!.name.split(" ")[1][0].toUpperCase()}`
         return (name.split(" ").length > 1)
@@ -51,16 +53,13 @@ export const StudentsList: FC<Props> = ({ record }) => {
                             isActive />
                     ))
                     : <>
-                        <Select
-                            key={'abc'}
-                            components={animatedComponents}
-                            defaultValue={''}
-                            placeholder="Estudiantes adicionales"
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            options={showStudents as any}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        />
+                        <div>
+                            Ver mas...
+                        </div>
                     </>
-            }</div>
+            }
+            <ModalGeneric isVisible={isVisible} setIsVisible={setIsVisible} children={<>
+                </>}/>
+            </div>
     )
 }
