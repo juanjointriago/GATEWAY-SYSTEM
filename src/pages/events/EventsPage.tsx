@@ -14,6 +14,7 @@ import { useState } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
 import { EditEventForm } from "../../components/shared/forms/EditEventForm"
 import Swal from "sweetalert2"
+import { getInitials } from "../users/helper"
 
 
 export const EventsPage = () => {
@@ -37,7 +38,7 @@ export const EventsPage = () => {
 
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
-        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton initialLetter={users.find(user => user.id === record.teacher)?.name.slice(0, 1).toUpperCase()} tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
+        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton initialLetter={ getInitials(users.find(user => user.id === record.teacher)?.name ?? 'XX')} tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
       }
     },
     {

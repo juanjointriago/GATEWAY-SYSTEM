@@ -3,6 +3,7 @@ import {  status,  students } from "../../interface"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton";
 import { useUserStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
+import { getInitials } from "./helper";
 
 
 
@@ -27,17 +28,10 @@ const changeVisualStatus = (status: status) => {
 export const StudentsList: FC<Props> = ({ record }) => {
     const getUserByRole = useUserStore(state => state.getUserByRole);
     const studentIds = Object.keys(record);
-    const studentStatus = Object.values(record);
-    console.log({studentStatus});
     const allStudents = getUserByRole("student");
     const showStudents = studentIds.map((studentId) => allStudents.find((student) => student.id === studentId));
     const [isVisible, setIsVisible] = useState(false);
-    const getInitials = (name: string) => {
-        // `${allStudents.find(user => user.id === student)!.name.split(" ")[0][0].toUpperCase()}${allStudents.find(user => user.id === student)!.name.split(" ")[1][0].toUpperCase()}`
-        return (name.split(" ").length > 1)
-            ? `${name.split(" ")[0][0].toUpperCase()}${name.split(" ")[1][0].toUpperCase()}`
-            : name ? name.slice(0, 1) : 'XX'
-    }
+
     return (
         <div
             className="flex flex-row">
