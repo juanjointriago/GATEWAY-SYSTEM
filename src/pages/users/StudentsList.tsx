@@ -1,9 +1,10 @@
 import { FC, useState } from "react"
-import {  status,  students } from "../../interface"
+import { status, students } from "../../interface"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton";
 import { useUserStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { getInitials } from "./helper";
+import { colors } from "../../theme/theme";
 
 
 
@@ -32,6 +33,8 @@ export const StudentsList: FC<Props> = ({ record }) => {
     const showStudents = studentIds.map((studentId) => allStudents.find((student) => student.id === studentId));
     const [isVisible, setIsVisible] = useState(false);
 
+
+
     return (
         <div
             className="flex flex-row">
@@ -42,35 +45,41 @@ export const StudentsList: FC<Props> = ({ record }) => {
                     studentIds.length < 4)
                     ? showStudents && showStudents.map((student) => (
                         <AvatarButton key={student?.id}
-                            tootTipText={student?.name ?? 'NO name'}
+                            tootTipText={`${student?.name ?? 'NO name'} - ${changeVisualStatus(record[`${student!.id!}`].status)}`}
                             initialLetter={getInitials(student?.name ?? 'XX')}
-                            isActive />
+                            isActive
+                            color={colors[Math.floor(Math.random() * colors.length)]}
+                        />
                     ))
                     : <>
                         {showStudents && showStudents.slice(0, 3).map((student) => (
                             <AvatarButton key={student?.id}
-                                tootTipText={student?.name ?? 'NO name'}
+                                tootTipText={`${student?.name ?? 'NO name'} - ${changeVisualStatus(record[`${student!.id!}`].status)}`}
                                 initialLetter={getInitials(student?.name ?? 'XX')}
+                                color={colors[Math.floor(Math.random() * colors.length)]}
                                 isActive />
                         ))}
                         <AvatarButton
                             initialLetter={`+${studentIds.length - 3}`}
                             isActive
                             tootTipText="Ver todos..."
-                            action={() => setIsVisible(true)} />
+                            action={() => setIsVisible(true)}
+                            color={colors[Math.floor(Math.random() * colors.length)]}
+                        />
                     </>
             }
             <ModalGeneric title="Estudiantes para esta clase" isVisible={isVisible} setIsVisible={setIsVisible} children={<>
                 {showStudents && showStudents.map((student) => (
                     <div key={student?.id} className="flex flex-row items-center">
                         <AvatarButton
-                            tootTipText={student?.name ?? 'NO name'}
+                            tootTipText={`${student?.name ?? 'NO name'} - ${changeVisualStatus(record[`${student!.id!}`].status)}`}
                             initialLetter={getInitials(student?.name ?? 'XX')}
+                            color={colors[Math.floor(Math.random() * colors.length)]}
                             isActive />
                         <p>{student?.name} {changeVisualStatus(record[`${student!.id!}`].status)}</p>
                     </div>
                 ))}
-                </>}/>
-            </div>
+            </>} />
+        </div>
     )
 }

@@ -38,7 +38,7 @@ export const EventsPage = () => {
 
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
-        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton initialLetter={ getInitials(users.find(user => user.id === record.teacher)?.name ?? 'XX')} tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
+        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton initialLetter={getInitials(users.find(user => user.id === record.teacher)?.name ?? 'XX')} tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
       }
     },
     {
@@ -55,8 +55,7 @@ export const EventsPage = () => {
       key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
         <>
           {isAdmin
-            //TODO editable form for students
-            ? <> {(record.students) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
+            ? <> {!(record.students.length) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
             : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
         </>
     },
@@ -64,22 +63,24 @@ export const EventsPage = () => {
       key: 'isActive', title: 'Público', render: (_, record) => (
         //TODO component for generic actions on all tables
         <>
-          <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
-            Swal.fire({
-              title: '¿Estás seguro?',
-              text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta reservación`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, continuar',
-              cancelButtonText: 'Cancelar'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                updateEvent({ ...record, isActive: !record.isActive })
-              }
-            })
-          } : () => { }} />
+          <FabButton isActive
+            Icon={record.isActive ? IoEye : IoEyeOff}
+            action={isAdmin ? () => {
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta reservación`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  updateEvent({ ...record, isActive: !record.isActive })
+                }
+              })
+            } : () => { }} />
           {isAdmin && <FabButton isActive tootTipText={''} action={() => {
             setOpenModal(true);
             setEventToEdit(record.id)

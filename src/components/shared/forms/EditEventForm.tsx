@@ -19,6 +19,7 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
   const sublevels = useSubLevelStore(state => state.sublevels);
   const users = useUserStore(state => state.users);
   const currentEvent = getEventById(eventId)!;
+  console.log('👀Current Event',{currentEvent})  
   const animatedComponents = makeAnimated();
   const defaultValues: event = { ...currentEvent }
   
