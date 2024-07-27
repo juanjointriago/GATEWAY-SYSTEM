@@ -3,22 +3,23 @@ import { FirestoreUser } from "../../interface";
 import { AuthService, UserService } from "../../services";
 import { devtools, persist } from "zustand/middleware";
 import Swal from "sweetalert2";
+import { role } from '../../interface/user.interface';
 
 interface UsersStore {
     users: FirestoreUser[];
     getAllUsers: () => void;
     getUserById: (id: string) => FirestoreUser | undefined;
+    getUserByRole: (id: role) => FirestoreUser[] | [];
     createUser: (user: FirestoreUser) => void;
     updateUser: (user: FirestoreUser) => void;
     deleteUserById: (id: string) => void;
-    resetPasswordByEmail : (email:string) => void;
+    resetPasswordByEmail: (email: string) => void;
 }
 
 
 const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
 
     users: [],
-
     getAllUsers: async () => {
         try {
             const users = await UserService.getUsers();
@@ -28,11 +29,12 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         }
     },
 
-    getUserById:  (id: string) => {
+    getUserById: (id: string) => {
         const user = get().users.find(user => user.id === id)
         // console.log('FOUND USER =>',{user})
         return user;
     },
+    getUserByRole: (role: role) => get().users.filter((user)=>user.role === role),
 
     createUser: async (user: FirestoreUser) => {
         try {
@@ -71,7 +73,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
             console.warn(error);
         }
     },
-    resetPasswordByEmail: async (email:string) => {
+    resetPasswordByEmail: async (email: string) => {
         AuthService.resetPassword(email);
     }
 })

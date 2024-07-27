@@ -7,6 +7,7 @@ import { immer } from "zustand/middleware/immer";
 interface EventStore {
     events: event[],
     getAndSetEvents: () => Promise<void>;
+    getAllEvents: () => Promise<void>;
     getEventsQuery: () => Promise<void>;
     getEventById: (id: string) => event | undefined;
     createEvent: (event: event) => Promise<void>;
@@ -27,9 +28,13 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
             console.warn(error);
         }
     },
+    getAllEvents: async () => {
+        const events = await EventService.getEvents();
+        set({ events: [...events] })
+    },
     getEventsQuery: async () => {
-        const year = new Date().getFullYear();
-        const month = new Date().getMonth() - 4;
+        const year = new Date().getFullYear()-3;
+        const month = new Date().getMonth();
         const day = new Date().getDate();
         const date = new Date(year, month, day);
         const events = await EventService.getEventsQuery('date', '>=', date.getTime());

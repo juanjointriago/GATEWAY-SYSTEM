@@ -27,16 +27,16 @@ export const EventsPage = () => {
   const eventCols: Array<ColumnProps<event>> = [
     {
       key: 'name', title: 'Nombre', render: (_, record) => <div className="truncate  w-[10rem] max-w-[10rem]">
-        <p className="">{record.name}</p>
+        <p >{record.name}</p>
       </div>
     },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
-    { key: 'date', title: 'Hora', render: (_, record) => <>{new Date(record.date).toLocaleTimeString()}</> },
-    { key: 'limitDate', title: 'Fecha Limite', render: (_, record) => <>{ record.limitDate ?new Date(record.limitDate.toLocaleString()): 'No asignado'}</> },
+    { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString()}</> },
+    // { key: 'limitDate', title: 'Fecha Limite', render: (_, record) => <>{ record.limitDate ? new Date(record.limitDate.toLocaleString()): 'No asignado'}</> },
 
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
-        return <> {users.find(user => user.id === record.teacher) && <AvatarButton tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
+        return <> {record.teacher && users.find(user => user.id === record.teacher) && <AvatarButton tootTipText={`${users.find(user => user.id === record.teacher)?.name}✨`} isActive />}</>
       }
     },
     {
@@ -49,15 +49,15 @@ export const EventsPage = () => {
         }
         </>
     },
-    {
-      key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
-        <>
-          {isAdmin
-            //TODO editable form for students
-            ? <> {record.students ? <StudentsList record={record.students} /> : <div>Sin asistentes</div>} </>
-            : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
-        </>
-    },
+    // {
+    //   key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
+    //     <>
+    //       {isAdmin
+    //         //TODO editable form for students
+    //         ? <> {(!!record.students) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
+    //         : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
+    //     </>
+    // },
     {
       key: 'isActive', title: 'Público', render: (_, record) => (
         //TODO component for generic actions on all tables
