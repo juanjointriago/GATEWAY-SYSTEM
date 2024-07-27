@@ -17,6 +17,7 @@ import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
 export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
   const user = useAuthStore(state => state.user);
+  console.log('👀 ==== > USER ',{user})
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);

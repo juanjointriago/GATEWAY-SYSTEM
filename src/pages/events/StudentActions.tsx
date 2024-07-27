@@ -44,21 +44,21 @@ const changeVisualStatus = (status: status) => {
         case 'CONFIRMED':
             return '✅ Aceptado'
         default:
-            return 'Talves'
+            return 'Tal vez'
     }
 
 }
 export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
-    const keys = Object.keys(students);
     const updateEvent = useEventStore(state => state.updateEvent);
     const today = new Date().getTime();
     return (
         <div className="flex flex-row">
             {
 
-                keys.map((key: string) => (
-                    <div key={key} className="flex flex-row">
-                        <TootipBase title="" tootTipText={changeVisualAction(`${students[key].status}`)}>
+                // keys.map((key: string) => (
+
+                    <div key={userId} className="flex flex-row">
+                        <TootipBase title="" tootTipText={changeVisualAction(`${students[userId].status}`)}>
                             <div onClick={() => {
                                 const student = event.students[userId];
                                 if (!event.limitDate) {
@@ -82,15 +82,15 @@ export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => 
                                         Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success')
                                     }
                                 })
-                            }} style={{ backgroundColor: changeVisualColor(`${event.students[key].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
+                            }} style={{ backgroundColor: changeVisualColor(`${event.students[userId].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
                                 <Icon size={20} color='white' />
                             </div>
 
                         </TootipBase>
-                        <p className="self-center">{changeVisualStatus(event.students[key].status)}</p>
+                        <p className="self-center">{changeVisualStatus(event.students[userId].status)}</p>
                     </div>
 
-                ))
+                // ))
             }
         </div>
     )
