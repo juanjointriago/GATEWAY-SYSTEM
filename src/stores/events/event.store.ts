@@ -33,8 +33,8 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
         set({ events: [...events] })
     },
     getEventsQuery: async () => {
-        const year = new Date().getFullYear()-1;
-        const month = new Date().getMonth();
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth()-4;
         const day = new Date().getDate();
         const date = new Date(year, month, day);
         const events = await EventService.getEventsQuery('date', '>=', date.getTime());

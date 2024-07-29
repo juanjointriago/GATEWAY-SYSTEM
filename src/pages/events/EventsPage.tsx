@@ -28,9 +28,7 @@ export const EventsPage = () => {
 
   const eventCols: Array<ColumnProps<event>> = [
     {
-      key: 'name', title: 'Nombre', render: (_, record) => <div className="truncate  w-[10rem] max-w-[10rem]">
-        <p >{record.name}</p>
-      </div>
+      key: 'name', title: 'Nombre', render: (_, record) => <div>{record.name} </div>
     },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
     { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString()}</> },
@@ -97,7 +95,7 @@ export const EventsPage = () => {
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
       {eventToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditEventForm eventId={eventToEdit} />} />}
-      <TableContainer
+      {sortedEvents && <TableContainer
         hasAddBtn={isAdmin}
         columns={eventCols}
         data={user && ((user.role === 'admin')
@@ -106,7 +104,7 @@ export const EventsPage = () => {
             ? sortedEvents.filter((event => event.teacher === user.id))
             : sortedEvents.filter((event) => event.students[user.id!]))}
         modalChildren={<FormEvent />}
-        modalTitle="Crear Reservación" />
+        modalTitle="Crear Reservación" />}
     </div>
   )
 }

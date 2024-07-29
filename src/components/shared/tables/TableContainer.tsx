@@ -75,7 +75,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
   const [showModal, setShowModal] = useState(false);
   const headers = columns.map((column, index) => {
     return (
-      <th key={`headCell-${index}`} scope="col" className="py-3 px-3 text-[#212B36] sm:text-base max-w-40 font-bold whitespace-nowrap">
+      <th key={`headCell-${index}`} scope="col" className="py-3 px-3 w-[auto] text-[#212B36] sm:text-base font-bold whitespace-nowrap">
         {column.title}
       </th>
     );
@@ -110,7 +110,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
         {/* searchInput */}
         <input type="text" id="table-search"
           placeholder="🔍      Buscar ...   " onChange={(e) => {
-            setSearchTerms(e.target.value)
+            setSearchTerms(e.target.value.trim())
             if (searchTerms.length > 0) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const results = data && data.filter((data: any) =>
