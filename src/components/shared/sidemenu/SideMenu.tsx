@@ -16,8 +16,8 @@ export const SideMenu = () => {
   const getAllUsers = useUserStore(state => state.getAllUsers);
   const getAllLevels = useLevelStore(state => state.getAndSetLevels);
   const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
-  // const getAllEvents = useEventStore(state => state.getEventsQuery);
-  const getAllEvents = useEventStore(state => state.getAllEvents);
+  const getAllEvents = useEventStore(state => state.getEventsQuery);
+  // const getAllEvents = useEventStore(state => state.getAllEvents);
 
 
   const authStatus = useAuthStore(state => state.status);
