@@ -31,7 +31,7 @@ export const EventsPage = () => {
       key: 'name', title: 'Nombre', render: (_, record) => <div>{record.name} </div>
     },
     { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
-    { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString()}</> },
+    { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString([],{hour:'2-digit', minute:"2-digit"})}</> },
     // { key: 'limitDate', title: 'Fecha Limite', render: (_, record) => <>{ record.limitDate ? new Date(record.limitDate.toLocaleString()): 'No asignado'}</> },
 
     {
