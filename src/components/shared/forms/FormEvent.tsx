@@ -16,7 +16,7 @@ export const FormEvent = () => {
     name: '',
     date: 0,
     teacher: '',
-    levels: { level: '', sublevels: [] },
+    levels: [{ level: '', subLevels: [] }],
     students: {},
     status: 'COMMING',
     isActive: true,
@@ -28,9 +28,8 @@ export const FormEvent = () => {
     updatedAt: new Date().getTime(),
   }
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<event>({ defaultValues })
-  const [levelEvent, setLevelEvent] = useState<string>();
-  console.log(levelEvent)
+  const { register, getValues, handleSubmit, reset, formState: { errors } } = useForm<event>({ defaultValues })
+  const [levelEvent, setLevelEvent] = useState<string>('');
   const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedSublevels, setSelectedSublevels] = useState<any[]>([]);
@@ -38,19 +37,23 @@ export const FormEvent = () => {
   const [aditionalStudents, setAditionalStudents] = useState<any[]>([])
   const [teacher, setTeacher] = useState<string>()
   const levels = useLevelStore(state => state.levels);
-  const sublevels = useSubLevelStore(state => state.sublevels);
-  const users = useUserStore(state => state.users);
+  const subLevels = useSubLevelStore(state => state.subLevels);
+  const getUserByRole = useUserStore(state => state.getUserByRole);
+  const students = getUserByRole('student')!;
+  const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!];
 
+  console.log(getValues('teacher'));
   const onSubmit = handleSubmit(async (data: event) => {
     if (!levelEvent) return;
-    data.levels.level = levelEvent;
-    if ((sublevels.length === 0) && (selectedSublevels.length === 0)) return;
+    if ((subLevels.length === 0) && (selectedSublevels.length === 0)) return;
     const sublevelsToSave: string[] = selectedSublevels.map((sublevel) => sublevel.value);
-    data.levels.sublevels = sublevelsToSave;
+    data.levels[0] = { level: levelEvent, subLevels: sublevelsToSave };
     // const aditionalStudentsToSave: students = aditionalStudents.map((aditionalStd) => ({ [aditionalStd.value]: { status: 'COMMING' } }));
     const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
     console.log(aditionalStudentsToSave)
-    const studentByLevel = users.map((user) => { if (sublevelsToSave.includes(user.subLevel!)) { return { [user.id!]: { status: 'COMMING' } } } });
+    // const studentByLevel = students.map((user) => { if (sublevelsToSave.includes(user.subLevel!)) { return { [user.id!]: { status: 'COMMING' } } } });
+    const studentByLevel = students.map((student) => { if (sublevelsToSave.includes(student.subLevel!)) { return { [student.id!]: { status: 'COMMING' } } } });
+    console.log('👀FOUND STUDENTS ===> ', { studentByLevel })
     const studentsToSave = studentByLevel.reduce((acc, curr) => ({ ...acc, ...curr }), {});
     const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,11 +61,11 @@ export const FormEvent = () => {
     if (!teacher) return;
     data.teacher = teacher;
     if (data.teacher) {
-      data.meetLink = users.find((user) => user.id === data.teacher) ? users.find((user) => user.id === data.teacher)?.teacherLink : '';
-      const id = uuid();
-      console.log({id})
-      const eventRecord = { id, ...data }
+      data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
+      const eventRecord = { id: uuid(), ...data }
       //loading swal 
+      console.log({ eventRecord });
+      // return;
       Swal.fire({
         title: 'Creando Reservación',
         html: 'Espere un momento por favor',
@@ -71,19 +74,18 @@ export const FormEvent = () => {
           Swal.showLoading()  //swal loading
         },
       })
-      console.log({ eventRecord });
       await createEvent(eventRecord).then(() => {
         // console.log('ITS ok');
         Swal.fire('DATA', `${eventRecord}`, 'info');
         Swal.fire('Reservación creado', 'Reservación creado con éxito', 'success');
-        
+
       }).catch((error) => {
         Swal.fire('Error', `${error.message}`, 'error');
         console.error(error);
       });
-      // Swal.close();
-      console.log({ eventRecord })
-      reset();
+      Swal.close();
+
+      reset(defaultValues);
     }
   })
   return (
@@ -128,12 +130,13 @@ export const FormEvent = () => {
           {/*Teacher*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <Select
+              {...register("teacher", { required: "El docente es obligatorio 👀", })}
               components={animatedComponents}
               defaultValue={''}
               placeholder="Teacher"
               // isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              options={users.filter(user => ((user.role === 'teacher') || (user.role === 'admin') && (user.isActive))).map(user => ({ value: user.id, label: user.name }))}
+              options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name }))}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
                 console.log(' TEACHER-ID', e.value);
@@ -141,12 +144,13 @@ export const FormEvent = () => {
                 setTeacher(e.value)
               }}
             />
+            {errors.teacher && <p className="text-red-500 text-xs italic">{errors.teacher.message}</p>}
           </div>
           {/*Level*/}
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <Select
               components={animatedComponents}
-              defaultValue={''}
+              defaultValue={levelEvent}
               placeholder="Modalidad"
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               options={levels.map(level => ({ value: level.id, label: level.name })) as any}
@@ -156,7 +160,7 @@ export const FormEvent = () => {
                 console.log('LEVELID', e.value);
                 if (!e.value) return
                 setLevelEvent(e.value);
-                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
+                const sublv = subLevels.filter((sublevel) => sublevel.parentLevel === e.value);
                 if (sublv) setSubLevelslEvent(sublv);
               }}
             />
@@ -166,7 +170,7 @@ export const FormEvent = () => {
             <div className="bg-indigo-300 w-[auto] rounded-sm ">
             </div>
             <Select
-              id="sublevels"
+              id="subLevels"
               defaultValue={''}
               components={animatedComponents}
               placeholder="Unidad "
@@ -188,7 +192,7 @@ export const FormEvent = () => {
               placeholder="Estudiantes adicionales"
               isMulti
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              options={users.filter((user) => user.role === 'student').map(user => ({ value: user.id, label: user.name })) as any}
+              options={students.map(student => ({ value: student.id, label: student.name })) as any}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
                 // if (!environment.production) return

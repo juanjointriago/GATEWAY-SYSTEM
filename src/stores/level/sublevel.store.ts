@@ -4,7 +4,7 @@ import { SubLevelService } from "../../services";
 import { devtools, persist } from "zustand/middleware";
 
 interface SubLevelsStore{
-    sublevels: subLevel[];
+    subLevels: subLevel[];
     getAndSetSubLevels: () => Promise<void>;
     getSubLevelById: (id: string) => subLevel | undefined;
     createSubLevel: (sublevel: subLevel) => Promise<void>;
@@ -13,24 +13,24 @@ interface SubLevelsStore{
 }
 
 const storeAPI:StateCreator<SubLevelsStore, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
-    sublevels: [],
+    subLevels: [],
     getAndSetSubLevels: async () => {
         try {
-            const sublevels = await SubLevelService.getSubLevels();
-            // console.log('SUBNIVELES ENCONTRADOS', { sublevels })
-            set({ sublevels: [...sublevels] })
+            const subLevels = await SubLevelService.getSubLevels();
+            // console.log('SUBNIVELES ENCONTRADOS', { subLevels })
+            set({ subLevels: [...subLevels] })
         } catch (error) {
             console.warn(error)
         }
     },
     getSubLevelById: (id: string) => {
-        const foundSubLevel = get().sublevels.find(sublevel => sublevel.id === id);
+        const foundSubLevel = get().subLevels.find(sublevel => sublevel.id === id);
         // console.log(foundSubLevel)
         return foundSubLevel
     },
     createSubLevel: async (sublevel: subLevel) => {
         await SubLevelService.createSubLevel(sublevel);
-        set({ sublevels: [...get().sublevels, sublevel] })
+        set({ subLevels: [...get().subLevels, sublevel] })
     },
     updateSubLevel: (sublevel: subLevel) => {
         console.log('updateSubLevel', sublevel)

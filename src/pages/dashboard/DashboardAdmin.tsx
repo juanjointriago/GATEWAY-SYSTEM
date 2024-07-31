@@ -7,7 +7,7 @@ import { IoBarChart, IoCalendar, IoPerson, IoPersonAdd, IoPersonAddOutline, IoPe
 export const DashboardAdmin: FC = () => {
     const users = useUserStore(state => state.users);
     const levels = useLevelStore(state => state.levels);
-    const subLevels = useSubLevelStore(state => state.sublevels);
+    const subLevels = useSubLevelStore(state => state.subLevels);
     const events = useEventStore(state => state.events.length);
     return (
 

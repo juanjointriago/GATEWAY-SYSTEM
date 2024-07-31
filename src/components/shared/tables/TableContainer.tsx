@@ -117,7 +117,9 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
         <input type="search" 
         className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
          id="table-search"
-          placeholder="🔍      Buscar ...   " onChange={(e) => {
+          placeholder="🔍      Buscar ...   " 
+          onEmptied={() => {setSearchTerms(''); setRowsToShow(data);}}
+          onChange={(e) => {
             // console.log(e.target)
             setSearchTerms(e.target.value.trim())
             if (searchTerms.length > 0) {

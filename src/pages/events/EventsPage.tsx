@@ -5,22 +5,23 @@ import { StudentsList } from "../users/StudentsList"
 import { useAuthStore, useUserStore } from "../../stores"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton"
 import { StudentActions } from "./StudentActions"
-import { IoCalendarClearOutline, IoEye, IoEyeOff, IoPencil } from "react-icons/io5"
+import { IoCalendarClearOutline, IoEye, IoEyeOff, IoPencil, IoTrash } from "react-icons/io5"
 import { NavLink } from "react-router-dom"
-import { FormEvent } from "../../components/shared/forms"
 import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { FabButton } from "../../components/shared/buttons/FabButton"
 import { useState } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
-import { EditEventForm } from "../../components/shared/forms/EditEventForm"
 import Swal from "sweetalert2"
 import { getInitials } from "../users/helper"
+import { FormEventControl } from "../../components/shared/forms/FormEventControl"
+import { EditEventControl } from "../../components/shared/forms/EditEventControl"
 
 
 export const EventsPage = () => {
   const users = useUserStore(state => state.users);
   const user = useAuthStore(state => state.user);
   const updateEvent = useEventStore(state => state.updateEvent);
+  const deleteEvent = useEventStore(state => state.deleteEvent);
   const isAdmin = user && user.role === 'admin';
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>()
@@ -79,10 +80,29 @@ export const EventsPage = () => {
                 }
               })
             } : () => { }} />
+            
           {isAdmin && <FabButton isActive tootTipText={''} action={() => {
             setOpenModal(true);
             setEventToEdit(record.id)
           }} Icon={IoPencil} />}
+          {isAdmin && <FabButton isActive
+            Icon={IoTrash}
+            action={() => {
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: `Estas a punto de eliminar esta reservación`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteEvent(record.id!);
+                }
+              })
+            }} />}
         </>
       )
     },
@@ -94,7 +114,7 @@ export const EventsPage = () => {
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
-      {eventToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditEventForm eventId={eventToEdit} />} />}
+      {eventToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditEventControl eventId={eventToEdit} />} />}
       {sortedEvents && <TableContainer
         hasAddBtn={isAdmin}
         columns={eventCols}
@@ -103,7 +123,7 @@ export const EventsPage = () => {
           : (user.role === 'teacher')
             ? sortedEvents.filter((event => event.teacher === user.id))
             : sortedEvents.filter((event) => event.students[user.id!]))}
-        modalChildren={<FormEvent />}
+        modalChildren={<FormEventControl />}
         modalTitle="Crear Reservación" />}
     </div>
   )

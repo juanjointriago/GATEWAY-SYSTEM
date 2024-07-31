@@ -9,7 +9,7 @@ export const FormUnit = () => {
   const fileRef = useRef(null);
   const createUnit = useUnitStore(state => state.createUnit);
   const unitQTY = useUnitStore(state => state.units.length);
-  const subLevels = useSubLevelStore(state => state.sublevels);
+  const subLevels = useSubLevelStore(state => state.subLevels);
 
   const [fileUpload, setFileUpload] = useState<FileList | null>(null)
   const defaultValues: unit = {

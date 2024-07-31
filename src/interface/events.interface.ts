@@ -8,7 +8,7 @@ interface user {
 
 interface levelSubLevel {
     level: string
-    sublevels: string[]
+    subLevels: string[]
 }
 
 export interface Level {
@@ -22,17 +22,17 @@ export interface students { [key: string]: { status: status } }
 export interface event {
     id?: string;
     isActive: boolean;
-    levels: levelSubLevel;
+    levels: [levelSubLevel];
     maxAssistantsNumber: number;
     minAssistantsNumber: number;
     name: string;
     status: status;
     students: students;
-    teacher: string;
+    teacher: string | null;
     updatedAt: number;
     createdAt: number;
     limitDate?: number;
-    meetLink?:string;
+    meetLink?:string | null;
     date: number;
 }
 

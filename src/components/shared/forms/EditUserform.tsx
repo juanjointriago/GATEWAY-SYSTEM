@@ -18,7 +18,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const user = getUserById(userId)!;
     const animatedComponents = makeAnimated();
     const levels = useLevelStore(state => state.levels);
-    const sublevels = useSubLevelStore(state => state.sublevels);
+    const sublevels = useSubLevelStore(state => state.subLevels);
     const [levelStudent, setLevelStudent] = useState<string>();
     console.log(levelStudent)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

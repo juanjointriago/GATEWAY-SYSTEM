@@ -10,7 +10,7 @@ interface Props {
 export const EditUnitForm: FC<Props> = ({ unit }) => {
     const fileRef = useRef(null);
     const updateUnit = useUnitStore(state => state.updateUnit);
-    const subLevels = useSubLevelStore(state => state.sublevels);
+    const subLevels = useSubLevelStore(state => state.subLevels);
     // const getUnitById = useUnitStore(state => state.getUnitById);
     const [currentUnit, setCurrentUnit] = useState<unit>(unit);
     // const currentUnit = getUnitById(unitId)!;

@@ -15,7 +15,7 @@ export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
   const updateSublevel = useSubLevelStore(state => state.updateSubLevel);
   const isAdmin = user && user.role === 'admin';
-  const subLevels = useSubLevelStore(state => state.sublevels);
+  const subLevels = useSubLevelStore(state => state.subLevels);
   const [openModal, setOpenModal] = useState(false);
   const [subLevelToEdit, seSsubLevelToEdit] = useState<subLevel>()
   // console.log('SUBLEVELS', subLevels)

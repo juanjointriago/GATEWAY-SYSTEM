@@ -40,7 +40,7 @@ const changeVisualStatus = (status: status) => {
         case 'DECLINED':
             return '❌ Cancelado '
         case 'MAYBE':
-            return '⁇ Talvez'
+            return  '👁️‍🗨️ Talvez'
         case 'CONFIRMED':
             return '✅ Aceptado'
         default:

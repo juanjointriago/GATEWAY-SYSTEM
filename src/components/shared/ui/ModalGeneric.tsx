@@ -24,15 +24,6 @@ export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Moda
                                     <h3 className="text-3xl font-semibold mr-5">
                                         {title}
                                     </h3>
-                                    {/* <div className="ml-80 flex items-center justify-end  border-t border-solid border-blueGray-200 rounded-b">
-                                        <button
-                                            className="bg-blue-700 text-white active:bg-emerald-600 font-bold uppercase text-sm px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                            type="button"
-                                            onClick={() => setIsVisible(false)}
-                                        >
-                                            X
-                                        </button>
-                                    </div> */}
                                     <button
                                         className="p-1 ml-auto bg-blue-700 border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                                         onClick={() => setIsVisible(false)}

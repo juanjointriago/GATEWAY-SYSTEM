@@ -5,6 +5,7 @@ import { useUserStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { getInitials } from "./helper";
 import { colors } from "../../theme/theme";
+import {v6 as uuid} from 'uuid'
 
 
 
@@ -67,7 +68,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
                         />
                     </>
             }
-            <ModalGeneric key={`${showStudents.length}`} title="Estudiantes para esta clase" isVisible={isVisible} setIsVisible={setIsVisible} children={<>
+            <ModalGeneric key={uuid()}  title="Estudiantes para esta clase" isVisible={isVisible} setIsVisible={setIsVisible} children={<div key={uuid()} >
                 {showStudents && showStudents.map((student) => (
                     <div key={student?.id} className="flex flex-row items-center">
                         <AvatarButton
@@ -78,7 +79,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
                         <p>{student?.name} {changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}</p>
                     </div>
                 ))}
-            </>} />
+            </div>} />
         </div>
     )
 }

@@ -16,15 +16,15 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
   const createEvent = useEventStore(state => state.createEvent);
   const getEventById = useEventStore(state => state.getEventById);
   const levels = useLevelStore(state => state.levels);
-  const sublevels = useSubLevelStore(state => state.sublevels);
+  const subLevels = useSubLevelStore(state => state.subLevels);
   const users = useUserStore(state => state.users);
   const currentEvent = getEventById(eventId)!;
   console.log('👀Current Event',{currentEvent})  
   const animatedComponents = makeAnimated();
   const defaultValues: event = { ...currentEvent }
   
-  console.log('==>>>>> CURRENT LEVELS',currentEvent.levels.level )
-  console.log('==>>>>> LEVELS',levels.find(level => level.id === currentEvent.levels.level)?.name  )
+  console.log('==>>>>> CURRENT LEVELS',currentEvent.levels )
+  // console.log('==>>>>> LEVELS',levels.find(level => level.id === currentEvent.levels.level)?.name  )
   const { register, handleSubmit, reset, formState: { errors } } = useForm<event>({ defaultValues })
   const [levelEvent, setLevelEvent] = useState<string>();
   console.log(levelEvent)
@@ -38,10 +38,10 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
 
   const onSubmit = handleSubmit(async (data: event) => {
     if (!levelEvent) return;
-    data.levels.level = levelEvent;
-    if ((sublevels.length === 0) && (selectedSublevels.length === 0)) return;
+    data.levels[0].level = levelEvent;
+    if ((subLevels.length === 0) && (selectedSublevels.length === 0)) return;
     const sublevelsToSave: string[] = selectedSublevels.map((sublevel) => sublevel.value);
-    data.levels.sublevels = sublevelsToSave;
+    data.levels[0].subLevels = sublevelsToSave;
     // const aditionalStudentsToSave: students = aditionalStudents.map((aditionalStd) => ({ [aditionalStd.value]: { status: 'COMMING' } }));
     const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
     console.log(aditionalStudentsToSave)
@@ -120,7 +120,7 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
           <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
             <Select
               components={animatedComponents}
-              defaultValue={levels.find(level => level.id === currentEvent.levels.level) ? { value: currentEvent.levels.level, label: levels.find(level => level.id === currentEvent.levels.level)?.name } : '' }
+              defaultValue={levels.find(level => level.id === currentEvent.levels[0].level) ? { value: currentEvent.levels[0].level, label: levels.find(level => level.id === currentEvent.levels[0].level)?.name } : ''  }
               placeholder="Modalidad"
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               options={levels.map(level => ({ value: level.id, label: level.name })) as any}
@@ -130,7 +130,7 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
                 console.log('LEVELID', e.value);
                 if (!e.value) return
                 setLevelEvent(e.value);
-                const sublv = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
+                const sublv = subLevels.filter((sublevel) => sublevel.parentLevel === e.value);
                 if (sublv) setSubLevelslEvent(sublv);
               }}
             />
@@ -140,7 +140,7 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
             <div className="bg-indigo-300 w-[auto] rounded-sm ">
             </div>
             <Select
-              id="sublevels"
+              id="subLevels"
               // defaultValue={subLevelslEvent.map(sublevel => ({ value: sublevel.id, label: sublevel.name }))}
               components={animatedComponents}
               placeholder="Unidad "
