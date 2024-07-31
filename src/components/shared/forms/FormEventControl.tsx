@@ -56,11 +56,14 @@ export const FormEventControl:FC = () => {
         data.students = allstudents as students;//change for STUDENTS
         // if (!data.teacher) return;
         if (data.teacher) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const newTeacher = data.teacher as any
+            data.teacher = newTeacher.value;
             data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
             console.log({ eventRecord });
-            // return;
+            return;
             Swal.fire({
                 title: 'Creando Reservación',
                 html: 'Espere un momento por favor',
@@ -158,11 +161,11 @@ export const FormEventControl:FC = () => {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name })) as any}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                onChange={(e: any) => {
-                                    // console.log(' TEACHER-ID', e.value);
-                                    // if (!e) return
-                                    setValue('teacher',e.value)
-                                }}
+                                // onChange={(e: any) => {
+                                //     console.log(' TEACHER-ID', e.value);
+                                //     if (!e) return
+                                //     setTeacher(e.value)
+                                // }}
                                 />
                             )}
                         />

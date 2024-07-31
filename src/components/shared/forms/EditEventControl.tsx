@@ -21,6 +21,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     const levels = useLevelStore(state => state.levels);
     const getLevelById = useLevelStore(state => state.getLevelById);
     const sublevels = useSubLevelStore(state => state.subLevels);
+    const getUserById = useUserStore(state => state.getUserById);
     const getUserByRole = useUserStore(state => state.getUserByRole);
     const students = getUserByRole('student')!;
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!];
@@ -52,6 +53,9 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
         const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
         data.students = allstudents as students;//change for STUDENTS
         if (data.teacher) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const newTeacher = data.teacher as any
+            data.teacher = newTeacher.value;
             data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
@@ -140,6 +144,9 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     </div>
                     {/*Teacher*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <p className="bg-indigo-300 w-[auto] rounded-sm ">
+                            Datos actuales : { getUserById(defaultValues.teacher!)?.name ?? 'Profesor' }
+                        </p>
                         <Controller
                             rules={{ required: "El docente es obligatorio 👀" }}
                             control={control}
@@ -154,11 +161,11 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name })) as any}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                onChange={(e: any) => {
+                                // onChange={(e: any) => {
                                     // console.log(' TEACHER-ID', e.value);
                                     // if (!e) return
-                                    setValue('teacher',e.value)
-                                }}
+                                    // setValue('teacher',e.value)
+                                // }}
                                 />
                             )}
                         />
