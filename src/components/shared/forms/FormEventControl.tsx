@@ -63,7 +63,7 @@ export const FormEventControl:FC = () => {
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
             console.log({ eventRecord });
-            return;
+            // return;
             Swal.fire({
                 title: 'Creando Reservación',
                 html: 'Espere un momento por favor',
