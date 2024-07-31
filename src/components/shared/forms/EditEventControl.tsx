@@ -56,7 +56,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
             console.log({ eventRecord });
-            return;
+            // return;
             Swal.fire({
                 title: 'Actualizando Reservación',
                 html: 'Espere un momento por favor',
@@ -154,11 +154,11 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name })) as any}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                // onChange={(e: any) => {
-                                //     console.log(' TEACHER-ID', e.value);
-                                //     if (!e) return
-                                //     setTeacher(e.value)
-                                // }}
+                                onChange={(e: any) => {
+                                    // console.log(' TEACHER-ID', e.value);
+                                    // if (!e) return
+                                    setValue('teacher',e.value)
+                                }}
                                 />
                             )}
                         />

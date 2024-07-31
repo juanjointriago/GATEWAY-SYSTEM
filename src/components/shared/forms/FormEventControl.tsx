@@ -158,11 +158,11 @@ export const FormEventControl:FC = () => {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name })) as any}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                // onChange={(e: any) => {
-                                //     console.log(' TEACHER-ID', e.value);
-                                //     if (!e) return
-                                //     setTeacher(e.value)
-                                // }}
+                                onChange={(e: any) => {
+                                    // console.log(' TEACHER-ID', e.value);
+                                    // if (!e) return
+                                    setValue('teacher',e.value)
+                                }}
                                 />
                             )}
                         />
