@@ -11,7 +11,7 @@ interface Props {
 }
 export const DashboardStudent: FC<Props> = ({ user }) => {
     const events = useEventStore(state => state.events);
-    const eventsStudent = events.filter(event => event.students[user.id!])
+    const eventsStudent = events.filter(event => event.students[user.id!] && event.isActive);
     const units = useUnitStore(state => state.units);
     const booksStudent = units.length
     // const myEvent = 
