@@ -27,13 +27,13 @@ const student: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Información del Estudiante', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
   { title: 'Clases', subTitle: 'Clases donde el estudiante se encuentra', href: '/dashboard/events', Icon: IoCalendar, active: true },
   // { title: 'Unidades', subTitle: 'Unidades del estudiante', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
-  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true, expandible: true  },
+  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
 ]
 
 const teacher: MenuItem[] = [
   { title: 'Dashboard', subTitle: 'Welcome Teacher', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
   { title: 'Reservaciones', subTitle: 'Gestión de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
-  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true, expandible: true  },
+  { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true  },
 
 ]
 

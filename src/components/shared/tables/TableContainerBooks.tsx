@@ -23,11 +23,11 @@ type Props<T> = {
 
 export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
     const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
-    const subLevels = useSubLevelStore(state => state.subLevels);
     const animatedComponents = makeAnimated();
 
     const tableRef = useRef<HTMLTableElement | null>(null);
     const user = useAuthStore(state => state.user);
+    const subLevels = useSubLevelStore(state => state.subLevels);
     const handleDownloadExcel = () => {
         const wb: WorkBook = utils.table_to_book(tableRef.current);
         writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
@@ -43,14 +43,15 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
     }
     const [rowsLimit] = useState(25);
     const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
+    const [selectedUnit, setSelectedUnit] = useState<string>('');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [customPagination, setCustomPagination] = useState<any>([]);
-    const [totalPage] = useState(Math.ceil(data!.length / rowsLimit));
+    const [totalPage] = useState(Math.ceil(rowsToShow!.length / rowsLimit));
     const [currentPage, setCurrentPage] = useState(0);
     const nextPage = () => {
         const startIndex = rowsLimit * (currentPage + 1);
         const endIndex = startIndex + rowsLimit;
-        const newArray = data?.slice(startIndex, endIndex);
+        const newArray = rowsToShow?.slice(startIndex, endIndex);
         setRowsToShow(newArray);
         setCurrentPage(currentPage + 1);
     };
@@ -65,7 +66,7 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
     const previousPage = () => {
         const startIndex = (currentPage - 1) * rowsLimit;
         const endIndex = startIndex + rowsLimit;
-        const newArray = data?.slice(startIndex, endIndex);
+        const newArray = rowsToShow?.slice(startIndex, endIndex);
         setRowsToShow(newArray);
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
@@ -77,10 +78,9 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
 
     useMemo(() => {
         setCustomPagination(
-            Array(Math.ceil(data!.length / rowsLimit)).fill(null)
+            Array(Math.ceil(rowsToShow!.length / rowsLimit)).fill(null)
         );
-    }, [data, rowsLimit]);
-
+    }, [rowsToShow, rowsLimit]);
 
 
     const [showModal, setShowModal] = useState(false);
@@ -95,7 +95,7 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
     const rows = !rowsToShow?.length ? (
         <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200">
             <td colSpan={columns.length} className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                No hay registros{" "}
+                No tiene libros asignados ...{" "}
             </td>
         </tr>
     ) : (
@@ -124,26 +124,39 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
                         className="block w-[15rem] p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                         id="table-search"
                         placeholder="🔍 Buscar por nombre ... "
-                        onEmptied={() => { setSearchTerms(''); setRowsToShow(data); }}
+                        onEmptied={() => {
+                            setSearchTerms('');
+                            if (selectedUnit === '') {
+                                setRowsToShow(data);
+                                return;
+                            }
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            setRowsToShow(data?.filter((record: any) => (record.sublevel as keyof typeof data) === selectedUnit));
+                        }}
                         onChange={(e) => {
                             // console.log(e.target)
                             setSearchTerms(e.target.value.trim())
-                            if (searchTerms.length > 0) {
+                            const results = data && (selectedUnit !== ''
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                const results = data && data.filter((data: any) =>
-                                    data["name"].toLowerCase().includes(searchTerms.toLowerCase())
-                                )
-                                console.log("resultados encontrados: ", results)
-                                setRowsToShow(results as T[])
-                            }
+                                ? data.filter((item: any) => item.sublevel === selectedUnit).filter((data: any) =>
+                                    data["name"].toLowerCase().includes(searchTerms.toLowerCase()))
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                : data.filter((data: any) =>
+                                    data["name"].toLowerCase().includes(searchTerms.toLowerCase()))
+                            )
+                            console.log("resultados encontrados: ", results)
+                            setRowsToShow(results as T[])
                         }}
                     />
                     <Select
                         components={animatedComponents}
                         placeholder="-- Unidades -- "
-                        options={subLevels.filter(subLevel => subLevel.isActive).sort().map((item) => ({ value: item.id, label: item.name }))}
+                        options={user && (user.role === 'admin'
+                            ? subLevels.map((item) => ({ value: item.id, label: item.name })).sort()
+                            : subLevels.filter((sublevel) => sublevel.id === user.subLevel).map((item) => ({ value: item.id, label: item.name })).sort())}
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onChange={(e: any) => {
+                            setSelectedUnit(e.value);
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const results = data && data.filter((record: any) => (record.sublevel as keyof typeof data) === e.value)
                             setRowsToShow(results as T[])
@@ -177,9 +190,9 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
                                     <div className="tex-lg">
                                         👁️ {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} /
                                         {currentPage === totalPage - 1
-                                            ? data?.length
+                                            ? rowsToShow?.length
                                             : (currentPage + 1) * rowsLimit}{" "}
-                                        = {data?.length} registros
+                                        = {rowsToShow?.length} registros
                                     </div>
                                     <div className="flex">
                                         <ul className="flex justify-center items-center gap-x-[10px] z-30"

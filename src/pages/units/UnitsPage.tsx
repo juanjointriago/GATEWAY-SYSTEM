@@ -17,7 +17,7 @@ import { TableContainerBooks } from "../../components/shared/tables/TableContain
 export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
   const user = useAuthStore(state => state.user);
-  console.log('👀 ==== > USER ',{user})
+  console.log('👀 ==== > USER ', { user })
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const units = useUnitStore(state => state.units);
@@ -27,7 +27,7 @@ export const UnitsPage = () => {
 
   useEffect(() => {
     getAllUnits();
-  }, []);
+  }, [getAllUnits]);
   // console.log('UNIDADES', units);
   const unitsCols: Array<ColumnProps<unit>> = [
     { key: 'orderNumber', title: 'Nro', render: (_, record) => <>{record.orderNumber}</> },
@@ -41,12 +41,10 @@ export const UnitsPage = () => {
     },
     {
       key: 'isActive', title: 'Acciones', render: (_, record) => (<>
-        <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />
-        {isAdmin && <FabButton isActive tootTipText={''} action={() => {
-          setOpenModal(true);
-          // setUnitToEdit(record.id)
-          setUnitToEdit(record)
-        }} Icon={IoPencil} />}
+        {isAdmin ? <div>
+          {isAdmin && <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />}
+          {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUnitToEdit(record) }} Icon={IoPencil} />}
+        </div> : <p>--------</p>}
       </>
       )
     },
@@ -61,7 +59,7 @@ export const UnitsPage = () => {
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/**Table comp */}
         {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unit={unitToEdit} />} />}
-        <TableContainerBooks 
+        <TableContainerBooks
           hasAddBtn={isAdmin}
           columns={unitsCols}
           data={user && ((user.role === 'admin') ? sortedUnits : sortedUnits.filter((unit) => unit.sublevel === user.subLevel))}

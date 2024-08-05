@@ -146,15 +146,16 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                   onClick={handleDownloadPDF}><MdPictureAsPdf /> </button>}
               </div>
 
-              <div className="w-full overflow-x-scroll md:overflow-auto  max-w-7xl 2xl:max-w-none mt-2">
+              <div className="w-full overflow-x-scroll md:overflow-auto  md:max-w-7xl max-w-7xl 2xl:max-w-none mt-2">
                 <table ref={tableRef} className="table-auto overflow-scroll md:overflow-auto w-full text-left font-inter border ">
                   <thead className="rounded-lg text-base text-white font-semibold w-full">
                     <tr className="bg-[#222E3A]/[6%]">{headers}</tr>
                   </thead>
                   <tbody className="overflow-x-auto">{rows}</tbody>
                 </table>
+              </div>
                 {/* Pagination */}
-                <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
+                <div className="w-ful overflow-x-scroll md:overflow-scroll md:max-w-5xl l:max-w-7xl xl:max-w-7xl  3xl:max-w-none flex justify-center sm:justify-center flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center self-center">
                   <div className="tex-lg">
                     👁️ {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} /
                     {currentPage === totalPage - 1
@@ -198,7 +199,6 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                     </ul>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
           {/* Modal */}

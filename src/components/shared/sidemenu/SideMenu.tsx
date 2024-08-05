@@ -28,7 +28,7 @@ export const SideMenu = () => {
     getAllLevels();
     getAllSubLevels();
     getAllEvents();
-  }, [])
+  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents]);
 
 
   if (authStatus === 'unauthorized') {
