@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { unit } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useAuthStore, useUnitStore } from "../../stores";
-import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
 import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
 import { NavLink } from "react-router-dom";
@@ -11,6 +10,7 @@ import { FabButton } from "../../components/shared/buttons/FabButton";
 import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
+import { TableContainerBooks } from "../../components/shared/tables/TableContainerBooks";
 
 
 
@@ -61,7 +61,7 @@ export const UnitsPage = () => {
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/**Table comp */}
         {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unit={unitToEdit} />} />}
-        <TableContainer
+        <TableContainerBooks 
           hasAddBtn={isAdmin}
           columns={unitsCols}
           data={user && ((user.role === 'admin') ? sortedUnits : sortedUnits.filter((unit) => unit.sublevel === user.subLevel))}

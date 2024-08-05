@@ -17,7 +17,7 @@ export const SubLevelsPage = () => {
   const isAdmin = user && user.role === 'admin';
   const subLevels = useSubLevelStore(state => state.subLevels);
   const [openModal, setOpenModal] = useState(false);
-  const [subLevelToEdit, seSsubLevelToEdit] = useState<subLevel>()
+  const [subLevelToEdit, setSsubLevelToEdit] = useState<subLevel>();
   // console.log('SUBLEVELS', subLevels)
   const subLevelsCols: Array<ColumnProps<subLevel>> = [
     { key: 'name', title: 'Nombre' },
@@ -44,8 +44,8 @@ export const SubLevelsPage = () => {
           } : () => console.log('')} />
           {isAdmin && <FabButton isActive tootTipText={''} action={() => {
             setOpenModal(true);
-            // seSsubLevelToEdit(record.id)
-            seSsubLevelToEdit(record)
+            // setSsubLevelToEdit(record.id)
+            setSsubLevelToEdit(record)
           }} Icon={IoPencil} />}
         </>
           ;

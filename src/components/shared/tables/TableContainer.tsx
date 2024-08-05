@@ -114,11 +114,11 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
     <>
       <div className="ml-5 p-4 w-[17rem] flex justify-end">
         {/* searchInput */}
-        <input type="search" 
-        className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-         id="table-search"
-          placeholder="🔍      Buscar ...   " 
-          onEmptied={() => {setSearchTerms(''); setRowsToShow(data);}}
+        <input type="search"
+          className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+          id="table-search"
+          placeholder="🔍      Buscar ...   "
+          onEmptied={() => { setSearchTerms(''); setRowsToShow(data); }}
           onChange={(e) => {
             // console.log(e.target)
             setSearchTerms(e.target.value.trim())
@@ -142,7 +142,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                   onClick={() => setShowModal(true)}>+ </button>}
                 {user && user.role === 'admin' && <button className="mr-1 ml-q bg-green-800 mb-5 text-white px-4 py-2 rounded hover:bg-green-700" type="button"
                   onClick={handleDownloadExcel}><IoBarChart /> </button>}
-                  {user && user.role === 'admin' && <button className="bg-red-800 mb-5 text-white px-4 py-2 rounded hover:bg-red-700" type="button"
+                {user && user.role === 'admin' && <button className="bg-red-800 mb-5 text-white px-4 py-2 rounded hover:bg-red-700" type="button"
                   onClick={handleDownloadPDF}><MdPictureAsPdf /> </button>}
               </div>
 
@@ -153,50 +153,50 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                   </thead>
                   <tbody className="overflow-x-auto">{rows}</tbody>
                 </table>
-              </div>
-              {/* Pagination */}
-              <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
-                <div className="tex-lg">
-                  👁️ {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} /
-                  {currentPage === totalPage - 1
-                    ? data?.length
-                    : (currentPage + 1) * rowsLimit}{" "}
-                  = {data?.length} registros
-                </div>
-                <div className="flex">
-                  <ul className="flex justify-center items-center gap-x-[10px] z-30"
-                    role="navigation"
-                    aria-label="Pagination">
-                    <li className={` prev-btn flex items-center justify-center w-[30px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${currentPage == 0
-                      ? "bg-[#cccccc] pointer-events-none"
-                      : " cursor-pointer"
-                      }`}
-                      onClick={previousPage}>
-                      <img src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg" />
-                    </li>
-                    {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      customPagination?.map((_: any, index: number) => (
-                        <li className={`flex items-center justify-center w-[30px] rounded-[6px] h-[34px] border-[1px] border-solid bg-[#FFFFFF] cursor-pointer ${currentPage == index
-                          ? "text-blue-600  border-sky-500"
-                          : "border-[#E4E4EB] "
-                          }`}
-                          onClick={() => changePage(index)}
-                          key={index}>
-                          {index + 1}
-                        </li>
-                      )
-                      )}
-                    <li
-                      className={`flex items-center justify-center w-[30px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
+                {/* Pagination */}
+                <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
+                  <div className="tex-lg">
+                    👁️ {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} /
+                    {currentPage === totalPage - 1
+                      ? data?.length
+                      : (currentPage + 1) * rowsLimit}{" "}
+                    = {data?.length} registros
+                  </div>
+                  <div className="flex">
+                    <ul className="flex justify-center items-center gap-x-[10px] z-30"
+                      role="navigation"
+                      aria-label="Pagination">
+                      <li className={` prev-btn flex items-center justify-center w-[30px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${currentPage == 0
                         ? "bg-[#cccccc] pointer-events-none"
                         : " cursor-pointer"
                         }`}
-                      onClick={nextPage}
-                    >
-                      <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
-                    </li>
-                  </ul>
+                        onClick={previousPage}>
+                        <img src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg" />
+                      </li>
+                      {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        customPagination?.map((_: any, index: number) => (
+                          <li className={`flex items-center justify-center w-[30px] rounded-[6px] h-[34px] border-[1px] border-solid bg-[#FFFFFF] cursor-pointer ${currentPage == index
+                            ? "text-blue-600  border-sky-500"
+                            : "border-[#E4E4EB] "
+                            }`}
+                            onClick={() => changePage(index)}
+                            key={index}>
+                            {index + 1}
+                          </li>
+                        )
+                        )}
+                      <li
+                        className={`flex items-center justify-center w-[30px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${currentPage == totalPage - 1
+                          ? "bg-[#cccccc] pointer-events-none"
+                          : " cursor-pointer"
+                          }`}
+                        onClick={nextPage}
+                      >
+                        <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
