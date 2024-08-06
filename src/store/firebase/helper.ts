@@ -32,6 +32,8 @@ export const setItem = async (collectionName: string, data: DocumentData) => {
 
 export const updateItem = async (collectionName: string, data: DocumentData) => {
     return await updateDoc(doc(db, collectionName, data.id), data);
+    // return await setDoc(doc(db, collectionName, data.uid), data);
+
 }
 
 export const deleteItem = async (collectionName: string, id: string) => {

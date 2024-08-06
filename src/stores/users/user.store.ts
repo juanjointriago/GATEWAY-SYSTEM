@@ -46,6 +46,8 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
     },
 
     updateUser: async (user: FirestoreUser) => {
+        console.log(' 👀=====> Editando a ',{user})
+        // return 
         try {
             await UserService.updateUsers(user);
             Swal.fire({

@@ -20,7 +20,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const levels = useLevelStore(state => state.levels);
     const sublevels = useSubLevelStore(state => state.subLevels);
     const [levelStudent, setLevelStudent] = useState<string>();
-    console.log(levelStudent)
+    // console.log(levelStudent)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [subLevelslStudent, setSubLevelsStudent] = useState<any[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -257,8 +257,11 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         { value: 'student', label: 'Student' },
         { value: 'admin', label: 'Administrator Be carefull' }
     ]
-    console.log('EditUserForm Found User by id',{user});
-    const defaultValues: FirestoreUser = { ...user };
+    console.log('EditUserForm Found User by id', { user });
+    const defaultValues: FirestoreUser = {
+        ...user,
+        updatedAt: new Date().getTime()
+    };
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
     const onSubmit = handleSubmit((async (data) => {
         if (!levelStudent && user.role === 'student') {
@@ -269,15 +272,25 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             })
             return;
         }
-        data.level = levelStudent;
-        if ((sublevels.length === 0) && (selectedSublevels)) return;
-        data.subLevel = selectedSublevels.value;
+        data.level = levelStudent??"";
+        if ((sublevels.length === 0) && (selectedSublevels)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Debe seleccionar una unidad',
+            });
+            return
+        }
+        if (user.role === 'student') {
+            data.subLevel = selectedSublevels.value;
+        }
         const updatedUser = {
             ...defaultValues,
             ...data
         }
-        await updateUser(updatedUser);
         console.log('👀====>', { updatedUser });
+        // return
+        await updateUser(updatedUser);
         reset();
     }))
 
@@ -346,7 +359,6 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 </div>
                 {/*Level*/}
                 {/*SubLevels*/}
-
                 {user && user.role === 'student' && <>
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <Select
@@ -401,7 +413,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                         <input
                             {...register("teacherLink")}
                             type="text"
-                            name="teacherLink"
+                            id="teacherLink"
                         />
                         {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                     </div>
