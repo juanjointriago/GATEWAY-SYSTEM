@@ -11,6 +11,7 @@ import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
 import { TableContainerBooks } from "../../components/shared/tables/TableContainerBooks";
+import Swal from "sweetalert2";
 
 
 
@@ -42,7 +43,22 @@ export const UnitsPage = () => {
     {
       key: 'isActive', title: 'Acciones', render: (_, record) => (<>
         {isAdmin ? <div>
-          {isAdmin && <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateUnit({ ...record, isActive: !record.isActive }) : () => console.log('')} />}
+          {isAdmin && <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
+            Swal.fire({
+              title: '¿Está seguro?',
+              text: `¿Está seguro de ${record.isActive ? 'desactivar' : 'activar'} la unidad ${record.name}?`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, desactivarla',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                updateUnit({ ...record, isActive: !record.isActive })
+              }
+            })
+          } : () => console.log('')} />}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUnitToEdit(record) }} Icon={IoPencil} />}
         </div> : <p>--------</p>}
       </>
