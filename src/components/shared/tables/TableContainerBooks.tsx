@@ -15,7 +15,7 @@ import { unit } from "../../../interface";
 
 type Props = {
     columns: Array<ColumnProps<unit>>;
-    data?:  unit[];
+    data?: unit[];
     modalChildren: ReactElement;
     modalTitle: string;
     hasAddBtn?: boolean;
@@ -28,7 +28,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
 
     const tableRef = useRef<HTMLTableElement | null>(null);
     const user = useAuthStore(state => state.user);
-    const subLevels = useSubLevelStore(state => state.subLevels);
+    const units = useSubLevelStore(state => state.subLevels);
     const handleDownloadExcel = () => {
         const wb: WorkBook = utils.table_to_book(tableRef.current);
         writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
@@ -43,7 +43,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
         })
     }
     const [rowsLimit] = useState(25);
-    const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
+    const [rowsToShow, setRowsToShow] = useState(data?.sort((a, b) => a.orderNumber - b.orderNumber).slice(0, rowsLimit));
     const [selectedUnit, setSelectedUnit] = useState<string>('');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [customPagination, setCustomPagination] = useState<any>([]);
@@ -153,13 +153,16 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                         }}
                     />
                     <Select
+                        //   console.log('BOOKS',books.filter((book) => user!.unitsForBooks.includes(book.id!)) )
+
                         components={animatedComponents}
                         placeholder="-- Unidades -- "
                         options={user && (user.role === 'admin'
-                            ? subLevels.sort((a, b) => a.name > b.name ? 1 : -1).map((item) => ({ value: item.id, label: item.name })).sort()
-                            : subLevels.filter((sublevel) => sublevel.id === user.subLevel).map((item) => ({ value: item.id, label: item.name })).sort())}
+                            ? units.sort((a, b) => a.name > b.name ? 1 : -1).map((item) => ({ value: item.id, label: item.name })).sort()
+                            : units.filter((unit) => user.unitsForBooks.includes(unit.id!)).map((item) => ({ value: item.id, label: item.name })).sort())}
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onChange={(e: any) => {
+                            console.log(e.value)
                             setSelectedUnit(e.value);
                             const results = data && data.filter((record) => (record.sublevel as keyof typeof data) === e.value)
                             setRowsToShow(results as unit[])

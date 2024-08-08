@@ -3,7 +3,7 @@ import { SideMenuItem } from "./SideMenuItem";
 import './SideMenu.css';
 import { useAuthStore } from "../../../stores/auth/auth.store";
 import { Navigate } from "react-router-dom";
-import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
+import { useLevelStore, useSubLevelStore, useUnitStore, useUserStore } from "../../../stores";
 import { useEffect } from "react";
 import { menuItemsByRole } from './menu';
 import { useEventStore } from '../../../stores/events/event.store';
@@ -16,6 +16,7 @@ export const SideMenu = () => {
   const getAllUsers = useUserStore(state => state.getAllUsers);
   const getAllLevels = useLevelStore(state => state.getAndSetLevels);
   const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
+  const getAllUnits =  useUnitStore(state => state.getAndSetUnits);
   // const getAllEvents = useEventStore(state => state.getEventsQuery);
   const getAllEvents = useEventStore(state => state.getAllEvents);
 
@@ -28,7 +29,8 @@ export const SideMenu = () => {
     getAllLevels();
     getAllSubLevels();
     getAllEvents();
-  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents]);
+    getAllUnits()
+  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits]);
 
 
   if (authStatus === 'unauthorized') {

@@ -17,10 +17,10 @@ import { TableContainerBooks } from "../../components/shared/tables/TableContain
 export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
   const user = useAuthStore(state => state.user);
-  console.log('👀 ==== > USER ', { user })
+  // console.log('👀 ==== > USER ', { user })
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
-  const units = useUnitStore(state => state.units);
+  const books = useUnitStore(state => state.units);
   const [openModal, setOpenModal] = useState(false);
   const [unitToEdit, setUnitToEdit] = useState<unit>()
 
@@ -50,7 +50,7 @@ export const UnitsPage = () => {
     },
   ]
 
-  const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
+  // const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
 
 
   return (
@@ -62,7 +62,7 @@ export const UnitsPage = () => {
         <TableContainerBooks
           hasAddBtn={isAdmin}
           columns={unitsCols}
-          data={user && ((user.role === 'admin') ? units : sortedUnits.filter((unit) => unit.sublevel === user.subLevel))}
+          data={user && ((user.role === 'admin') ? books : books.filter((unit) => user.unitsForBooks.includes(unit.sublevel )))}
           modalChildren={<FormUnit />}
           modalTitle="Crear Unidades" />
       </div>

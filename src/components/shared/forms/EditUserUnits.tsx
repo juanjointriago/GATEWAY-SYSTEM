@@ -35,7 +35,7 @@ export const EditUserUnits: FC<Props> = ({ userId }) => {
         })
     }
     // console.log('units',units.filter(unit => unit.isActive));
-    console.log('=====> unidades del usuario', { unitsForBooks: user.unitsForBooks });
+    // console.log('=====> unidades del usuario', { unitsForBooks: user.unitsForBooks });
     return (
         <>
             <div>
