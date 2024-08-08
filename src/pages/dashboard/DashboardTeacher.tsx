@@ -1,13 +1,17 @@
 import { FC } from "react";
-import { useAuthStore, useUnitStore } from "../../stores";
+import { useUnitStore } from "../../stores";
 import { useEventStore } from "../../stores/events/event.store";
 import { WhiteCard } from "../../components";
 import {  IoBook, IoCalendar } from "react-icons/io5";
-
-export const DashboardTeacher: FC = () => {
-    const user = useAuthStore(state => state.user);
+import { FirestoreUser } from "../../interface";
+interface Props {
+    user: FirestoreUser
+}
+export const DashboardTeacher: FC<Props> = ({user}) => {
     const events = useEventStore(state => state.events);
     const units = useUnitStore(state => state.units);
+    const booksTeacher = units.filter(unit => unit.isActive && (user.unitsForBooks || []).includes(unit.sublevel));
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 
@@ -19,7 +23,7 @@ export const DashboardTeacher: FC = () => {
             <WhiteCard centered>
                 <IoBook size={48} className="text-indigo-600" />
                 <h2>Libros</h2>
-                <p>{units.length}</p>
+                <p>{booksTeacher.length}</p>
             </WhiteCard>
         </div>)
 }
