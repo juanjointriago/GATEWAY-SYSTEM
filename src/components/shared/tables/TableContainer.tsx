@@ -119,15 +119,16 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
           id="table-search"
           placeholder="🔍      Buscar ...   "
           onEmptied={() => { setSearchTerms(''); setRowsToShow(data); }}
+          onAbort={() => { setSearchTerms(''); setRowsToShow(data); }}
           onChange={(e) => {
-            // console.log(e.target)
+            console.log(e.target.value)
             setSearchTerms(e.target.value.trim())
             if (searchTerms.length > 0) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const results = data && data.filter((data: any) =>
                 data["name"].toLowerCase().includes(searchTerms.toLowerCase())
               )
-              console.log("resultados encontrados: ", results)
+              // console.log("resultados encontrados: ", results)
               setRowsToShow(results as T[])
             }
           }}

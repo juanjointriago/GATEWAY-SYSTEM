@@ -8,20 +8,21 @@ import { useAuthStore, useSubLevelStore } from "../../../stores";
 import Swal from "sweetalert2";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { unit } from "../../../interface";
 
 
 
 
-type Props<T> = {
-    columns: Array<ColumnProps<T>>;
-    data?: T[];
+type Props = {
+    columns: Array<ColumnProps<unit>>;
+    data?:  unit[];
     modalChildren: ReactElement;
     modalTitle: string;
     hasAddBtn?: boolean;
 };
 
 
-export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
+export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props) => {
     const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
     const animatedComponents = makeAnimated();
 
@@ -99,13 +100,16 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
             </td>
         </tr>
     ) : (
-        rowsToShow?.map((row, index) => {
+        rowsToShow?.sort((a, b) => {
+            return a.orderNumber - b.orderNumber;
+            // return b.orderNumber - a.orderNumber;
+        }).filter(unit => unit.isActive).map((row, index) => {
             return (
                 <tr key={`row-${index}`}
                     className={`bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200 `}>
                     {columns.map((column, index2) => {
                         const value = column.render
-                            ? column.render(column, row as T)
+                            ? column.render(column, row as unit)
                             : (row[column.key as keyof typeof row] as string);
 
                         return <td className="text-sm text-gray-900 font-light px-2 py-4 whitespace-nowrap" key={`cell-${index2}`}>{value}</td>;
@@ -145,21 +149,20 @@ export const TableContainerBooks = <T,>({ data, columns, hasAddBtn = true, modal
                                     data["name"].toLowerCase().includes(searchTerms.toLowerCase()))
                             )
                             console.log("resultados encontrados: ", results)
-                            setRowsToShow(results as T[])
+                            setRowsToShow(results as unit[])
                         }}
                     />
                     <Select
                         components={animatedComponents}
                         placeholder="-- Unidades -- "
                         options={user && (user.role === 'admin'
-                            ? subLevels.map((item) => ({ value: item.id, label: item.name })).sort()
+                            ? subLevels.sort((a, b) => a.name > b.name ? 1 : -1).map((item) => ({ value: item.id, label: item.name })).sort()
                             : subLevels.filter((sublevel) => sublevel.id === user.subLevel).map((item) => ({ value: item.id, label: item.name })).sort())}
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onChange={(e: any) => {
                             setSelectedUnit(e.value);
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            const results = data && data.filter((record: any) => (record.sublevel as keyof typeof data) === e.value)
-                            setRowsToShow(results as T[])
+                            const results = data && data.filter((record) => (record.sublevel as keyof typeof data) === e.value)
+                            setRowsToShow(results as unit[])
 
                         }}
                     />

@@ -62,7 +62,7 @@ export const UnitsPage = () => {
         <TableContainerBooks
           hasAddBtn={isAdmin}
           columns={unitsCols}
-          data={user && ((user.role === 'admin') ? sortedUnits : sortedUnits.filter((unit) => unit.sublevel === user.subLevel))}
+          data={user && ((user.role === 'admin') ? units : sortedUnits.filter((unit) => unit.sublevel === user.subLevel))}
           modalChildren={<FormUnit />}
           modalTitle="Crear Unidades" />
       </div>

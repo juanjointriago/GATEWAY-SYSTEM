@@ -18,6 +18,7 @@ export interface newUSer {
     city: string;
     country: string;
     level?: string;
+    unitsForBooks?: string[];
     subLevel?: string;
     phone: string;
     role: role
@@ -37,6 +38,7 @@ export interface FirestoreUser extends User {
     city: string;
     country: string;
     level?: string;
+    unitsForBooks: string[];
     teacherLink?: string;
     subLevel?: string;
     phone: string;

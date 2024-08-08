@@ -10,6 +10,7 @@ import { useState } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
 import Swal from "sweetalert2";
+import { EditUserUnits } from "../../components/shared/forms/EditUserUnits";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -39,20 +40,12 @@ export const UsersPage = () => {
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',
-              confirmButtonText: 'Si, estoy seguro'
+              confirmButtonText: 'Si, estoy seguro',
+              cancelButtonText: 'Cancelar'
             }).then((result) => {
-              if (result.isConfirmed) {
-                updateUserById({ ...record, isActive: !record.isActive });
-                Swal.fire(
-                  'Actualizado!',
-                  'El usuario ha sido actualizado.',
-                  'success'
-                )
-              }
+              if (result.isConfirmed) { updateUserById({ ...record, isActive: !record.isActive }); Swal.fire('Actualizado!', 'El usuario ha sido actualizado.', 'success') }
 
             })
-            // updateUserById({ ...record, isActive: !record.isActive });
-
           }} Icon={record.isActive ? IoEye : IoEyeOff} iconSize={18} />
           {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUserToEdit(record.id) }} Icon={IoPencil} />}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenUnitModal(true); setUserforUnit(record.id) }} Icon={IoBook} />}
@@ -65,8 +58,8 @@ export const UsersPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
-        {userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
-        {userforUnit && <ModalGeneric title="Actualizar datos" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserform userId={userforUnit} />} />}
+        {isAdmin && userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
+        {isAdmin && userforUnit && <ModalGeneric title="Administrar Libros" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserUnits userId={userforUnit} />} />}
         {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />
           : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />}
       </div>

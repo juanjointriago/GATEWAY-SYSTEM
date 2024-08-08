@@ -238,7 +238,7 @@ export const FormEvent = () => {
           </div>
         </div>
         {/*Submit button*/}
-        <div className="flex h-[10%] justify-`end` ]">
+        <div className="flex h-[10%] justify-end">
           <button
             className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
             type="submit"

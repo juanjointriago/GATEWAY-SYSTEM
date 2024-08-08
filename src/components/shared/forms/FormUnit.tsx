@@ -63,7 +63,7 @@ export const FormUnit = () => {
               className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
               <option value={''}>Seleccione la Unidad</option>
               {
-                subLevels.map((sublevel) => {
+                subLevels.filter(unit=>unit.isActive).map((sublevel) => {
                   return <option key={sublevel.id} value={sublevel.id}>{sublevel.name}</option>
                 })
               }
