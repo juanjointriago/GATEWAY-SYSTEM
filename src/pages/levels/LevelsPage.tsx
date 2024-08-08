@@ -6,6 +6,7 @@ import { useAuthStore, useLevelStore } from "../../stores";
 import { FormLevel } from "../../components/shared/forms";
 import { FabButton } from "../../components/shared/buttons/FabButton";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 
 export const LevelsPage = () => {
@@ -21,7 +22,22 @@ export const LevelsPage = () => {
     { key: 'description', title: 'Descripción' },
     { key: 'isActive', title: 'Activo', render: (_, record) => (
       //TODO component for generic actions on all tables
-      <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => updateLevel({ ...record, isActive: !record.isActive }) : () => console.log('')} />
+      <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
+        Swal.fire({
+          title: '¿Está seguro?',
+          text: `¿Está seguro de ${record.isActive ? 'desactivar' : 'activar'} la modalidad ${record.name}?`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, desactivarla',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            updateLevel({ ...record, isActive: !record.isActive })
+          }
+        })
+      } : () => console.log('')} />
     )
   },
   ]
