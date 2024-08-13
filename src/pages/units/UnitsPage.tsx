@@ -68,7 +68,7 @@ export const UnitsPage = () => {
 
   // const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
 
-
+  const activeUnits = books.filter((unit) => unit.isActive === true)
   return (
     <>
       <div className="pt-5">
@@ -78,7 +78,7 @@ export const UnitsPage = () => {
         <TableContainerBooks
           hasAddBtn={isAdmin}
           columns={unitsCols}
-          data={user && ((user.role === 'admin') ? books : books.filter((unit) => unit.isActive === true).filter((unit) => user.unitsForBooks.includes(unit.sublevel )))}
+          data={user && ((user.role === 'admin') ? books : user.unitsForBooks ?activeUnits.filter((unit) => user.unitsForBooks.includes(unit.sublevel)):[])}
           modalChildren={<FormUnit />}
           modalTitle="Crear Unidades" />
       </div>

@@ -58,6 +58,18 @@ export const UsersPage = () => {
     <>
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
+        <div className=" ml-10 bg-red-600 w-1/5">
+          <select aria-placeholder="Modalidad"
+          onChange={(e) => console.log(e.target.value)}
+          className="h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
+            <option>---- Filtros ----</option>
+            <option value={'Docente'}>Docente</option>
+            <option value={'Estudiante'}>Estudiante</option>
+            <option value={'Administrativo'}>Administrativo</option>
+            <option value={'Activo'}>Activo</option>
+            <option value={'Inactivo'}>Inactivo</option>
+          </select>
+        </div>
         {isAdmin && userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
         {isAdmin && userforUnit && <ModalGeneric title="Administrar Libros" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserUnits userId={userforUnit} />} />}
         {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />
