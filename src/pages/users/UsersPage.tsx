@@ -5,12 +5,13 @@ import { useAuthStore, useUserStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoBook, IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
+import { IoBook, IoPencil } from "react-icons/io5";
 import { useState } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
 import Swal from "sweetalert2";
 import { EditUserUnits } from "../../components/shared/forms/EditUserUnits";
+import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -32,7 +33,7 @@ export const UsersPage = () => {
       key: 'isActive', title: 'Estado', render: (_, record) => <>
         {record && <div className="flex:1 flex-row justify-center">
           {/* TODO validate update with swal confirm */}
-          <FabButton isActive action={() => {
+          {/* <FabButton isActive action={() => {
             Swal.fire({
               title: '¿Estas seguro?',
               text: `Deseas ${record.isActive ? 'desactivar' : 'activar'} el usuario ${record.name}`,
@@ -44,9 +45,28 @@ export const UsersPage = () => {
               cancelButtonText: 'Cancelar'
             }).then((result) => {
               if (result.isConfirmed) { updateUserById({ ...record, isActive: !record.isActive }); Swal.fire('Actualizado!', 'El usuario ha sido actualizado.', 'success') }
-
             })
-          }} Icon={record.isActive ? IoEye : IoEyeOff} iconSize={18} />
+          }} Icon={record.isActive ? IoEye : IoEyeOff} iconSize={18} /> */}
+
+          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
+            console.log(record)
+            Swal.fire({
+              title: '¿Estás seguro?',
+              text: `Estas a punto de ${record.isActive ? 'desactivar' : 'activar'}  el usuario ${record.name}`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, continuar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // return
+                updateUserById({ ...record, isActive: record.isActive ? false : true })
+                Swal.fire('Actualizado!', 'El usuario ha sido actualizado.', 'success')
+              }
+            })
+          }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUserToEdit(record.id) }} Icon={IoPencil} />}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenUnitModal(true); setUserforUnit(record.id) }} Icon={IoBook} />}
         </div>}
@@ -60,8 +80,8 @@ export const UsersPage = () => {
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
         <div className=" ml-10 bg-red-600 w-1/5">
           <select aria-placeholder="Modalidad"
-          onChange={(e) => console.log(e.target.value)}
-          className="h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
+            onChange={(e) => console.log(e.target.value)}
+            className="h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
             <option>---- Filtros ----</option>
             <option value={'Docente'}>Docente</option>
             <option value={'Estudiante'}>Estudiante</option>

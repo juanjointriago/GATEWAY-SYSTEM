@@ -30,8 +30,16 @@ const storeAPI: StateCreator<UnitStore, [["zustand/devtools", never], ["zustand/
         set({ units: [...get().units, newUnit] });
         // console.log('createUnit', unit)
     },
-    updateUnit: async (unit: unit, file: unitFile | null | undefined = null) => await UnitService.updateUnitById(unit, file),
-    deleteUnit: async (id: string) => await UnitService.deleteUnitById(id)
+    updateUnit: async (unit: unit, file: unitFile | null | undefined = null) => {
+        const updatedUnits = get().units.map(u => u.id === unit.id ? unit : u);
+        set({ units: updatedUnits })
+        await UnitService.updateUnitById(unit, file)
+    },
+    deleteUnit: async (id: string) => {
+        const updatedUnits = get().units.filter(unit => unit.id !== id);
+        set({ units: updatedUnits });
+        await UnitService.deleteUnitById(id)
+    }
 })
 
 export const useUnitStore = create<UnitStore>()(

@@ -5,7 +5,7 @@ import { StudentsList } from "../users/StudentsList"
 import { useAuthStore, useUserStore } from "../../stores"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton"
 import { StudentActions } from "./StudentActions"
-import { IoCalendarClearOutline, IoEye, IoEyeOff, IoPencil, IoTrash } from "react-icons/io5"
+import { IoCalendarClearOutline, IoPencil, IoTrash } from "react-icons/io5"
 import { NavLink } from "react-router-dom"
 import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { FabButton } from "../../components/shared/buttons/FabButton"
@@ -15,6 +15,7 @@ import Swal from "sweetalert2"
 import { getInitials } from "../users/helper"
 import { FormEventControl } from "../../components/shared/forms/FormEventControl"
 import { EditEventControl } from "../../components/shared/forms/EditEventControl"
+import { ToggleButton } from "../../components/shared/buttons/ToggleButton"
 
 
 export const EventsPage = () => {
@@ -55,32 +56,29 @@ export const EventsPage = () => {
         <>
           {isAdmin
             ? <> {!(record.students.length) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
-            : <> {user && <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} />} </>}
+            : <> {user && user.role === 'student' ? <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} /> : null} </>}
         </>
     },
     {
       key: 'isActive', title: 'Público', render: (_, record) => (
         //TODO component for generic actions on all tables
         <>
-          <FabButton isActive
-            Icon={record.isActive ? IoEye : IoEyeOff}
-            action={isAdmin ? () => {
-              Swal.fire({
-                title: '¿Estás seguro?',
-                text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta reservación`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, continuar',
-                cancelButtonText: 'Cancelar'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  updateEvent({ ...record, isActive: !record.isActive })
-                }
-              })
-            } : () => { }} />
-
+          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
+            Swal.fire({
+              title: '¿Estás seguro?',
+              text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta reservación`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, continuar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                updateEvent({ ...record, isActive: !record.isActive })
+              }
+            })
+          }} /> : <div>{record.isActive ? 'Público' : 'Privado'}</div>}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => {
             setOpenModal(true);
             setEventToEdit(record.id)

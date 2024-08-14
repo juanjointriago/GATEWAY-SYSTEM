@@ -1,4 +1,4 @@
-import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5"
+import { IoPencil, IoTrash } from "react-icons/io5"
 import { FabButton } from "../../components/shared/buttons/FabButton"
 import { SublevelForm } from "../../components/shared/forms/SublevelForm"
 import { TableContainer } from "../../components/shared/tables/TableContainer"
@@ -10,10 +10,12 @@ import { useState } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
 import { EditSubLEvelForm } from "../../components/shared/forms/EditSubLEvelForm"
 import Swal from "sweetalert2"
+import { ToggleButton } from "../../components/shared/buttons/ToggleButton"
 
 export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
   const updateSublevel = useSubLevelStore(state => state.updateSubLevel);
+  const deleteSubLevel = useSubLevelStore(state => state.deleteSubLevel);
   const isAdmin = user && user.role === 'admin';
   const subLevels = useSubLevelStore(state => state.subLevels);
   const [openModal, setOpenModal] = useState(false);
@@ -27,7 +29,29 @@ export const SubLevelsPage = () => {
       key: 'isActive', title: 'Público', render: (_, record) => {
         //TODO component for generic actions on all tables
         return <>
-          <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
+          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
+
+            console.log(record)
+            Swal.fire({
+              title: '¿Estás seguro?',
+              text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta Unidad`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, continuar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                console.log('data for update', { ...record, isActive: record.isActive ? false : true })
+                // return
+                updateSublevel({ ...record, isActive: !record.isActive })
+                Swal.fire('¡Hecho!', `La unidad ha sido ${record.isActive ? 'desactivada' : 'activada'}`, 'success')
+
+              }
+            })
+          }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
+          {/* <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
             Swal.fire({
               title: '¿Estás seguro?',
               text: `Estás a punto ${record.isActive ? 'Desactivar' : 'Activar'} ${record.name} la unidad`,
@@ -41,12 +65,30 @@ export const SubLevelsPage = () => {
                 Swal.fire('¡Hecho!', `La unidad ha sido ${record.isActive ? 'desactivada' : 'activada'}`, 'success')
               }
             })
-          } : () => console.log('')} />
+          } : () => console.log('')} /> */}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => {
             setOpenModal(true);
             // setSsubLevelToEdit(record.id)
             setSsubLevelToEdit(record)
           }} Icon={IoPencil} />}
+          {isAdmin && <FabButton isActive
+            Icon={IoTrash}
+            action={() => {
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: `Estas a punto de eliminar esta Unidad (Sub-Nivel)`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteSubLevel(record.id!);
+                }
+              })
+            }} />}
         </>
           ;
       }

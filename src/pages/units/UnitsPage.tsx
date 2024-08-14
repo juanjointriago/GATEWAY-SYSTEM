@@ -7,16 +7,18 @@ import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
 import { NavLink } from "react-router-dom";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
+import { IoPencil, IoTrash } from "react-icons/io5";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
 import { TableContainerBooks } from "../../components/shared/tables/TableContainerBooks";
 import Swal from "sweetalert2";
+import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 
 
 
 export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
+  const deleteUnit = useUnitStore(state => state.deleteUnit);
   const user = useAuthStore(state => state.user);
   // console.log('👀 ==== > USER ', { user })
   const isAdmin = user && user.role === 'admin';
@@ -43,23 +45,46 @@ export const UnitsPage = () => {
     {
       key: 'isActive', title: 'Acciones', render: (_, record) => (<>
         {isAdmin ? <div>
-          {isAdmin && <FabButton isActive Icon={record.isActive ? IoEye : IoEyeOff} action={isAdmin ? () => {
+          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
+
+            console.log(record)
             Swal.fire({
-              title: '¿Está seguro?',
-              text: `¿Está seguro de ${record.isActive ? 'desactivar' : 'activar'} la unidad ${record.name}?`,
+              title: '¿Estás seguro?',
+              text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} este Libro`,
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, desactivarla',
+              confirmButtonText: 'Sí, continuar',
               cancelButtonText: 'Cancelar'
             }).then((result) => {
               if (result.isConfirmed) {
-                updateUnit({ ...record, isActive: !record.isActive })
+                console.log('data for update', { ...record, isActive: record.isActive ? false : true })
+                // return
+                updateUnit({ ...record, isActive: record.isActive? false : true })
+                Swal.fire('¡Hecho!', `El libro ha sido ${record.isActive ? 'desactivado' : 'activado'}`, 'success')
               }
             })
-          } : () => console.log('')} />}
+          }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
           {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUnitToEdit(record) }} Icon={IoPencil} />}
+          {isAdmin && <FabButton isActive
+            Icon={IoTrash}
+            action={() => {
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: `Estas a punto de eliminar este Libro `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteUnit(record.id!);
+                }
+              })
+            }} />}
         </div> : <p>--------</p>}
       </>
       )
@@ -74,11 +99,11 @@ export const UnitsPage = () => {
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
         {/**Table comp */}
-        {unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unit={unitToEdit} />} />}
+        {isAdmin && unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unit={unitToEdit} />} />}
         <TableContainerBooks
           hasAddBtn={isAdmin}
           columns={unitsCols}
-          data={user && ((user.role === 'admin') ? books : user.unitsForBooks ?activeUnits.filter((unit) => user.unitsForBooks.includes(unit.sublevel)):[])}
+          data={user && ((user.role === 'admin') ? books : user.unitsForBooks ? activeUnits.filter((unit) => user.unitsForBooks.includes(unit.sublevel)) : [])}
           modalChildren={<FormUnit />}
           modalTitle="Crear Unidades" />
       </div>

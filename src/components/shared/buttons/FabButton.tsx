@@ -5,7 +5,7 @@ import { IconType } from "react-icons";
 
 interface Props {
     isActive: boolean;
-action: () => void;
+    action: () => void;
     Icon: IconType;
     iconSize?: number;
     color?: string;

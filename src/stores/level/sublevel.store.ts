@@ -32,11 +32,15 @@ const storeAPI:StateCreator<SubLevelsStore, [["zustand/devtools", never], ["zust
         await SubLevelService.createSubLevel(sublevel);
         set({ subLevels: [...get().subLevels, sublevel] })
     },
-    updateSubLevel: (sublevel: subLevel) => {
-        console.log('updateSubLevel', sublevel)
+    updateSubLevel: async (sublevel: subLevel) => {
+        await SubLevelService.updateSubLevel(sublevel);
+        const updatedSubLevels = get().subLevels.map(sub => sub.id === sublevel.id ? sublevel : sub);
+        set({ subLevels: updatedSubLevels })
     },
-    deleteSubLevel: (id: string) => {
-        console.log('deleteSubLevel', id)
+    deleteSubLevel: async (id: string) => {
+        await SubLevelService.deleteSubLevelById(id);
+        const updatedSubLevels = get().subLevels.filter(sub => sub.id !== id);
+        set({ subLevels: updatedSubLevels })
     }
 })
 
