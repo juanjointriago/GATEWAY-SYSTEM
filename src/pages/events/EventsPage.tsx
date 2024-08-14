@@ -24,6 +24,7 @@ export const EventsPage = () => {
   const updateEvent = useEventStore(state => state.updateEvent);
   const deleteEvent = useEventStore(state => state.deleteEvent);
   const isAdmin = user && user.role === 'admin';
+  const isTeacher= user && user.role === 'teacher';
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>()
 
@@ -54,7 +55,7 @@ export const EventsPage = () => {
     {
       key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
         <>
-          {isAdmin
+          {(isAdmin || isTeacher)
             ? <> {!(record.students.length) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
             : <> {user && user.role === 'student' ? <StudentActions userId={user.id!} students={record.students} event={record} Icon={IoCalendarClearOutline} /> : null} </>}
         </>
