@@ -93,7 +93,7 @@ export const UnitsPage = () => {
 
   // const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
 
-  const activeUnits = books.filter((unit) => unit.isActive === true)
+  const activeUnits = books
   return (
     <>
       <div className="pt-5">
