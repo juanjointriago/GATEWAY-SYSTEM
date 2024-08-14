@@ -53,7 +53,7 @@ export const EventsPage = () => {
         </>
     },
     {
-      key: 'students', title: isAdmin ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
+      key: 'students', title:( isAdmin || isTeacher) ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
         <>
           {(isAdmin || isTeacher)
             ? <> {!(record.students.length) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
