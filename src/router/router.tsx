@@ -9,11 +9,13 @@ import { EventsPage } from '../pages/events/EventsPage'
 import { FaqPage } from '../pages/faq/FaqPage'
 import { SupportPage } from '../pages/support/SupportPage'
 import { LocationsPage } from '../pages/locations/LocationsPage'
+import { NotFound } from '../pages/errorPage/NotFound'
 
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <Root />,
+        errorElement: <NotFound/>,
         children: [
             //Dahsbord routes
             {
