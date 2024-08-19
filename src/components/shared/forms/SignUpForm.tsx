@@ -366,7 +366,7 @@ export const SignUpForm = () => {
 
         {/** BornDate*/}
         <div className="mb-4 text-blue-500">
-          <a href="/auth/forgot-password" className="hover:underline">Fecha de cumpleaños 🎂</a>
+          <p className="hover:underline">Fecha de cumpleaños 🎂</p>
           <input type="date" name="bornDate" />
 
         </div>
