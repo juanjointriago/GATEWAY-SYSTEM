@@ -93,7 +93,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
         );
     });
 
-    const rows = !rowsToShow?.length ? (
+    const rows = (!rowsToShow?.length) || (!data?.length) ? (
         <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-indigo-200">
             <td colSpan={columns.length} className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                 No tiene libros asignados ...{" "}
@@ -152,9 +152,8 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                             setRowsToShow(results as unit[])
                         }}
                     />
-                    <Select
+                    {user && user?.subLevel && user.unitsForBooks && <Select
                         //   console.log('BOOKS',books.filter((book) => user!.unitsForBooks.includes(book.id!)) )
-
                         components={animatedComponents}
                         placeholder="-- Unidades -- "
                         options={user && (user.role === 'admin'
@@ -168,7 +167,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                             setRowsToShow(results as unit[])
 
                         }}
-                    />
+                    />}
                 </div>
             </div>
             <div className="w-[97%] mx-auto overflow-auto">

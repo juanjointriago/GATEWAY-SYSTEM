@@ -54,10 +54,10 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
         console.log('start checkAuthStatus=>')
         const user = await AuthService.checkStatus();
         if (user) {
-            console.log('✅Authorized', JSON.stringify(user))
+            // console.log('✅Authorized', JSON.stringify(user))
             set({ status: 'authorized', ...user });
         } else {
-            console.log('❌Unauthorized', JSON.stringify(user))
+            // console.log('❌Unauthorized', JSON.stringify(user))
             set({ status: 'unauthorized', user: undefined });
         }
     },
