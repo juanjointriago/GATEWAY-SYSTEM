@@ -22,8 +22,10 @@ const changeVisualStatus = (status: status) => {
             return '⁇ Talvez'
         case 'CONFIRMED':
             return '✅ Aceptado'
+        case 'COMMING':
+            return '✅ Aceptado'
         default:
-            return 'Talves'
+            return 'Talvez'
     }
 
 }
@@ -70,13 +72,13 @@ export const StudentsList: FC<Props> = ({ record }) => {
             }
             <ModalGeneric key={uuid()}  title="Estudiantes para esta clase" isVisible={isVisible} setIsVisible={setIsVisible} children={<div key={uuid()} >
                 {showStudents && showStudents.map((student) => (
-                    <div key={student?.id} className="flex flex-row items-center">
+                    <div key={student?.id} className="flex flex-row items-center h-1/2">
                         <AvatarButton
-                            tootTipText={`${student?.name ?? 'NO name'} - ${changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}`}
                             initialLetter={getInitials(student?.name ?? 'XX').toUpperCase()}
                             color={colors[Math.floor(Math.random() * colors.length)]}
                             isActive />
-                        <p>{student?.name} {changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}</p>
+                            <p >{student?.name} -  {record[`${student?.id}`]?.status}</p>
+                        <p className="text-indigo-700">{changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}</p>
                     </div>
                 ))}
             </div>} />

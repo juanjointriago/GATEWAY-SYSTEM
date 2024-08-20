@@ -14,7 +14,7 @@ export const AvatarButton: FC<Props> = ({ isActive, action = () => console.log('
     return (
         <>
             {isActive && <div>
-                <TootipBase title={''} tootTipText={`${tootTipText}`}>
+                <TootipBase title={''} tootTipText={tootTipText}>
                     <div onClick={action} className={`relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-${color} rounded-full`}>
                         <span className="font-medium text-gray-100">{initialLetter}</span>
                     </div>
