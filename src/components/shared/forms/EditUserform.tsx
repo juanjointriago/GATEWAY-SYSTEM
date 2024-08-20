@@ -361,8 +361,8 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <Select
                             components={animatedComponents}
-                            defaultValue={''}
                             placeholder="Modalidad"
+                            defaultInputValue={levels.find(level => level.id === user.level)?.name}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             options={levels.map(level => ({ value: level.id, label: level.name })) as any}
                             // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
@@ -380,8 +380,9 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                         </div>
                         <Select
                             id="sublevels"
-                            defaultValue={''}
                             components={animatedComponents}
+                            defaultInputValue={sublevels.find(sublevel => sublevel.id === user.subLevel)?.name}
+
                             placeholder="Unidad "
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
