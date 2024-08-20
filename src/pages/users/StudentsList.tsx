@@ -77,8 +77,8 @@ export const StudentsList: FC<Props> = ({ record }) => {
                             initialLetter={getInitials(student?.name ?? 'XX').toUpperCase()}
                             color={colors[Math.floor(Math.random() * colors.length)]}
                             isActive />
-                            <p >{student?.name} -  {record[`${student?.id}`]?.status}</p>
-                        <p className="text-indigo-700">{changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}</p>
+                            <p >{student?.name} - </p>
+                        <p className="text-indigo-700">- {changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}</p>
                     </div>
                 ))}
             </div>} />

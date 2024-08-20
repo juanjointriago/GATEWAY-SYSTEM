@@ -28,7 +28,7 @@ export const UrlIframe: FC<Props> = ({ title, src, errorMsg = 'Este producto no 
                         isLoading
                             ? <Loading />
                             : <div>
-                                {<iframe src={pdfFileUrl}  className="w-[100%] h-[27rem]"></iframe>}
+                                {<iframe src={pdfFileUrl}  className="w-[60rem] h-[35rem]"></iframe>}
                             </div>}
                 </>} />
 
