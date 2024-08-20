@@ -22,7 +22,6 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const [levelStudent, setLevelStudent] = useState<string>();
     // console.log(levelStudent)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [subLevelslStudent, setSubLevelsStudent] = useState<any[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [selectedSublevels, setSelectedSublevels] = useState<any>();
 
@@ -358,7 +357,6 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     </select>
                 </div>
                 {/*Level*/}
-                {/*SubLevels*/}
                 {user && user.role === 'student' && <>
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <Select
@@ -373,11 +371,10 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                                 console.log('LEVELID', e.value);
                                 if (!e.value) return
                                 setLevelStudent(e.value);
-                                const sublvs = sublevels.filter((sublevel) => sublevel.parentLevel === e.value);
-                                if (sublvs) setSubLevelsStudent(sublvs);
                             }}
                         />
                     </div>
+                {/*SubLevels*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <div className="bg-indigo-300 w-[auto] rounded-sm ">
                         </div>
@@ -387,7 +384,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                             components={animatedComponents}
                             placeholder="Unidad "
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            options={subLevelslStudent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
+                            options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
                                 console.log('SUB-LEVELID', { e });
