@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 interface Props {
     userId: string
 }
+
 export const EditUserform: FC<Props> = ({ userId }) => {
     const updateUser = useUserStore(state => state.updateUser);
     const resetPasswordByEmail = useUserStore(state => state.resetPasswordByEmail);

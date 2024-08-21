@@ -23,7 +23,7 @@ const changeVisualStatus = (status: status) => {
         case 'CONFIRMED':
             return '✅ Aceptado'
         case 'COMMING':
-            return '✅ Aceptado'
+            return '👁️‍🗨️ Reservación creada'
         default:
             return 'Talvez'
     }

@@ -256,8 +256,9 @@ export const SignUpForm = () => {
       ...defaultValues,
       ...data
     }
-    await signUp(newUser);
     console.log(newUser);
+    // return
+    await signUp(newUser);
     reset()
   }))
 
