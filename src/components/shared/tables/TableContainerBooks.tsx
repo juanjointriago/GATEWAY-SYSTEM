@@ -152,7 +152,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                             setRowsToShow(results as unit[])
                         }}
                     />
-                    {user && user?.subLevel && user.unitsForBooks && <Select
+                    {(user && ((user?.subLevel && user.unitsForBooks)||user.role === 'admin')) && <Select
                         //   console.log('BOOKS',books.filter((book) => user!.unitsForBooks.includes(book.id!)) )
                         components={animatedComponents}
                         placeholder="-- Unidades -- "
