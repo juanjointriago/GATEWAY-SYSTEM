@@ -24,7 +24,7 @@ export const EventsPage = () => {
   const updateEvent = useEventStore(state => state.updateEvent);
   const deleteEvent = useEventStore(state => state.deleteEvent);
   const isAdmin = user && user.role === 'admin';
-  const isTeacher= user && user.role === 'teacher';
+  const isTeacher = user && user.role === 'teacher';
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>()
 
@@ -46,14 +46,14 @@ export const EventsPage = () => {
       key: 'meetLink', title: 'Enlace de Meet', render: (_, record) =>
         <>{record.meetLink
           ? <NavLink to={record.meetLink} target="_blank" end rel="noreferrer noopener" >
-            <span className="text-sm text-blue-500 hidden md:block">🧑‍💻 Ir a reunión</span>
+            <span className="text-sm text-blue-500 md:block">🧑‍💻 Ir a reunión</span>
           </NavLink>
-          : <span className="text-sm  text-blue-500 hidden md:block">Sin enlace configurado</span>
+          : <span className="text-sm  text-blue-500 md:block">Sin enlace configurado</span>
         }
         </>
     },
     {
-      key: 'students', title:( isAdmin || isTeacher) ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
+      key: 'students', title: (isAdmin || isTeacher) ? 'Estudiantes' : 'Gestión clase', render: (_, record) =>
         <>
           {(isAdmin || isTeacher)
             ? <> {!(record.students.length) ? <StudentsList key={record.id} record={record.students} /> : <div>Sin asistentes</div>} </>
