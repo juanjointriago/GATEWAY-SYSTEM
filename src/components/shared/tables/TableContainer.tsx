@@ -2,7 +2,7 @@ import { ReactElement, useMemo, useRef, useState } from "react";
 import { ColumnProps } from "../../../interface/ui/tables.interface";
 import { ModalGeneric } from "../ui/ModalGeneric";
 import { WorkBook, utils, writeFileXLSX } from 'xlsx';
-import { IoBarChart, IoRefreshCircle, IoTrash } from "react-icons/io5";
+import { IoBarChart, IoTrash } from "react-icons/io5";
 import { MdPictureAsPdf } from "react-icons/md";
 import { useAuthStore } from "../../../stores";
 import Swal from "sweetalert2";
