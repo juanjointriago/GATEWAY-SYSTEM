@@ -2,10 +2,11 @@ import { ReactElement, useMemo, useRef, useState } from "react";
 import { ColumnProps } from "../../../interface/ui/tables.interface";
 import { ModalGeneric } from "../ui/ModalGeneric";
 import { WorkBook, utils, writeFileXLSX } from 'xlsx';
-import { IoBarChart } from "react-icons/io5";
+import { IoBarChart, IoRefreshCircle, IoTrash } from "react-icons/io5";
 import { MdPictureAsPdf } from "react-icons/md";
 import { useAuthStore } from "../../../stores";
 import Swal from "sweetalert2";
+import { dateToMiliseconds } from "../../../helpers/date.helper";
 
 
 
@@ -22,6 +23,10 @@ type Props<T> = {
 export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChildren, modalTitle }: Props<T>) => {
   const [searchTerms, setSearchTerms] = useState('')//send Terms to table for table filter on data
   const tableRef = useRef<HTMLTableElement | null>(null);
+  //for date range
+  const [startDate, setStartDate] = useState<number | undefined>();
+  const [endDate, setEndDate] = useState<number>(new Date().getTime());
+
   const user = useAuthStore(state => state.user);
   const handleDownloadExcel = () => {
     const wb: WorkBook = utils.table_to_book(tableRef.current);
@@ -36,16 +41,16 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
       confirmButtonColor: '#2563EB'
     })
   }
-  const [rowsLimit] = useState(25);
+  const [rowsLimit] = useState(50);
   const [rowsToShow, setRowsToShow] = useState(data?.slice(0, rowsLimit));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [customPagination, setCustomPagination] = useState<any>([]);
-  const [totalPage] = useState(Math.ceil(data!.length / rowsLimit));
+  const [totalPage] = useState(Math.ceil(rowsToShow!.length / rowsLimit));
   const [currentPage, setCurrentPage] = useState(0);
   const nextPage = () => {
     const startIndex = rowsLimit * (currentPage + 1);
     const endIndex = startIndex + rowsLimit;
-    const newArray = data?.slice(startIndex, endIndex);
+    const newArray = rowsToShow?.slice(startIndex, endIndex);
     setRowsToShow(newArray);
     setCurrentPage(currentPage + 1);
   };
@@ -53,14 +58,14 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
   const changePage = (value: any) => {
     const startIndex = value * rowsLimit;
     const endIndex = startIndex + rowsLimit;
-    const newArray = data?.slice(startIndex, endIndex);
+    const newArray = rowsToShow?.slice(startIndex, endIndex);
     setRowsToShow(newArray);
     setCurrentPage(value);
   };
   const previousPage = () => {
     const startIndex = (currentPage - 1) * rowsLimit;
     const endIndex = startIndex + rowsLimit;
-    const newArray = data?.slice(startIndex, endIndex);
+    const newArray = rowsToShow?.slice(startIndex, endIndex);
     setRowsToShow(newArray);
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -112,7 +117,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
 
   return (
     <>
-      <div className="ml-5 p-4 w-[17rem] flex justify-end">
+      <div className="ml-5 p-4 w-[30rem] flex justify-end">
         {/* searchInput */}
         <input type="search"
           className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
@@ -128,12 +133,45 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
               const results = data && data.filter((data: any) =>
                 data["name"] && data["name"].toLowerCase().includes(searchTerms.toLowerCase())
               )
-              // console.log("resultados encontrados: ", results)
+              console.log("resultados encontrados: ", results)
               setRowsToShow(results as T[])
             }
           }}
         />
       </div>
+      {/* Range DatePicker */}
+      <div id="date-range-picker" className="flex items-center ml-5">
+        <span className="mx-4 text-gray-500">Desde</span>
+        <div className="relative">
+          <input id={'start-date'} name={'start-date'} type="date" onChange={e => {
+            console.log('start-date => ', e.target.value);
+            setStartDate(dateToMiliseconds(e.target.value));
+            if(startDate && endDate){
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const results = data?.filter((record:any)=>{
+                return record.updatedAt >= startDate && record.updatedAt <= endDate;
+              })
+              console.log("resultados encontrados start: ", results?.length)
+              setRowsToShow(results as T[])
+            }
+          }} />
+        </div>
+        <span className="mx-4 text-gravy-500">Hasta</span>
+        <div className="relative">
+          <input id={'end-date'} name={'end-date'} type="date" onChange={e=>{
+            setEndDate(dateToMiliseconds(e.target.value));
+            if(startDate && endDate){
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const results = data?.filter((record:any)=>{
+                return record.updatedAt >= startDate && record.updatedAt <= endDate;
+              })
+              setRowsToShow(results as T[])
+            }
+          }}/>
+        </div>
+        <IoTrash size={25} onClick={()=>window.location.reload()}/>
+      </div>
+      {/* rest */}
       <div className="w-[97%] mx-auto overflow-auto">
         <div className="flex flex-col">
           <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
