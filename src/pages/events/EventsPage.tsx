@@ -30,11 +30,11 @@ export const EventsPage = () => {
 
 
   const eventCols: Array<ColumnProps<event>> = [
+    { key: 'date', title: 'Fecha - Hora', render: (_, record) => <span>{new Date(record.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span> },
+    // { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" })}</> },
     {
       key: 'name', title: 'Nombre', render: (_, record) => <div>{record.name} </div>
     },
-    { key: 'date', title: 'Fecha', render: (_, record) => <span>{new Date(record.date).toLocaleDateString()}</span> },
-    { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" })}</> },
     { key: 'limitDate', title: 'Fecha Limite', render: (_, record) => <>{record.limitDate ? record.limitDate : 'No asignado'}</> },
 
     {
