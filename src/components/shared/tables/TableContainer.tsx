@@ -25,7 +25,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
   const tableRef = useRef<HTMLTableElement | null>(null);
   //for date range
   const [startDate, setStartDate] = useState<number | undefined>();
-  const [endDate, setEndDate] = useState<number>(new Date().getTime());
+  const [endDate, setEndDate] = useState<number>(Date.now());
 
   const user = useAuthStore(state => state.user);
   const handleDownloadExcel = () => {

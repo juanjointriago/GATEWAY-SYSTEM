@@ -21,8 +21,8 @@ export const FormUnit = () => {
     workSheetUrl: '',
     isActive: false,
     orderNumber: unitQTY + 1,
-    createdAt: new Date().getTime(),
-    updatedAt: new Date().getTime(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   }
   const { register, handleSubmit, reset, formState: { errors } } = useForm<unit>({ defaultValues });
   const onSubmit = handleSubmit(async (data: unit) => {

@@ -50,7 +50,7 @@ const changeVisualStatus = (status: status) => {
 }
 export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
     const updateEvent = useEventStore(state => state.updateEvent);
-    const today = new Date().getTime();
+    const today = Date.now();
     return (
         <div className="flex flex-row">
             {

@@ -8,7 +8,7 @@ interface SubLevelsStore{
     getAndSetSubLevels: () => Promise<void>;
     getSubLevelById: (id: string) => subLevel | undefined;
     createSubLevel: (sublevel: subLevel) => Promise<void>;
-    updateSubLevel: (sublevel: subLevel) => void;
+    updateSubLevel: (sublevel: subLevel) => Promise<void>;
     deleteSubLevel: (id: string) => void;
 }
 
@@ -40,7 +40,8 @@ const storeAPI:StateCreator<SubLevelsStore, [["zustand/devtools", never], ["zust
     deleteSubLevel: async (id: string) => {
         await SubLevelService.deleteSubLevelById(id);
         const updatedSubLevels = get().subLevels.filter(sub => sub.id !== id);
-        set({ subLevels: updatedSubLevels })
+        set({ subLevels: updatedSubLevels });
+        window.location.reload();
     }
 })
 

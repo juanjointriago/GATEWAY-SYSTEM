@@ -29,7 +29,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     //To formulary
     const defaultValues: event = { 
         ...getEventById(eventId)!,
-        updatedAt: new Date().getTime() };
+        updatedAt: Date.now()};
     
     
     console.log('EVENT TO EDIT ', { event: getEventById(eventId) });
@@ -236,7 +236,6 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             options={students.map(student => ({ value: student.id, label: student.name })) as any}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
-                                // if (!environment.production) return
                                 console.log(' STUDENT-ADITIONAL-ID', e);
                                 if (!e) return
                                 setAditionalStudents(e)
@@ -285,13 +284,15 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             <Controller
                                 rules={{ required: "Este campo debe registrarse por primera vez como Activo 👀" }}
                                 control={control}
-                                name="limitDate"
+                                name="isActive"
                                 render={({ field }) => (
                                     <input
-                                        {...field}
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        {...field as any}
                                         id="isActive"
-                                        type="checkbox"
+                                        type="radio"
                                         className="sr-only peer"
+
                                     />
                                 )}
                             />
@@ -303,7 +304,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     </div>
                 </div>
                 {/*Submit button*/}
-                <div className="flex h-[10%] justify-`end` ]">
+                <div className="flex h-[30%] justify-`end` ]">
                     <button
                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
                         type="submit"

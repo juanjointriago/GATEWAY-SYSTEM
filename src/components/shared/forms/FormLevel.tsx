@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { level } from "../../../interface";
 import { useLevelStore } from "../../../stores";
 import { v4 as uuid } from 'uuid'
+import Swal from "sweetalert2";
 
 export const FormLevel = () => {
 
@@ -10,18 +11,31 @@ export const FormLevel = () => {
         name: '',
         description: '',
         isActive: false,
-        createdAt: new Date().getDate(),
-        updatedAt: new Date().getDate(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
     }
     const { register, handleSubmit, reset, formState: { errors } } = useForm<level>({ defaultValues });
     const onSubmit = handleSubmit(async (data) => {
         const levelRecord = { id: uuid(), ...data }
-        await createLevel(levelRecord);
+        await createLevel(levelRecord).then(()=>{
+            Swal.fire({
+                title: 'Modalidad creada',
+                text: `Modalidad creada con éxito`,
+                icon: 'success',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Aceptar',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.reload();
+                }
+              })
+        }).catch((error)=>{
+            Swal.fire('Error', `${error.message}`, 'error');
+            console.error({error});
+        });
         console.log({ data })
         reset();
     })
-
-    // console.log({ errors })
     return (
         <>
             <form className="w-full max-w-lg" onSubmit={onSubmit}>
@@ -71,22 +85,6 @@ export const FormLevel = () => {
                             >Guardar  💾</button>
                         </div>
                     </div>
-                    {/* //selector example
-                    <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-state">
-                            State
-                        </label>
-                        <div className="relative">
-                            <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
-                                <option>New Mexico</option>
-                                <option>Missouri</option>
-                                <option>Texas</option>
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                            </div>
-                        </div>
-                    </div> */}
                 </div>
             </form>
         </>

@@ -32,11 +32,12 @@ const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand
     },
     updateLevel: async (level: level) => {
         await LevelService.updateLevel(level);
-        set({ levels: [...get().levels.map(l => l.id === level.id ? level : l)] })
+        set({ levels: [...get().levels.map(l => l.id === level.id ? level : l)] });
     },
     deleteLevel: async (id: string) => {
         await LevelService.deleteLevelById(id);
-        set({ levels: [...get().levels.filter(level => level.id !== id)] })
+        set({ levels: [...get().levels.filter(level => level.id !== id)] });
+        window.location.reload();
     }
 });
 

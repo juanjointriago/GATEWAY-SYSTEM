@@ -10,9 +10,9 @@ export interface level {
 export interface subLevel {
     id?: string;
     name: string;
-    parentLevel:string;
-    maxAssistantsNumber: number;
-    minAssistantsNumber: number;
+    // parentLevel?:string;
+    // maxAssistantsNumber: number;
+    // minAssistantsNumber: number;
     isActive: boolean;
     createdAt: number;
     updatedAt: number;

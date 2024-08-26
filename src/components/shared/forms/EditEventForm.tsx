@@ -165,7 +165,6 @@ export const EditEventForm: FC<Props> = ({ eventId }) => {
               options={users.map(user => ({ value: user.id, label: user.name })) as any}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onChange={(e: any) => {
-                // if (!environment.production) return
                 console.log(' STUDENT-ADITIONAL-ID', e);
                 if (!e) return
                 setAditionalStudents(e)

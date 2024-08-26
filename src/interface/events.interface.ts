@@ -22,6 +22,7 @@ export interface students { [key: string]: { status: status } }
 export interface event {
     id?: string;
     isActive: boolean;
+    // isActive: boolean | number | string | undefined;
     levels: [levelSubLevel];
     maxAssistantsNumber: number;
     minAssistantsNumber: number;

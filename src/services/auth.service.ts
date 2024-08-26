@@ -100,8 +100,8 @@ export class AuthService {
                     city,
                     country,
                     isActive: false,
-                    createdAt: new Date().getTime(),
-                    updatedAt: new Date().getTime(),
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
                 };
                 await updateProfile(userCredential.user, { displayName: name });
                 await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);
@@ -166,7 +166,7 @@ export class AuthService {
                     city: "",
                     country: "",
                     isActive: false,
-                    createdAt: new Date().getTime(),
+                    createdAt: Date.now(),
                 };
                 await adddItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
                 Swal.close();
@@ -213,7 +213,7 @@ export class AuthService {
             city,
             country,
             isActive: false,
-            createdAt: new Date().getTime(),
+            createdAt: Date.now(),
         };
 
         await updateProfile(user, { displayName: name });

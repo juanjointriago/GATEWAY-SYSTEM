@@ -260,7 +260,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     console.log('EditUserForm Found User by id', { user });
     const defaultValues: FirestoreUser = {
         ...user,
-        updatedAt: new Date().getTime()
+        updatedAt: Date.now()
     };
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
     const onSubmit = handleSubmit((async (data) => {

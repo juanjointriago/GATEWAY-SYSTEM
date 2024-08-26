@@ -26,7 +26,7 @@ export const EventsPage = () => {
   const isAdmin = user && user.role === 'admin';
   const isTeacher = user && user.role === 'teacher';
   const [openModal, setOpenModal] = useState(false);
-  const [eventToEdit, setEventToEdit] = useState<string>()
+  const [eventToEdit, setEventToEdit] = useState<string>();
 
 
   const eventCols: Array<ColumnProps<event>> = [
@@ -61,7 +61,7 @@ export const EventsPage = () => {
         </>
     },
     {
-      key: 'isActive', title: 'Público', render: (_, record) => (
+      key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => (
         //TODO component for generic actions on all tables
         <>
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
@@ -114,7 +114,7 @@ export const EventsPage = () => {
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
-      
+
       {eventToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditEventControl eventId={eventToEdit} />} />}
       {sortedEvents && <TableContainer
         hasAddBtn={isAdmin}

@@ -24,8 +24,8 @@ export const FormEventControl:FC = () => {
         minAssistantsNumber: 1,
         limitDate: 0,
         meetLink: '',
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
     }
 
     const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<event>({ defaultValues })
@@ -235,7 +235,6 @@ export const FormEventControl:FC = () => {
                             options={students.map(student => ({ value: student.id, label: student.name })) as any}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
-                                // if (!environment.production) return
                                 console.log(' STUDENT-ADITIONAL-ID', e);
                                 if (!e) return
                                 setAditionalStudents(e)

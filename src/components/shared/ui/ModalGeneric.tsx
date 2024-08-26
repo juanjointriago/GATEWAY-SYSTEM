@@ -1,4 +1,4 @@
-import { FC, ReactElement } from "react"
+import { FC, ReactElement, useEffect } from "react"
 
 interface Props {
     isVisible: boolean
@@ -10,6 +10,18 @@ const Nothing = () => {
     return <div>No Content</div>
 }
 export const ModalGeneric: FC<Props> = ({ isVisible, setIsVisible, title = 'Modal Title', children = <Nothing /> }) => {
+
+    useEffect(() => {
+        const close = (e: KeyboardEvent) => {
+            if(e.key === 'Escape'){
+                setIsVisible(false);
+            }
+        }
+        window.addEventListener('keydown', close)
+        return ()=> window.removeEventListener('keydown', close)
+        
+    }, [])
+    
 
     return (
         <>
