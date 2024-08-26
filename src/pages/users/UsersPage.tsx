@@ -31,24 +31,8 @@ export const UsersPage = () => {
     { key: 'subLevel', title: 'Curso', render: (_, record) => <SubLevelById subLevelId={record.subLevel!} /> },
     { key: 'createdAt', title: 'Fecha de Creacion', render: (_, record) => <div>{record.createdAt&& new Date(record.createdAt).toDateString()}</div> },
     {
-      key: 'isActive', title: 'Estado', render: (_, record) => <>
+      key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => <>
         {record && <div className="flex:1 flex-row justify-center">
-          {/* TODO validate update with swal confirm */}
-          {/* <FabButton isActive action={() => {
-            Swal.fire({
-              title: '¿Estas seguro?',
-              text: `Deseas ${record.isActive ? 'desactivar' : 'activar'} el usuario ${record.name}`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Si, estoy seguro',
-              cancelButtonText: 'Cancelar'
-            }).then((result) => {
-              if (result.isConfirmed) { updateUserById({ ...record, isActive: !record.isActive }); Swal.fire('Actualizado!', 'El usuario ha sido actualizado.', 'success') }
-            })
-          }} Icon={record.isActive ? IoEye : IoEyeOff} iconSize={18} /> */}
-
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
             console.log(record)
             Swal.fire({

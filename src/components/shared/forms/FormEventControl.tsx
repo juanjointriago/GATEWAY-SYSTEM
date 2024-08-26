@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { Controller, useForm } from "react-hook-form";
-import { event, students, subLevel } from "../../../interface";
+import { event, students } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
 import { v6 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
@@ -28,20 +28,19 @@ export const FormEventControl:FC = () => {
         updatedAt: Date.now(),
     }
 
-    const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<event>({ defaultValues })
-    const [levelEvent, setLevelEvent] = useState<string>('');
-    const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
+    const { control, handleSubmit, formState: { errors } } = useForm<event>({ defaultValues })
+    // const [levelEvent, setLevelEvent] = useState<string>('');
+    // const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [aditionalStudents, setAditionalStudents] = useState<any[]>([])
     const levels = useLevelStore(state => state.levels);
-    const getLevelById = useLevelStore(state => state.getLevelById);
-    const subLevels = useSubLevelStore(state => state.subLevels);
+    const sublevels = useSubLevelStore(state => state.subLevels);
     const getUserByRole = useUserStore(state => state.getUserByRole);
     const students = getUserByRole('student')!;
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!].filter((user) => user.isActive);
 
     const onSubmit = handleSubmit(async (data: event) => {
-        if (!levelEvent) return;
+        // if (!levelEvent) return;
         // data.levels[0] = { level: getValues('levels.0.level'), subLevels:  };
         // const aditionalStudentsToSave: students = aditionalStudents.map((aditionalStd) => ({ [aditionalStd.value]: { status: 'COMMING' } }));
         const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
@@ -60,6 +59,9 @@ export const FormEventControl:FC = () => {
             const newTeacher = data.teacher as any
             data.teacher = newTeacher.value;
             data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const newLevel = data.levels[0].level as any;
+            data.levels[0].level = newLevel.value;
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
             console.log({ eventRecord });
@@ -74,15 +76,23 @@ export const FormEventControl:FC = () => {
             })
             await createEvent(eventRecord).then(() => {
                 // console.log('ITS ok');
-                Swal.fire('DATA', `${eventRecord}`, 'info');
-                Swal.fire('Reservación creado', 'Reservación creado con éxito', 'success');
+                Swal.fire({
+                    title: 'Reservación creada',
+                    text: `Reservación creada con éxito`,
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                })
 
             }).catch((error) => {
                 Swal.fire('Error', `${error.message}`, 'error');
                 console.error(error);
             });
-            Swal.close();
-            reset(defaultValues);
+            // reset(defaultValues);
 
         }
     })
@@ -147,25 +157,25 @@ export const FormEventControl:FC = () => {
                     </div>
                     {/*Teacher*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                        <Controller
+                    <Controller
                             rules={{ required: "El docente es obligatorio 👀" }}
                             control={control}
                             name="teacher"
-                            render={({ field }) => (
+                            render={({ field: { onChange, onBlur, ref, name } }) => (
 
                                 <Select
-                                    {...field}
+                                    name={name}
+                                    id={name}
+                                    // {...field}
                                     components={animatedComponents}
-                                    placeholder="Teacher"
+                                    // defaultInputValue={defaultValues.teacher ? getUserByRole('teacher')?.find(user => user.id === defaultValues.teacher)?.name : 'Profesor'}
                                     // isMulti
+                                    options={teachers && teachers.map(teacher => ({ value: teacher.id, label: teacher.name }))}
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name })) as any}
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                // onChange={(e: any) => {
-                                //     console.log(' TEACHER-ID', e.value);
-                                //     if (!e) return
-                                //     setTeacher(e.value)
-                                // }}
+                                    onChange={onChange}
+                                    placeholder="Profesor"
+                                    onBlur={onBlur}
+                                    ref={ref}
                                 />
                             )}
                         />
@@ -173,26 +183,27 @@ export const FormEventControl:FC = () => {
                     </div>
                     {/*Level*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                        <p>{ }</p>
-                        <Controller
+                    <Controller
                             rules={{ required: "La modalidad es obligatoria 👀" }}
                             control={control}
                             name="levels.0.level"
-                            render={({ field }) => (
+                            render={({ field: { onChange, onBlur, ref, name } }) => (
                                 <Select
-                                    {...field}
+                                    // {...field}
+                                    ref={ref}
+                                    name={name}
+                                    id={name}
                                     components={animatedComponents}
-                                    placeholder={getLevelById(levelEvent)?.name ?? 'Modalidad'}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    options={levels.map(level => ({ value: level.id, label: level.name })) as any}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onChange={(e: any) => {
-                                        setValue('levels.0.level', e.value);
-                                        if (!e.value) return
-                                        setLevelEvent(e.value);
-                                        const sublv = subLevels.filter((sublevel) => (sublevel.parentLevel === e.value) && (sublevel.isActive));
-                                        if (sublv) setSubLevelslEvent(sublv);
-                                    }}
+                                    placeholder="Modalidad"
+                                    options={levels.map(level => ({ value: level.id, label: level.name }))}
+                                    onBlur={onBlur}
+                                    onChange={onChange}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                // onChange={(e: any) => {
+                                //     setValue('levels.0.level', e.value);
+                                //     if (!e.value) return
+                                //     setLevelEvent(e.value);
+                                // }}
                                 />
                             )}
                         />
@@ -206,21 +217,26 @@ export const FormEventControl:FC = () => {
                             rules={{ required: "La(s) unidad(es) es(son) obligatoria(s) 👀" }}
                             control={control}
                             name="levels.0.subLevels"
-                            render={({ field }) => (
+                            render={({ field: { onBlur, onChange, ref, name } }) => (
                                 // console.log(getValues("levels.0.level")),
                                 <Select
-                                    {...field}
+                                    // {...field}
+                                    ref={ref}
+                                    name={name}
+                                    id={name}
+                                    onBlur={onBlur}
+                                    onChange={onChange}
                                     components={animatedComponents}
-                                    placeholder="Unidad"
                                     isMulti
+                                    placeholder="Unidades"
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    options={subLevelslEvent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onChange={(e: any) => {
-                                        console.log('SUB-LEVELID', { e });
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        setValue('levels.0.subLevels', e);
-                                    }}
+                                    options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                // onChange={(e: any) => {
+                                //     console.log('SUB-LEVELID', { e });
+                                //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                //     setValue('levels.0.subLevels', e);
+                                // }}
                                 />
                             )}
                         />
@@ -280,16 +296,20 @@ export const FormEventControl:FC = () => {
                     {/*IsActive*/}
                     <div className="w-full md:w-1/1 mt-2 px-3">
                         <label className="inline-flex items-center cursor-pointer">
-                            <Controller
-                                rules={{ required: "Este campo debe registrarse por primera vez como Activo 👀" }}
+                        <Controller
+                                rules={{ required: "Este campo debe registrarse por primera vez como Activo 👀" }}//justneed those for create or not?
                                 control={control}
-                                name="limitDate"
-                                render={({ field }) => (
+                                name="isActive"
+                                render={({ field: { onChange, onBlur, value, ref } }) => (
                                     <input
-                                        {...field}
+                                        onBlur={onBlur}
+                                        onChange={() => onChange(!value)}
+                                        checked={value}
+                                        ref={ref}
                                         id="isActive"
                                         type="checkbox"
                                         className="sr-only peer"
+
                                     />
                                 )}
                             />
@@ -301,7 +321,7 @@ export const FormEventControl:FC = () => {
                     </div>
                 </div>
                 {/*Submit button*/}
-                <div className="flex h-[10%] justify-`end` ]">
+                <div className="flex h-[4rem] w-[4rem] justify-`end` ]">
                     <button
                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
                         type="submit"

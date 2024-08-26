@@ -43,7 +43,7 @@ export const UnitsPage = () => {
           <NavLink to={record.workSheetUrl} target="_blank" end rel="noreferrer noopener" > <span className="text-sm uppercase text-white-500 hidden md:block">🔍 WorkSheet</span></NavLink> </div>
     },
     {
-      key: 'isActive', title: 'Acciones', render: (_, record) => (<>
+      key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => (<>
         {isAdmin ? <div>
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
 

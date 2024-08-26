@@ -35,7 +35,7 @@ export const SubLevelsPage = () => {
     // { key: 'description', title: 'Descripción' },
     // { key: 'parentLevel', title: 'Modalidad', render: (_, record) => record.isActive ? <LevelById levelId={record.parentLevel} /> : <div>No asignado</div> },
     {
-      key: 'isActive', title: 'Público', render: (_, record) => {
+      key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => {
         //TODO component for generic actions on all tables
         return <>
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {

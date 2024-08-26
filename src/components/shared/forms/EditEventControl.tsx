@@ -1,12 +1,14 @@
 import { FC, useState } from "react";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import { v6 as uuid } from 'uuid'
 
 
 import { useEventStore } from "../../../stores/events/event.store";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
-import { event, students, subLevel } from "../../../interface";
+import {
+    event, students,
+    // subLevel
+} from "../../../interface";
 import { Controller, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 interface Props {
@@ -19,7 +21,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     const editEvent = useEventStore(state => state.updateEvent);
     const getEventById = useEventStore(state => state.getEventById);
     const levels = useLevelStore(state => state.levels);
-    const getLevelById = useLevelStore(state => state.getLevelById);
+    // const getLevelById = useLevelStore(state => state.getLevelById);
     const sublevels = useSubLevelStore(state => state.subLevels);
     const getUserById = useUserStore(state => state.getUserById);
     const getUserByRole = useUserStore(state => state.getUserByRole);
@@ -27,18 +29,17 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!];
 
     //To formulary
-    const defaultValues: event = { 
+    const defaultValues: event = {
         ...getEventById(eventId)!,
-        updatedAt: Date.now()};
-    
-    
+        updatedAt: Date.now()
+    };
+
+
     console.log('EVENT TO EDIT ', { event: getEventById(eventId) });
     // console.log('EVENT TO EDIT ', { defaultValues });
     // console.log('EVENT TO EDIT ',  defaultValues.levels[0].subLevels );
 
-    const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<event>({ defaultValues })
-    const [levelEvent, setLevelEvent] = useState<string>('');
-    const [subLevelslEvent, setSubLevelslEvent] = useState<subLevel[]>([]);
+    const { control, handleSubmit, formState: { errors } } = useForm<event>({ defaultValues })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [aditionalStudents, setAditionalStudents] = useState<any[]>([]);
 
@@ -48,7 +49,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.levels[0].subLevels = data.levels[0].subLevels.map((sublevel: any) => sublevel.value)
         const studentByLevel = students.map((student) => { if (data.levels[0].subLevels.includes(student.subLevel!)) { return { [student.id!]: { status: 'COMMING' } } } });
-        console.log(' EDIT FORM 👀 FOUND STUDENTS ===> ', { studentByLevel });
+        // console.log(' EDIT FORM 👀 FOUND STUDENTS ===> ', { studentByLevel });
         const studentsToSave = studentByLevel.reduce((acc, curr) => ({ ...acc, ...curr }), {});
         const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
         data.students = allstudents as students;//change for STUDENTS
@@ -57,9 +58,11 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
             const newTeacher = data.teacher as any
             data.teacher = newTeacher.value;
             data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
-            const eventRecord = { id: uuid(), ...data }
-            //loading swal 
-            console.log({ eventRecord });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const newLevel = data.levels[0].level as any;
+            data.levels[0].level = newLevel.value;
+            // console.log('👀 level[0].level =>', data.levels[0].level);
+            console.log({ data });
             // return;
             Swal.fire({
                 title: 'Actualizando Reservación',
@@ -69,17 +72,23 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     Swal.showLoading()  //swal loading
                 },
             })
-            await editEvent(eventRecord).then(() => {
-                // console.log('ITS ok');
-                // Swal.fire('DATA', `${eventRecord}`, 'info');
-                Swal.fire('Reservación actualizada', 'Reservación actualizada con éxito', 'success');
-
+            await editEvent(data).then(() => {
+                Swal.fire({
+                    title: 'Reservación actualizada',
+                    text: `Reservación actualizada con éxito`,
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Aceptar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                })
             }).catch((error) => {
                 Swal.fire('Error', `${error.message}`, 'error');
                 console.error(error);
             });
-            Swal.close();
-            reset(defaultValues);
+            // reset(defaultValues);
 
         }
 
@@ -144,28 +153,28 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     </div>
                     {/*Teacher*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                    <p className="bg-indigo-300 w-[auto] rounded-sm ">
-                            Datos actuales : { getUserById(defaultValues.teacher!)?.name ?? 'Profesor' }
+                        <p className="bg-indigo-300 w-[auto] rounded-sm ">
+                            Datos actuales : {getUserById(defaultValues.teacher!)?.name ?? 'Profesor'}
                         </p>
                         <Controller
                             rules={{ required: "El docente es obligatorio 👀" }}
                             control={control}
                             name="teacher"
-                            render={({ field }) => (
+                            render={({ field: { onChange, onBlur, ref, name } }) => (
 
                                 <Select
-                                    {...field}
+                                    name={name}
+                                    id={name}
+                                    // {...field}
                                     components={animatedComponents}
-                                    placeholder={defaultValues.teacher ? getUserByRole('teacher')?.find(user => user.id === defaultValues.teacher)?.name : 'Profesor'}
+                                    defaultInputValue={defaultValues.teacher ? getUserByRole('teacher')?.find(user => user.id === defaultValues.teacher)?.name : 'Profesor'}
                                     // isMulti
+                                    options={teachers && teachers.map(teacher => ({ value: teacher.id, label: teacher.name }))}
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name })) as any}
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                // onChange={(e: any) => {
-                                    // console.log(' TEACHER-ID', e.value);
-                                    // if (!e) return
-                                    // setValue('teacher',e.value)
-                                // }}
+                                    onChange={onChange}
+                                    placeholder="Profesor"
+                                    onBlur={onBlur}
+                                    ref={ref}
                                 />
                             )}
                         />
@@ -178,21 +187,24 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             rules={{ required: "La modalidad es obligatoria 👀" }}
                             control={control}
                             name="levels.0.level"
-                            render={({ field }) => (
+                            render={({ field: { onChange, onBlur, ref, name } }) => (
                                 <Select
-                                    {...field}
+                                    // {...field}
+                                    ref={ref}
+                                    name={name}
+                                    id={name}
                                     components={animatedComponents}
-                                    placeholder={getLevelById(levelEvent)?.name ?? 'Modalidad'}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    options={levels.map(level => ({ value: level.id, label: level.name })) as any}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onChange={(e: any) => {
-                                        setValue('levels.0.level', e.value);
-                                        if (!e.value) return
-                                        setLevelEvent(e.value);
-                                        const sublv = sublevels.filter((sublevel) => (sublevel.parentLevel === e.value) && (sublevel.isActive));
-                                        if (sublv) setSubLevelslEvent(sublv);
-                                    }}
+                                    defaultInputValue={defaultValues.levels[0].level ? levels.find(level => level.id === defaultValues.levels[0].level)?.name : 'Modalidad'}
+                                    placeholder="Modalidad"
+                                    options={levels.map(level => ({ value: level.id, label: level.name }))}
+                                    onBlur={onBlur}
+                                    onChange={onChange}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                // onChange={(e: any) => {
+                                //     setValue('levels.0.level', e.value);
+                                //     if (!e.value) return
+                                //     setLevelEvent(e.value);
+                                // }}
                                 />
                             )}
                         />
@@ -201,27 +213,34 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     {/*SubLevels*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <p className="bg-indigo-300 w-[auto] rounded-sm ">
-                            Datos actuales : { getEventById(eventId)?.levels[0].subLevels?.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(' - ') ?? 'Unidades'}
+                            Datos actuales : {getEventById(eventId)?.levels[0].subLevels?.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(' - ') ?? 'Unidades'}
                         </p>
                         <Controller
                             rules={{ required: "La(s) unidad(es) es(son) obligatoria(s) 👀" }}
                             control={control}
                             name="levels.0.subLevels"
-                            render={({ field }) => (
+                            render={({ field: { onBlur, onChange, ref, name } }) => (
                                 // console.log(getValues("levels.0.level")),
                                 <Select
-                                    {...field}
+                                    // {...field}
+                                    ref={ref}
+                                    name={name}
+                                    id={name}
+                                    onBlur={onBlur}
+                                    onChange={onChange}
+                                    // value={value}
                                     components={animatedComponents}
-                                    // placeholder={defaultValues.levels[0].sublevels ? sublevels.filter(sublevel => defaultValues.levels[0].sublevels.includes(sublevel.id!)).map(sublevel => sublevel.name).join(' - ') : 'Unidades'}
+                                    defaultInputValue={getEventById(eventId)?.levels[0].subLevels?.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(' - ') ?? 'Unidades'}
                                     isMulti
+                                    placeholder="Unidades"
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    options={subLevelslEvent.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onChange={(e: any) => {
-                                        console.log('SUB-LEVELID', { e });
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        setValue('levels.0.subLevels', e);
-                                    }}
+                                    options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                // onChange={(e: any) => {
+                                //     console.log('SUB-LEVELID', { e });
+                                //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                //     setValue('levels.0.subLevels', e);
+                                // }}
                                 />
                             )}
                         />
@@ -254,6 +273,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                                     required
                                     {...field}
                                     type="datetime-local" id="date"
+                                    value={new Date(defaultValues.date).toISOString().substring(0, 16)}
                                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 />
                             )}
@@ -264,13 +284,14 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <label htmlFor="limit-date" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Límite de aprobación de estudiantes </label>
                         <Controller
-                            rules={{ required: "Debe seleccionar fecha y hora limite de aprobdación 👀" }}
+                            // rules={{ required: "Debe seleccionar fecha y hora limite de aprobación 👀" }}
                             control={control}
                             name="limitDate"
                             render={({ field }) => (
                                 <input
-                                    required
+                                    // required
                                     {...field}
+                                    value={defaultValues.limitDate && new Date(defaultValues.limitDate).toISOString().substring(0, 16)}
                                     type="datetime-local" id="limit-date"
                                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 />
@@ -282,15 +303,16 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     <div className="w-full md:w-1/1 mt-2 px-3">
                         <label className="inline-flex items-center cursor-pointer">
                             <Controller
-                                rules={{ required: "Este campo debe registrarse por primera vez como Activo 👀" }}
                                 control={control}
                                 name="isActive"
-                                render={({ field }) => (
+                                render={({ field: { onChange, onBlur, value, ref } }) => (
                                     <input
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        {...field as any}
+                                        onBlur={onBlur}
+                                        onChange={() => onChange(!value)}
+                                        checked={value}
+                                        ref={ref}
                                         id="isActive"
-                                        type="radio"
+                                        type="checkbox"
                                         className="sr-only peer"
 
                                     />
@@ -304,7 +326,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     </div>
                 </div>
                 {/*Submit button*/}
-                <div className="flex h-[30%] justify-`end` ]">
+                <div className="flex h-[4rem] w-[4rem] justify-`end` ]">
                     <button
                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
                         type="submit"

@@ -110,7 +110,7 @@ export const EventsPage = () => {
   const events = useEventStore(state => state.events);
   const sortedEvents = events.sort((a, b) => b.date - a.date)
   // .filter(event => event.isActive);
-  console.log('events', events.length)
+  // console.log('events', events.length)
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
@@ -123,7 +123,7 @@ export const EventsPage = () => {
           ? sortedEvents
           : (user.role === 'teacher')
             ? sortedEvents.filter((event => event.teacher === user.id))
-            : sortedEvents.filter((event) => event.students[user.id!] && event.isActive))}
+            : sortedEvents.filter((event) => event.students[user.id!] && event.isActive && (event.levels[0].level === user.level)))}
         modalChildren={<FormEventControl />}
         modalTitle="Crear Reservación" />}
     </div>
