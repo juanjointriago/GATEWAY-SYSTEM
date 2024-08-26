@@ -45,6 +45,7 @@ export const LevelsPage = () => {
             }).then((result) => {
               if (result.isConfirmed) {
                 updateLevel({ ...record, isActive: !record.isActive })
+                window.location.reload();
               }
             })
           }} /> : <div>{record.isActive ? 'Público' : 'Privado'}</div>}

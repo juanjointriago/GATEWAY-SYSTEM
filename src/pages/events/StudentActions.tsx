@@ -40,7 +40,7 @@ const changeVisualStatus = (status: status) => {
         case 'DECLINED':
             return '❌ Cancelado '
         case 'MAYBE':
-            return  '👁️‍🗨️ Talvez'
+            return '👁️‍🗨️ Talvez'
         case 'CONFIRMED':
             return '✅ Aceptado'
         default:
@@ -57,38 +57,39 @@ export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => 
 
                 // keys.map((key: string) => (
 
-                    <div key={userId} className="flex flex-row">
-                        <TootipBase title="" tootTipText={changeVisualAction(`${students[userId].status}`)}>
-                            <div onClick={() => {
-                                const student = event.students[userId];
-                                if (!event.limitDate) {
-                                    Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite para esta clase', 'warning')
-                                    return
+                <div key={userId} className="flex flex-row">
+                    <TootipBase title="" tootTipText={changeVisualAction(`${students[userId].status}`)}>
+                        <div onClick={() => {
+                            const student = event.students[userId];
+                            if (!event.limitDate) {
+                                Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite para esta clase', 'warning')
+                                return
+                            }
+                            if (today > event.limitDate) {
+                                Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite', 'error')
+                                return
+                            }
+                            Swal.fire({
+                                title: '¿Estás seguro?',
+                                text: `Estás a punto de ${student.status === 'CONFIRMED' ? 'CANCELAR' : 'ACEPTAR'} la clase`,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Sí, estoy seguro',
+                                cancelButtonText: 'No, cancelar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
+                                    Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success');
+                                    window.location.reload();
                                 }
-                                if (today > event.limitDate) {
-                                    Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite', 'error')
-                                    return
-                                }
-                                Swal.fire({
-                                    title: '¿Estás seguro?',
-                                    text: `Estás a punto de ${student.status === 'CONFIRMED' ? 'CANCELAR' : 'ACEPTAR'} la clase`,
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Sí, estoy seguro',
-                                    cancelButtonText: 'No, cancelar',
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
-                                        Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success')
-                                    }
-                                })
-                            }} style={{ backgroundColor: changeVisualColor(`${event.students[userId].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
-                                <Icon size={20} color='white' />
-                            </div>
+                            })
+                        }} style={{ backgroundColor: changeVisualColor(`${event.students[userId].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
+                            <Icon size={20} color='white' />
+                        </div>
 
-                        </TootipBase>
-                        <p className="self-center">{changeVisualStatus(event.students[userId].status)}</p>
-                    </div>
+                    </TootipBase>
+                    <p className="self-center">{changeVisualStatus(event.students[userId].status)}</p>
+                </div>
 
                 // ))
             }

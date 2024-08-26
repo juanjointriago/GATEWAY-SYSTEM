@@ -30,7 +30,7 @@ export const UsersPage = () => {
     { key: 'name', title: 'Nombres' },
     { key: 'level', title: 'Modalidad', render: (_, record) => <LevelById levelId={record.level!} /> },
     { key: 'subLevel', title: 'Curso', render: (_, record) => <SubLevelById subLevelId={record.subLevel!} /> },
-    { key: 'createdAt', title: 'Fecha de Creacion', render: (_, record) => <div>{record.createdAt&& new Date(record.createdAt).toDateString()}</div> },
+    { key: 'createdAt', title: 'Fecha de Creacion', render: (_, record) => <div>{record.createdAt && new Date(record.createdAt).toDateString()}</div> },
     {
       key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => <>
         {record && <div className="flex:1 flex-row justify-center">
@@ -48,8 +48,8 @@ export const UsersPage = () => {
             }).then((result) => {
               if (result.isConfirmed) {
                 // return
-                updateUserById({ ...record, isActive: record.isActive ? false : true })
-                Swal.fire('Actualizado!', 'El usuario ha sido actualizado.', 'success')
+                updateUserById({ ...record, isActive: record.isActive ? false : true });
+                window.location.reload();
               }
             })
           }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
@@ -78,7 +78,7 @@ export const UsersPage = () => {
         </div>}
         {isAdmin && userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
         {isAdmin && userforUnit && <ModalGeneric title="Administrar Libros" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserUnits userId={userforUnit} />} />}
-        {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={users.sort((a, b)=>{return b.createdAt - a.createdAt})} modalChildren={<></>} modalTitle="Registrar usuarios" />
+        {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={users.sort((a, b) => { return b.createdAt - a.createdAt })} modalChildren={<></>} modalTitle="Registrar usuarios" />
           : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />}
       </div>
     </>

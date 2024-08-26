@@ -59,10 +59,10 @@ export const UnitsPage = () => {
               cancelButtonText: 'Cancelar'
             }).then((result) => {
               if (result.isConfirmed) {
-                console.log('data for update', { ...record, isActive: record.isActive ? false : true })
+                // console.log('data for update', { ...record, isActive: record.isActive ? false : true });
                 // return
-                updateUnit({ ...record, isActive: record.isActive? false : true })
-                Swal.fire('¡Hecho!', `El libro ha sido ${record.isActive ? 'desactivado' : 'activado'}`, 'success')
+                updateUnit({ ...record, isActive: record.isActive? false : true });
+                window.location.reload();
               }
             })
           }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}

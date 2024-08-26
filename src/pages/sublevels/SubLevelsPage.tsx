@@ -52,11 +52,10 @@ export const SubLevelsPage = () => {
               cancelButtonText: 'Cancelar'
             }).then((result) => {
               if (result.isConfirmed) {
-                console.log('data for update', { ...record, isActive: record.isActive ? false : true })
+                console.log('data for update', { ...record, isActive: record.isActive ? false : true });
                 // return
                 updateSublevel({ ...record, isActive: !record.isActive })
-                Swal.fire('¡Hecho!', `La unidad ha sido ${record.isActive ? 'desactivada' : 'activada'}`, 'success')
-
+                window.location.reload();
               }
             })
           }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}

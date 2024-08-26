@@ -77,6 +77,7 @@ export const EventsPage = () => {
             }).then((result) => {
               if (result.isConfirmed) {
                 updateEvent({ ...record, isActive: !record.isActive })
+                window.location.reload();
               }
             })
           }} /> : <div>{record.isActive ? 'Público' : 'Privado'}</div>}
