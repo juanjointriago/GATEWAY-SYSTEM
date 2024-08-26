@@ -36,7 +36,7 @@ export const FormEventControl:FC = () => {
     const levels = useLevelStore(state => state.levels);
     const sublevels = useSubLevelStore(state => state.subLevels);
     const getUserByRole = useUserStore(state => state.getUserByRole);
-    const students = getUserByRole('student')!;
+    const students = getUserByRole('student')!.filter((student)=>student.isActive);
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!].filter((user) => user.isActive);
 
     const onSubmit = handleSubmit(async (data: event) => {
