@@ -33,27 +33,25 @@ export const UsersPage = () => {
     { key: 'createdAt', title: 'Fecha de Creacion', render: (_, record) => <div>{record.createdAt && new Date(record.createdAt).toDateString()}</div> },
     {
       key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => <>
-        {record && <div className="flex:1 flex-row justify-center">
-          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
-            Swal.fire({
-              title: '¿Estás seguro?',
-              text: `Estas a punto de ${record.isActive ? 'desactivar' : 'activar'}  el usuario ${record.name}`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, continuar',
-              cancelButtonText: 'Cancelar'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                updateUserById({ ...record, isActive: !record.isActive});
-                window.location.reload();
-              }
-            })
-          }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
-          {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUserToEdit(record.id) }} Icon={IoPencil} />}
-          {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenUnitModal(true); setUserforUnit(record.id) }} Icon={IoBook} />}
-        </div>}
+        {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
+          Swal.fire({
+            title: '¿Estás seguro?',
+            text: `Estas a punto de ${record.isActive ? 'desactivar' : 'activar'}  el usuario ${record.name}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+          }).then(async(result) => {
+            if (result.isConfirmed) {
+              await updateUserById({ ...record, isActive: !record.isActive });
+              window.location.reload();
+            }
+          })
+        }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
+        {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUserToEdit(record.id) }} Icon={IoPencil} />}
+        {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenUnitModal(true); setUserforUnit(record.id) }} Icon={IoBook} />}
       </>
     },
   ]

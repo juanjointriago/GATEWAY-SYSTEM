@@ -50,11 +50,11 @@ export const SubLevelsPage = () => {
               cancelButtonColor: '#d33',
               confirmButtonText: 'Sí, continuar',
               cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async (result) => {
               if (result.isConfirmed) {
                 console.log('data for update', { ...record, isActive: record.isActive ? false : true });
                 // return
-                updateSublevel({ ...record, isActive: !record.isActive })
+                await updateSublevel({ ...record, isActive: !record.isActive })
                 window.location.reload();
               }
             })
@@ -76,9 +76,9 @@ export const SubLevelsPage = () => {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, continuar',
                 cancelButtonText: 'Cancelar'
-              }).then((result) => {
+              }).then(async(result) => {
                 if (result.isConfirmed) {
-                  deleteSubLevel(record.id!);
+                  await deleteSubLevel(record.id!);
                 }
               })
             }} />}

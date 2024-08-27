@@ -42,9 +42,9 @@ export const LevelsPage = () => {
               cancelButtonColor: '#d33',
               confirmButtonText: 'Sí, continuar',
               cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async(result) => {
               if (result.isConfirmed) {
-                updateLevel({ ...record, isActive: !record.isActive })
+                await updateLevel({ ...record, isActive: !record.isActive })
                 window.location.reload();
               }
             })
@@ -65,9 +65,9 @@ export const LevelsPage = () => {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, continuar',
                 cancelButtonText: 'Cancelar'
-              }).then((result) => {
+              }).then(async(result) => {
                 if (result.isConfirmed) {
-                  deleteLevel(record.id!);
+                  await deleteLevel(record.id!);
                 }
               })
             }} />}

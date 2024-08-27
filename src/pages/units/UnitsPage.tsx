@@ -57,11 +57,11 @@ export const UnitsPage = () => {
               cancelButtonColor: '#d33',
               confirmButtonText: 'Sí, continuar',
               cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async(result) => {
               if (result.isConfirmed) {
                 // console.log('data for update', { ...record, isActive: record.isActive ? false : true });
                 // return
-                updateUnit({ ...record, isActive: record.isActive? false : true });
+                await updateUnit({ ...record, isActive: record.isActive? false : true });
                 window.location.reload();
               }
             })
@@ -79,9 +79,9 @@ export const UnitsPage = () => {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, continuar',
                 cancelButtonText: 'Cancelar'
-              }).then((result) => {
+              }).then(async(result) => {
                 if (result.isConfirmed) {
-                  deleteUnit(record.id!);
+                  await deleteUnit(record.id!);
                 }
               })
             }} />}

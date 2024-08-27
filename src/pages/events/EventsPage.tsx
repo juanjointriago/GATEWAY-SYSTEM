@@ -74,9 +74,9 @@ export const EventsPage = () => {
               cancelButtonColor: '#d33',
               confirmButtonText: 'Sí, continuar',
               cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async(result) => {
               if (result.isConfirmed) {
-                updateEvent({ ...record, isActive: !record.isActive })
+                await updateEvent({ ...record, isActive: !record.isActive })
                 window.location.reload();
               }
             })
@@ -97,9 +97,9 @@ export const EventsPage = () => {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, continuar',
                 cancelButtonText: 'Cancelar'
-              }).then((result) => {
+              }).then(async(result) => {
                 if (result.isConfirmed) {
-                  deleteEvent(record.id!);
+                  await deleteEvent(record.id!);
                 }
               })
             }} />}

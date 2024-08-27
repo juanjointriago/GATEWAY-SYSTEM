@@ -2,7 +2,6 @@ import { create, StateCreator } from "zustand";
 import { FirestoreUser } from "../../interface";
 import { AuthService, UserService } from "../../services";
 import { devtools, persist } from "zustand/middleware";
-import Swal from "sweetalert2";
 import { role } from '../../interface/user.interface';
 
 interface UsersStore {
@@ -34,7 +33,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         // console.log('FOUND USER =>',{user})
         return user;
     },
-    getUserByRole: (role: role) => get().users.filter((user)=>user.role === role),
+    getUserByRole: (role: role) => get().users.filter((user) => user.role === role),
 
     createUser: async (user: FirestoreUser) => {
         try {
@@ -46,25 +45,11 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
     },
 
     updateUser: async (user: FirestoreUser) => {
-        console.log(' 👀=====> Editando a ',{user})
+        console.log(' 👀=====> Editando a ', { user })
         // return 
-        try {
-            await UserService.updateUsers(user);
-            Swal.fire({
-                title: 'Usuario actualizado',
-                text: `El usuario ${user.name} ha sido actualizado`,
-                icon: 'success',
-                confirmButtonText: 'Continuar',
-            }).then((result) => {
-                result.isConfirmed &&
-                    set({ users: get().users.map(u => u.id === user.id ? user : u) });
-                window.location.reload();
-                // location.reload();
-            });
+        await UserService.updateUsers(user);
+        set({ users: get().users.map(u => u.id === user.id ? user : u) });
 
-        } catch (error) {
-            console.warn(error);
-        }
     },
 
     deleteUserById: async (id: string) => {
