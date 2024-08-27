@@ -7,9 +7,10 @@ import { useEventStore } from "../../../stores/events/event.store"
 import { v6 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import Swal from "sweetalert2";
+import { sendCustomEmail } from "../../../store/firebase/helper";
 
 
-export const FormEventControl:FC = () => {
+export const FormEventControl: FC = () => {
     const createEvent = useEventStore(state => state.createEvent);
     const animatedComponents = makeAnimated();
     const defaultValues: event = {
@@ -36,7 +37,8 @@ export const FormEventControl:FC = () => {
     const levels = useLevelStore(state => state.levels);
     const sublevels = useSubLevelStore(state => state.subLevels);
     const getUserByRole = useUserStore(state => state.getUserByRole);
-    const students = getUserByRole('student')!.filter((student)=>student.isActive);
+    const getUserById = useUserStore(state => state.getUserById);
+    const students = getUserByRole('student')!.filter((student) => student.isActive);
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!].filter((user) => user.isActive);
 
     const onSubmit = handleSubmit(async (data: event) => {
@@ -65,7 +67,18 @@ export const FormEventControl:FC = () => {
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
             console.log({ eventRecord });
-            // return;
+            await sendCustomEmail({
+                to: [getUserById(data.teacher!)!.email!],
+                message: {
+                    subject: `Reservación`,
+                    text: `Hola desde administracion queremos comunicarte que hemos creado un una nueva reservación en la fecha ${data.date} la clase será para estudiantes de la modalidad ${data.levels[0].level} y de las unidades ${data.levels[0].subLevels.map((sublevel: string) => sublevels.find((sub) => sub.id === sublevel)?.name).join(', ')}`,
+                    html: `<img src="https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd"
+            alt="Placeholder Image"
+            className="object-scale-down w-auto h-auto" />`
+                },
+
+            })
+            return;
             Swal.fire({
                 title: 'Creando Reservación',
                 html: 'Espere un momento por favor',
@@ -157,7 +170,7 @@ export const FormEventControl:FC = () => {
                     </div>
                     {/*Teacher*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                    <Controller
+                        <Controller
                             rules={{ required: "El docente es obligatorio 👀" }}
                             control={control}
                             name="teacher"
@@ -183,7 +196,7 @@ export const FormEventControl:FC = () => {
                     </div>
                     {/*Level*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                    <Controller
+                        <Controller
                             rules={{ required: "La modalidad es obligatoria 👀" }}
                             control={control}
                             name="levels.0.level"
@@ -296,7 +309,7 @@ export const FormEventControl:FC = () => {
                     {/*IsActive*/}
                     <div className="w-full md:w-1/1 mt-2 px-3">
                         <label className="inline-flex items-center cursor-pointer">
-                        <Controller
+                            <Controller
                                 rules={{ required: "Este campo debe registrarse por primera vez como Activo 👀" }}//justneed those for create or not?
                                 control={control}
                                 name="isActive"

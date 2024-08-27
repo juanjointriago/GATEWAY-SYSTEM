@@ -35,7 +35,6 @@ export const UsersPage = () => {
       key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => <>
         {record && <div className="flex:1 flex-row justify-center">
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
-            console.log(record)
             Swal.fire({
               title: '¿Estás seguro?',
               text: `Estas a punto de ${record.isActive ? 'desactivar' : 'activar'}  el usuario ${record.name}`,
@@ -47,8 +46,7 @@ export const UsersPage = () => {
               cancelButtonText: 'Cancelar'
             }).then((result) => {
               if (result.isConfirmed) {
-                // return
-                updateUserById({ ...record, isActive: record.isActive ? false : true });
+                updateUserById({ ...record, isActive: !record.isActive});
                 window.location.reload();
               }
             })

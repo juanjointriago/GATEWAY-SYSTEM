@@ -50,9 +50,9 @@ export const getDocsFromCollection = async <T>(collectionName: string) => {
     return data
 }
 
-export const getDocsFromCollectionQuery = async <T>(collectionName: string, field: string, clausule: WhereFilterOp, compareValue: string | number | boolean ) => {
+export const getDocsFromCollectionQuery = async <T>(collectionName: string, field: string, clausule: WhereFilterOp, compareValue: string | number | boolean) => {
     const data: T[] = [];
-    const q =  query(collection(db, collectionName), where(field,clausule,compareValue));
+    const q = query(collection(db, collectionName), where(field, clausule, compareValue));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         data.push({ id: doc.id, ...doc.data() } as T)
@@ -73,9 +73,9 @@ export const getItemById = async <T>(collectionName: string, id: string) => {
 
     const docRef = doc(db, collectionName, id);
     const docSnap = await getDoc(docRef);
-    console.log('Document data:',`${collectionName}`, docSnap.data());
+    console.log('Document data:', `${collectionName}`, docSnap.data());
     if (docSnap.exists()) {
-        return  { id: docSnap.id, ...docSnap.data() } as T
+        return { id: docSnap.id, ...docSnap.data() } as T
     }
     else {
         return {} as T;
@@ -83,11 +83,21 @@ export const getItemById = async <T>(collectionName: string, id: string) => {
 
 }
 
+interface email {
+    to: string[],
+    message: {
+        subject: string,
+        text: string,
+        html: string
+    }
+}
 
-export const sendCustomEmail = async (email: string, subject: string, message: string) => {
-    
-    console.log('Sending email to: ', email);
-    console.log('Subject: ', subject);
-    console.log('Message: ', message);
+export const sendCustomEmail = async (dataForSend: email) => {
+
+    const message: email = dataForSend;
+    console.log('Sending 📧 => ', { message });
+
+    await adddItem('mail', message);
+
 }
 
