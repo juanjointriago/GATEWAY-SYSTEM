@@ -76,11 +76,15 @@ export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => 
                                 showCancelButton: true,
                                 confirmButtonText: 'Sí, estoy seguro',
                                 cancelButtonText: 'No, cancelar',
-                            }).then((result) => {
+                            }).then(async(result) => {
                                 if (result.isConfirmed) {
-                                    updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
-                                    Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success');
-                                    window.location.reload();
+                                    await updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
+                                    Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success').then((res)=>{
+                                        if(res.isConfirmed){
+                                            window.location.reload();
+                                        }
+                                    });
+                                    // window.location.reload();
                                 }
                             })
                         }} style={{ backgroundColor: changeVisualColor(`${event.students[userId].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
