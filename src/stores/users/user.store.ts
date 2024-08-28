@@ -9,10 +9,10 @@ interface UsersStore {
     getAllUsers: () => void;
     getUserById: (id: string) => FirestoreUser | undefined;
     getUserByRole: (id: role) => FirestoreUser[] | [];
-    createUser: (user: FirestoreUser) => void;
-    updateUser: (user: FirestoreUser) => void;
-    deleteUserById: (id: string) => void;
-    resetPasswordByEmail: (email: string) => void;
+    createUser: (user: FirestoreUser) => Promise<void>;
+    updateUser: (user: FirestoreUser) => Promise<void>;
+    deleteUserById: (id: string) => Promise<void>;
+    resetPasswordByEmail: (email: string) => Promise<void>;
 }
 
 

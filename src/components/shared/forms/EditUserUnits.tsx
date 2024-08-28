@@ -1,11 +1,11 @@
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores"
 import { CardWithImage } from "../cards/CardWithImage";
 import { FirestoreUser } from "../../../interface";
 import Swal from "sweetalert2";
 
 interface Props {
-    userId: string
+    userId: string;
 }
 export const EditUserUnits: FC<Props> = ({ userId }) => {
     console.log(userId)
@@ -18,20 +18,34 @@ export const EditUserUnits: FC<Props> = ({ userId }) => {
     const [unitsForBooks, setUnitsForBooks] = useState<string[]>(user.unitsForBooks ? user.unitsForBooks : []);
     const updatedUser: FirestoreUser = { ...user, unitsForBooks };
 
+    useEffect(() => {
+        return () => setUnitsForBooks(user.unitsForBooks ? user.unitsForBooks : []);
+    }, [userId, user.unitsForBooks])
+
     const handleSave = async () => {
         // return;
         Swal.fire({
             title: 'Actualizando material de apoyo',
             text: `Las unidades del usuario ${user.name} se van a modificar desea continuar?`,
             icon: 'success',
+            showCancelButton: true,
             confirmButtonText: 'Continuar',
             cancelButtonText: 'Cancelar',
         }).then(async (result) => {
-            result.isConfirmed &&
-                setUnitsForBooks([]);
-            console.log('👀', { updatedUser })
             // return
-            await updateUser(updatedUser);
+            // console.log(updatedUser)
+            if (result.isConfirmed) {
+                await updateUser(updatedUser).then(()=>{
+                    Swal.fire({
+                        title: 'Actualizando',
+                        text: `Actualizacion de unidades de ${user.name} realizada exitosamente`,
+                        icon: 'info',
+                        confirmButtonText: 'Continuar',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                });
+            }
         })
     }
     // console.log('units',units.filter(unit => unit.isActive));
