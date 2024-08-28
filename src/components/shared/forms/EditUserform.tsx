@@ -262,9 +262,9 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         ...user,
         updatedAt: Date.now()
     };
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
+    const { register, handleSubmit, watch, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
     const onSubmit = handleSubmit((async (data) => {
-        if (!levelStudent && user.role === 'student') {
+        if (!levelStudent && watch('role') === 'student') {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
@@ -272,7 +272,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             })
             return;
         }
-        data.level = levelStudent??"";
+        data.level = levelStudent ?? "";
         if ((sublevels.length === 0) && (selectedSublevels)) {
             Swal.fire({
                 icon: 'error',
@@ -281,7 +281,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             });
             return
         }
-        if (user.role === 'student') {
+        if (watch('role') === 'student') {
             data.subLevel = selectedSublevels.value;
         }
         const updatedUser = {
@@ -290,10 +290,26 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         }
         console.log('👀====>', { updatedUser });
         // return
-        await updateUser(updatedUser);
-        reset();
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: `Estas a punto de actualizar los datos de ${user.name}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await updateUser(updatedUser);
+                window.location.reload();
+            }
+        })
+        // await updateUser(updatedUser);
+        // reset(defaultValues);
     }))
 
+    console.log('👀', watch('role'));
     return (
         <div>
             {/* <h1 className="text-2xl font-semibold mb-4">{`${user.name}` }</h1> */}
@@ -358,7 +374,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     </select>
                 </div>
                 {/*Level*/}
-                {user && user.role === 'student' && <>
+                {watch('role') === 'student' && <>
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <Select
                             components={animatedComponents}
@@ -373,9 +389,10 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                                 if (!e.value) return
                                 setLevelStudent(e.value);
                             }}
+                            required={false}
                         />
                     </div>
-                {/*SubLevels*/}
+                    {/*SubLevels*/}
                     <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
                         <div className="bg-indigo-300 w-[auto] rounded-sm ">
                         </div>
@@ -405,7 +422,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     />
                     {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
                 </div>
-                {user.role === 'teacher' && <div className='flex flex-row justify-between'>
+                {watch('role') === 'teacher' && <div className='flex flex-row justify-between'>
                     {/** TeacherLink*/}
                     <div className="mb-4 w-full">
                         <label className="block text-gray-600">Teacher Link</label>

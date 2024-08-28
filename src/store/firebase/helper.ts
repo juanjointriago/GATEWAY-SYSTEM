@@ -93,11 +93,14 @@ interface email {
 }
 
 export const sendCustomEmail = async (dataForSend: email) => {
-
     const message: email = dataForSend;
-    console.log('Sending 📧 => ', { message });
+    try {
+        await addDoc(collection(db, 'mail'), message)
+        console.log('Sending 📧 => ', { message });
+    } catch (error) {
+        console.warn("Error adding document: ", error)
 
-    await adddItem('mail', message);
+    }
 
 }
 

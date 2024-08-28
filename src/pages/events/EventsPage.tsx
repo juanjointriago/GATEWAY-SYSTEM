@@ -2,10 +2,10 @@ import { event } from "../../interface"
 import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useEventStore } from "../../stores/events/event.store"
 import { StudentsList } from "../users/StudentsList"
-import { useAuthStore, useUserStore } from "../../stores"
+import { useAuthStore, useLevelStore, useSubLevelStore, useUserStore } from "../../stores"
 import { AvatarButton } from "../../components/shared/buttons/AvatarButton"
 import { StudentActions } from "./StudentActions"
-import { IoCalendarClearOutline, IoPencil, IoTrash } from "react-icons/io5"
+import { IoCalendarClearOutline, IoMail, IoPencil, IoTrash } from "react-icons/io5"
 import { NavLink } from "react-router-dom"
 import { TableContainer } from "../../components/shared/tables/TableContainer"
 import { FabButton } from "../../components/shared/buttons/FabButton"
@@ -16,11 +16,14 @@ import { getInitials } from "../users/helper"
 import { FormEventControl } from "../../components/shared/forms/FormEventControl"
 import { EditEventControl } from "../../components/shared/forms/EditEventControl"
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton"
+import { sendCustomEmail } from "../../store/firebase/helper"
 
 
 export const EventsPage = () => {
   const users = useUserStore(state => state.users);
   const user = useAuthStore(state => state.user);
+  const sublevels = useSubLevelStore(state => state.subLevels);
+  const levels = useLevelStore(state => state.levels);
   const updateEvent = useEventStore(state => state.updateEvent);
   const deleteEvent = useEventStore(state => state.deleteEvent);
   const isAdmin = user && user.role === 'admin';
@@ -74,7 +77,7 @@ export const EventsPage = () => {
               cancelButtonColor: '#d33',
               confirmButtonText: 'Sí, continuar',
               cancelButtonText: 'Cancelar'
-            }).then(async(result) => {
+            }).then(async (result) => {
               if (result.isConfirmed) {
                 await updateEvent({ ...record, isActive: !record.isActive })
                 window.location.reload();
@@ -97,12 +100,56 @@ export const EventsPage = () => {
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, continuar',
                 cancelButtonText: 'Cancelar'
-              }).then(async(result) => {
+              }).then(async (result) => {
                 if (result.isConfirmed) {
                   await deleteEvent(record.id!);
                 }
               })
             }} />}
+          <FabButton isActive tootTipText={''} action={() => {
+            Swal.fire({
+              title: '¿Estás seguro?',
+              text: `Estas a punto de enviar un correo al docente de esta reservación`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, continuar',
+              cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                await sendCustomEmail({
+                  to: [users.find(user => user.id === record.teacher)!.email!],
+                  // to: ['juanjoitoshiki@gmail.com'],
+                  message: {
+                    subject: 'Recordatorio de reservación',
+                    text: `Hola, ${users.find(user => user.id === record.teacher)?.name}, te recordamos que tienes una reservación el ${new Date(record.date).toLocaleDateString()} a las ${new Date(record.date).toLocaleTimeString()} con el nombre de ${record.name}, con estudiantes de la(s) unidad(es) ${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === record.levels[0].level)?.name}.`,
+                    html: `<h1>Hola, ${users.find(user => user.id === record.teacher)?.name}</h1>
+                    <p>Te recordamos que tienes una reservación el ${new Date(record.date).toLocaleDateString()} a las ${new Date(record.date).toLocaleTimeString()} con el nombre de ${record.name}
+                    , con estudiantes de la(s) unidad(es) <b>${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}</b>, en modalidad <b>${levels.find((level) => level.id === record.levels[0].level)?.name}<b/>.
+                    </p>
+                    <a href="hhtps://gateway-english.com">
+                        <p> © 2024 Gateway Corp derechos reservados 2024</p>
+                    </a>
+                    `
+                  }
+                })
+                  .then(async () => {
+                    await Swal.fire({
+                      title: 'Correo enviado',
+                      text: `Se ha enviado un correo a ${users.find(user => user.id === record.teacher)?.name}`,
+                      icon: 'success',
+                      confirmButtonColor: '#3085d6',
+                      confirmButtonText: 'Continuar',
+                    })
+                    // .then(() => {
+                    //   window.location.reload();
+                    // })
+                  })
+              }
+            })
+          }} Icon={IoMail} />
+
         </>
       )
     },
