@@ -129,7 +129,17 @@ export const EventsPage = () => {
                     , con estudiantes de la(s) unidad(es) <b>${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}</b>, en modalidad <b>${levels.find((level) => level.id === record.levels[0].level)?.name}<b/>.
                     </p>
                     <a href="hhtps://gateway-english.com">
-                        <p> © 2024 Gateway Corp derechos reservados 2024</p>
+                        <p> © 2024 Gateway Corp derechos reservados </p>
+                        <table width="100%" style="max-width:640px;">
+                        <tr>
+                        <td>
+                        <img width="100%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
+                          </td>
+                        </tr>
+                      </table>
+                        <br/>
+                        <small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small>
+                        <img style="max-width:100%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
                     </a>
                     `
                   }
