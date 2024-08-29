@@ -87,36 +87,32 @@ export const FormEventControl: FC = () => {
                     confirmButtonText: 'Aceptar',
                 }).then(async (result) => {
                     if (result.isConfirmed) {
+                        const text = `, se le ha asignado un horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
                         await sendCustomEmail({
                             to: [getUserById(data.teacher!)!.email!],
                             message: {
                                 subject: 'Recordatorio de reservación',
-                                text: `Hola, ${getUserById(data.teacher!)!.name}, se ha asignado un nuevo horario con fecha y hora : ${new Date(eventRecord.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${eventRecord.name}, con estudiantes de la(s) unidad(es) ${eventRecord.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === eventRecord.levels[0].level)?.name}.`,
+                                text:`Hola, ${getUserById(data.teacher!)!.name} ${text}`,
                                 html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1>
-                                <p>Te recordamos que tienes una reservación el ${new Date(eventRecord.date).toLocaleDateString()} a las ${new Date(eventRecord.date).toLocaleTimeString()} con el nombre de ${eventRecord.name}
-                                , con estudiantes de la(s) unidad(es) <b>${eventRecord.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}</b>, en modalidad <b>${levels.find((level) => level.id === eventRecord.levels[0].level)?.name}<b/>.
-                                </p>
-                                <p> © 2024 Gateway Corp derechos reservados </p>
+                                <p>${text}</p>
                                 <table width="100%" style="max-width:640px;">
                                 <tr>
                                     <td>
+                                        <p> © 2024 Gateway Corp derechos reservados </p>
                                         <a href="https://gateway-english.com">
-                                            <img width="60%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
-                                        </a>
-                                    </td>
-                                        </tr>
-                                <tr>
-                                    <td>
-                                        <a href="https://purple-widget.com/">
-                                            <img style="max-width:20%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
+                                            <img width="40%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
                                         </a>
                                     </td>
                                 </tr>
-                                </table>
-                                `
-                            },
-
-                        })
+                                <tr>
+                                    <td>
+                                        <p><small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small></p>
+                                        <a href="https://purple-widget.com/">
+                                            <img style="max-width:10%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </table>` }, });
                         window.location.reload();
                     }
                 })
