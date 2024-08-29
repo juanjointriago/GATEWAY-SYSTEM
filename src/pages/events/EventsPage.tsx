@@ -123,12 +123,12 @@ export const EventsPage = () => {
                   // to: ['juanjoitoshiki@gmail.com'],
                   message: {
                     subject: 'Recordatorio de reservación',
-                    text: `Hola, ${users.find(user => user.id === record.teacher)?.name}, te recordamos que tienes una reservación el ${new Date(record.date).toLocaleDateString()} a las ${new Date(record.date).toLocaleTimeString()} con el nombre de ${record.name}, con estudiantes de la(s) unidad(es) ${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === record.levels[0].level)?.name}.`,
+                    text: `Hola, ${users.find(user => user.id === record.teacher)?.name}, te recordamos que tienes un horario asignado con fecha y hora : ${new Date(record.date).toLocaleTimeString([], {year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit'})} con el nombre de ${record.name}, con estudiantes de la(s) unidad(es) ${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === record.levels[0].level)?.name}.`,
                     html: `<h1>Hola, ${users.find(user => user.id === record.teacher)?.name}</h1>
                     <p>Te recordamos que tienes una reservación el ${new Date(record.date).toLocaleDateString()} a las ${new Date(record.date).toLocaleTimeString()} con el nombre de ${record.name}
                     , con estudiantes de la(s) unidad(es) <b>${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}</b>, en modalidad <b>${levels.find((level) => level.id === record.levels[0].level)?.name}<b/>.
                     </p>
-                    <a href="hhtps://gateway-english.com">
+                    <a href="https://gateway-english.com">
                         <p> © 2024 Gateway Corp derechos reservados </p>
                         <table width="100%" style="max-width:640px;">
                         <tr>

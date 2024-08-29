@@ -70,11 +70,25 @@ export const FormEventControl: FC = () => {
             await sendCustomEmail({
                 to: [getUserById(data.teacher!)!.email!],
                 message: {
-                    subject: `Reservación`,
-                    text: `Hola desde administracion queremos comunicarte que hemos creado un una nueva reservación en la fecha ${data.date} la clase será para estudiantes de la modalidad ${data.levels[0].level} y de las unidades ${data.levels[0].subLevels.map((sublevel: string) => sublevels.find((sub) => sub.id === sublevel)?.name).join(', ')}`,
-                    html: `<img src="https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd"
-            alt="Placeholder Image"
-            className="object-scale-down w-auto h-auto" />`
+                    subject: 'Recordatorio de reservación',
+                    text: `Hola, ${getUserById(data.teacher!)!.name}, se ha asignado un nuevo horario con fecha y hora : ${new Date(eventRecord.date).toLocaleTimeString([], {year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit'})} con el nombre de ${eventRecord.name}, con estudiantes de la(s) unidad(es) ${eventRecord.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === eventRecord.levels[0].level)?.name}.`,
+                    html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1>
+                    <p>Te recordamos que tienes una reservación el ${new Date(eventRecord.date).toLocaleDateString()} a las ${new Date(eventRecord.date).toLocaleTimeString()} con el nombre de ${eventRecord.name}
+                    , con estudiantes de la(s) unidad(es) <b>${eventRecord.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}</b>, en modalidad <b>${levels.find((level) => level.id === eventRecord.levels[0].level)?.name}<b/>.
+                    </p>
+                    <a href="https://gateway-english.com">
+                        <p> © 2024 Gateway Corp derechos reservados </p>
+                        <table width="100%" style="max-width:640px;">
+                        <tr>
+                        <td>
+                        <img width="100%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
+                          </td>
+                        </tr>
+                      </table>
+                        <br/>
+                        <small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small>
+                        <img style="max-width:100%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
+                    </a>`
                 },
 
             })
