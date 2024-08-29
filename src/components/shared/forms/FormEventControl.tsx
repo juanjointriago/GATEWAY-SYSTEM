@@ -7,7 +7,7 @@ import { useEventStore } from "../../../stores/events/event.store"
 import { v6 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import Swal from "sweetalert2";
-import { sendCustomEmail } from "../../../store/firebase/helper";
+import { footerMail, sendCustomEmail } from "../../../store/firebase/helper";
 
 
 export const FormEventControl: FC = () => {
@@ -92,27 +92,10 @@ export const FormEventControl: FC = () => {
                             to: [getUserById(data.teacher!)!.email!],
                             message: {
                                 subject: 'Asignación de horario de clase',
-                                text:`Hola, ${getUserById(data.teacher!)!.name} ${text}`,
-                                html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1>
-                                <p>${text}</p>
-                                <table width="100%" style="max-width:640px;">
-                                <tr>
-                                    <td>
-                                        <p> © 2024 Gateway Corp derechos reservados </p>
-                                        <a href="https://gateway-english.com">
-                                            <img width="40%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small></p>
-                                        <a href="https://purple-widget.com/">
-                                            <img style="max-width:10%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
-                                        </a>
-                                    </td>
-                                </tr>
-                                </table>` }, });
+                                text: `Hola, ${getUserById(data.teacher!)!.name} ${text}`,
+                                html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1> <p>${text}</p> ${footerMail}}`
+                            },
+                        });
                         window.location.reload();
                     }
                 })
