@@ -134,11 +134,15 @@ export const EventsPage = () => {
                         <small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small>
                         <table width="100%" style="max-width:640px;">
                         <tr>
-                        <td>
-                        <img width="60%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
-                        <img style="max-width:20%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
-                        <br/>
-                          </td>
+                            <td>
+                                <a href="https://gateway-english.com">
+                                    <img width="60%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
+                                </a>
+                                <a href="https://purple-widget.com/">
+                                    <img style="max-width:20%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
+                                </a>
+                                <br/>
+                            </td>
                         </tr>
                       </table>
                     </a>
