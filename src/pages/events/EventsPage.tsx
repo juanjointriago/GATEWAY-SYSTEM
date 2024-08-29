@@ -103,6 +103,7 @@ export const EventsPage = () => {
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   await deleteEvent(record.id!);
+                  window.location.reload();
                 }
               })
             }} />}
@@ -130,16 +131,16 @@ export const EventsPage = () => {
                     </p>
                     <a href="https://gateway-english.com">
                         <p> © 2024 Gateway Corp derechos reservados </p>
+                        <small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small>
                         <table width="100%" style="max-width:640px;">
                         <tr>
                         <td>
-                        <img width="100%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
+                        <img width="60%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
+                        <img style="max-width:20%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
+                        <br/>
                           </td>
                         </tr>
                       </table>
-                        <br/>
-                        <small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small>
-                        <img style="max-width:100%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
                     </a>
                     `
                   }
@@ -166,7 +167,7 @@ export const EventsPage = () => {
   ]
 
   const events = useEventStore(state => state.events);
-  const sortedEvents = events.sort((a, b) => b.date - a.date)
+  const sortedEvents = events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   // .filter(event => event.isActive);
   // console.log('events', events.length)
   return (
