@@ -88,7 +88,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             message: {
                                 subject: 'Actualizacion de horario de clase',
                                 text: `Hola, ${getUserById(data.teacher!)!.name} ${text}`,
-                                html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1> <p>${text}</p>${footerMail}}`
+                                html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1> <p>${text}</p>${footerMail}`
                             },
                         });
                         window.location.reload();

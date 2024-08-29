@@ -125,7 +125,7 @@ export const EventsPage = () => {
                   message: {
                     subject: 'Recordatorio de reservación',
                     text: `Hola, ${users.find(user => user.id === record.teacher)?.name} ${text}`,
-                    html: `<h1>Hola, ${users.find(user => user.id === record.teacher)?.name}</h1> <p>${text}</p> ${footerMail}}`
+                    html: `<h1>Hola, ${users.find(user => user.id === record.teacher)?.name}</h1> <p>${text}</p> ${footerMail}`
                   },
                 })
                   .then(async () => {
