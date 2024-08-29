@@ -82,11 +82,11 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                     confirmButtonText: 'Aceptar',
                 }).then(async (result) => {
                     if (result.isConfirmed) {
-                        const text = `, se ha actualizado el horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
+                        const text = `Se ha actualizado el horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
                         await sendCustomEmail({
                             to: [getUserById(data.teacher!)!.email!],
                             message: {
-                                subject: 'Recordatorio de reservación',
+                                subject: 'Actualizacion de horario de clase',
                                 text:`Hola, ${getUserById(data.teacher!)!.name} ${text}`,
                                 html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1>
                                 <p>${text}</p>
