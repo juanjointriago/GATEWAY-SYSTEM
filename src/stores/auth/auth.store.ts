@@ -23,7 +23,7 @@ export interface AuthState {
 export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
     status: 'pending',
     user: undefined,
-    sigUpUser: async (user:newUSer) =>  await AuthService.signUp(user),
+    sigUpUser: async (user:newUSer) =>  {await AuthService.signUp(user)},
 
     loginUser: async (email: string, password: string) => {
         const user = await AuthService.login(email, password);

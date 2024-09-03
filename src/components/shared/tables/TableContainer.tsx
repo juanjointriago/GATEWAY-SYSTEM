@@ -13,8 +13,8 @@ import { dateToMiliseconds } from "../../../helpers/date.helper";
 type Props<T> = {
   columns: Array<ColumnProps<T>>;
   data?: T[];
-  modalChildren: ReactElement;
-  modalTitle: string;
+  modalChildren?: ReactElement;
+  modalTitle?: string;
   hasAddBtn?: boolean;
 };
 
@@ -131,7 +131,12 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
             if (searchTerms.length > 0) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const results = data && data.filter((data: any) =>
-                data["name"] && data["name"].toLowerCase().includes(searchTerms.toLowerCase())
+              {
+                if(data['email']){
+                return data["email"] && data["email"].toLowerCase().includes(searchTerms.toLowerCase())
+                }
+                return data["name"] && data["name"].toLowerCase().includes(searchTerms.toLowerCase())
+              }
               )
               console.log("resultados encontrados: ", results)
               setRowsToShow(results as T[])
@@ -241,7 +246,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
             </div>
           </div>
           {/* Modal */}
-          <ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={modalTitle} children={modalChildren} />
+          {modalChildren&&<ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={modalTitle} children={modalChildren} />}
         </div>
       </div>
     </>

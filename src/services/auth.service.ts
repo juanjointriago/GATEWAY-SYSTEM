@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import Swal from 'sweetalert2';
-import { adddItem, getItemById } from "../store/firebase/helper";
+import { getItemById, setItem } from "../store/firebase/helper";
 import { FirestoreUser, newUSer } from "../interface";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../store/firebase/initialize";
@@ -104,7 +104,8 @@ export class AuthService {
                     updatedAt: Date.now(),
                 };
                 await updateProfile(userCredential.user, { displayName: name });
-                await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);
+                // await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);//
+                await setItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
                 Swal.fire({
                     title: `Registro completo`,
                     text: `Su cuenta se encuentra en proceso de activación`,
@@ -168,7 +169,7 @@ export class AuthService {
                     isActive: false,
                     createdAt: Date.now(),
                 };
-                await adddItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
+                await setItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
                 Swal.close();
                 return;
             }

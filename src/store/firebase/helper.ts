@@ -106,20 +106,20 @@ export const sendCustomEmail = async (dataForSend: email) => {
 
 export const footerMail =`
 <table width="100%" style="max-width:640px;">
-                        <tr>
-                            <td>
-                            <a href="https://gateway-english.com">
-                            <p> © 2024 Gateway Corp derechos reservados </p>
-                                    <img width="40%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                            <a href="https://purple-widget.com/">
-                            <p><small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small></p>
-                                    <img style="max-width:20%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
-                                </a>
-                            </td>
-                        </tr>
-                        </table>`
+    <tr>
+        <td>
+        <a href="https://gateway-english.com">
+        <p> © 2024 Gateway Corp derechos reservados </p>
+                <img width="40%" src='https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'/>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+        <a href="https://purple-widget.com/">
+        <p><small>Creado por: Purple-Widget - Software a medida - +(593)987357965</small></p>
+                <img style="max-width:20%;height:auto;" src='https://firebasestorage.googleapis.com/v0/b/zustand-practice-e2ec6.appspot.com/o/purplewidgetlogo.png?alt=media&token=9673f9b9-8b45-4ff0-a931-c0e6b4b72f01'/>
+            </a>
+        </td>
+    </tr>
+</table>`

@@ -55,6 +55,7 @@ export const UsersPage = () => {
       </>
     },
   ]
+  const sortedUsers = users.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime() )
 
   return (
     <>
@@ -74,8 +75,8 @@ export const UsersPage = () => {
         </div>}
         {isAdmin && userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
         {isAdmin && userforUnit && <ModalGeneric title="Administrar Libros" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserUnits userId={userforUnit} />} />}
-        {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={users.sort((a, b) => { return b.createdAt - a.createdAt })} modalChildren={<></>} modalTitle="Registrar usuarios" />
-          : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} modalChildren={<></>} modalTitle="Registrar usuarios" />}
+        {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={sortedUsers} modalChildren={<></>} modalTitle="Registrar usuarios" />
+          : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} />}
       </div>
     </>
   )
