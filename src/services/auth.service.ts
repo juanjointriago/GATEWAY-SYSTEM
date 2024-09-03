@@ -2,8 +2,6 @@ import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWith
 import Swal from 'sweetalert2';
 import { getItemById, setItem } from "../store/firebase/helper";
 import { FirestoreUser, newUSer } from "../interface";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../store/firebase/initialize";
 
 2
 export class AuthService {
@@ -195,33 +193,32 @@ export class AuthService {
 
     }
 
-    static signUpGateway = async (sigUpUser: FirestoreUser, action: () => void) => {
-        const auth = getAuth();
-        const { email, password, name, role, phone, address, bornDate, cc, city, country } = sigUpUser;
-        const { user } = await createUserWithEmailAndPassword(auth, email, password!)
-        const { photoURL, uid } = user;
-        const dataUser = {
-            uid,
-            id: uid,
-            name,
-            email,
-            role,
-            photoUrl: photoURL,
-            phone,
-            address,
-            bornDate,
-            cc,
-            city,
-            country,
-            isActive: false,
-            createdAt: Date.now(),
-        };
+    // static signUpGateway = async (sigUpUser: FirestoreUser) => {
+    //     const auth = getAuth();
+    //     const { email, password, name, role, phone, address, bornDate, cc, city, country } = sigUpUser;
+    //     const { user } = await createUserWithEmailAndPassword(auth, email, password!)
+    //     const { photoURL, uid } = user;
+    //     const dataUser = {
+    //         uid,
+    //         id: uid,
+    //         name,
+    //         email,
+    //         role,
+    //         photoUrl: photoURL,
+    //         phone,
+    //         address,
+    //         bornDate,
+    //         cc,
+    //         city,
+    //         country,
+    //         isActive: false,
+    //         createdAt: Date.now(),
+    //     };
 
-        await updateProfile(user, { displayName: name });
-        await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);
-        await signOut(auth);
-        action();
-    }
+    //     await updateProfile(user, { displayName: name });
+    //     await setItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
+    //     await signOut(auth);
+    // }
 
 
 

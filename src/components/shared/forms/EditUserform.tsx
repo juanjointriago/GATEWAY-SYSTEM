@@ -343,17 +343,18 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     <div className="mb-4 ml-2">
                         <label htmlFor="sublevel" className="block text-gray-600">Ciudad</label>
                         <select
-                            {...register("city", { required: "Ciudad" })}
+                            {...register("city", { required: "La ciudad es Obligatoria 👀" })}
                             id="sublevel"
                             defaultValue={''}
                             className="appearance-none block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-                            <option value={''}>Seleccione rol</option>
+                            <option value={''}>Seleccione ciudad</option>
                             {
                                 cities.map((city, index) => {
                                     return <option key={index} value={city}>{city}</option>
                                 })
                             }
                         </select>
+                        {errors.city && <p className="text-red-500 text-xs italic">{errors.city.message}</p>}
                     </div>
                 </div>
                 {/*Role*/}

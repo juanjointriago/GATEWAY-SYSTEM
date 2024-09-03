@@ -55,7 +55,7 @@ export const UsersPage = () => {
       </>
     },
   ]
-  const sortedUsers = users.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime() )
+  const sortedUsers = users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() )
 
   return (
     <>
