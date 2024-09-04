@@ -26,7 +26,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     const sublevels = useSubLevelStore(state => state.subLevels);
     const getUserById = useUserStore(state => state.getUserById);
     const getUserByRole = useUserStore(state => state.getUserByRole);
-    const students = getUserByRole('student')!;
+    const students = getUserByRole('student').filter((student)=>student.isActive)!;
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!];
 
     //To formulary

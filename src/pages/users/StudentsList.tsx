@@ -39,8 +39,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
 
 
     return (
-        <div
-            className="flex flex-row">
+        <div key={uuid()} className="flex flex-row">
             {
                 (!studentIds.length ?
                     <p>Sin estudiantes</p>
@@ -53,9 +52,9 @@ export const StudentsList: FC<Props> = ({ record }) => {
                             color={colors[Math.floor(Math.random() * colors.length)]}
                         />
                     ))
-                    : <>
+                    : <div key={uuid()} className="flex flex-row items-center ">
                         {showStudents && showStudents.slice(0, 3).map((student) => (
-                            <AvatarButton key={student?.id}
+                            <AvatarButton key={uuid()}
                                 tootTipText={`${student?.name ?? 'NO name'} - ${changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}`}
                                 initialLetter={getInitials(student?.name ?? 'XX')}
                                 color={colors[Math.floor(Math.random() * colors.length)]}
@@ -68,16 +67,17 @@ export const StudentsList: FC<Props> = ({ record }) => {
                             action={() => setIsVisible(true)}
                             color={colors[Math.floor(Math.random() * colors.length)]}
                         />
-                    </>
+                    </div>
             }
             <ModalGeneric key={uuid()}  title="Estudiantes para esta clase" isVisible={isVisible} setIsVisible={setIsVisible} children={<div key={uuid()} >
                 {showStudents && showStudents.map((student) => (
-                    <div key={student?.id} className="flex flex-row items-center h-1/2">
+                    <div key={uuid()} className="flex flex-row items-center h-1/2">
                         <AvatarButton
                             initialLetter={getInitials(student?.name ?? 'XX').toUpperCase()}
                             color={colors[Math.floor(Math.random() * colors.length)]}
-                            isActive />
-                            <p >{student?.name} - </p>
+                            isActive
+                             />
+                            <p className={`${student?.isActive?'text-gray-500':'text-red-500'} `}>{student?.name} - </p>
                         <p className="text-indigo-700">- {changeVisualStatus(record[`${student?.id ?? 'MAYBE'}`]?.status ?? 'MAYBE')}</p>
                     </div>
                 ))}
