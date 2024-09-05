@@ -48,15 +48,13 @@ const changeVisualStatus = (status: status) => {
     }
 
 }
-export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
+export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
     const updateEvent = useEventStore(state => state.updateEvent);
     const today = Date.now();
     return (
         <div className="flex flex-row">
             {
-
                 // keys.map((key: string) => (
-
                 <div key={userId} className="flex flex-row">
                     <TootipBase title="" tootTipText={changeVisualAction(`${students[userId].status}`)}>
                         <div onClick={() => {
@@ -65,7 +63,7 @@ export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => 
                                 Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite para esta clase', 'warning')
                                 return
                             }
-                            if (today > event.limitDate) {
+                            if (today > new Date(event.limitDate).getTime()) {
                                 Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite', 'error')
                                 return
                             }

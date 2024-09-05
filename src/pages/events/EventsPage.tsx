@@ -65,9 +65,11 @@ export const EventsPage = () => {
     },
     {
       key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => (
-        //TODO component for generic actions on all tables
+        
         <>
-          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
+        {/* //Cambiar estado */}
+          {isAdmin ? 
+          <ToggleButton isActive={record.isActive} action={() => {
             Swal.fire({
               title: '¿Estás seguro?',
               text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta reservación`,
@@ -84,29 +86,34 @@ export const EventsPage = () => {
               }
             })
           }} /> : <div>{record.isActive ? 'Público' : 'Privado'}</div>}
-          {isAdmin && <FabButton isActive tootTipText={''} action={() => {
-            setOpenModal(true);
-            setEventToEdit(record.id)
-          }} Icon={IoPencil} />}
-          {isAdmin && <FabButton isActive
-            Icon={IoTrash}
-            action={() => {
-              Swal.fire({
-                title: '¿Estás seguro?',
-                text: `Estas a punto de eliminar esta reservación`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, continuar',
-                cancelButtonText: 'Cancelar'
-              }).then(async (result) => {
-                if (result.isConfirmed) {
-                  await deleteEvent(record.id!);
-                  window.location.reload();
-                }
-              })
-            }} />}
+          {/* //Editar reservación */}
+          {isAdmin &&
+            <FabButton isActive tootTipText={''} action={() => {
+              setOpenModal(true);
+              setEventToEdit(record.id)
+            }} Icon={IoPencil} />}
+          {/* //Eliminar reservación */}
+          {isAdmin &&
+            <FabButton isActive
+              Icon={IoTrash}
+              action={() => {
+                Swal.fire({
+                  title: '¿Estás seguro?',
+                  text: `Estas a punto de eliminar esta reservación`,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Sí, continuar',
+                  cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    await deleteEvent(record.id!);
+                    window.location.reload();
+                  }
+                })
+              }} />}
+          {/* //envio correo Admin */}
           <FabButton isActive tootTipText={''} action={() => {
             Swal.fire({
               title: '¿Estás seguro?',
