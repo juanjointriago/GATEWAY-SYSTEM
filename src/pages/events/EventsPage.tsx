@@ -38,7 +38,7 @@ export const EventsPage = () => {
     {
       key: 'name', title: 'Nombre', render: (_, record) => <div>{record.name} </div>
     },
-    { key: 'limitDate', title: 'Fecha Limite', render: (_, record) => <>{record.limitDate ? record.limitDate : 'No asignado'}</> },
+    { key: 'limitDate', title: 'Fecha Limite Para reservar', render: (_, record) => <>{record.limitDate ? record.limitDate : 'No asignado'}</> },
 
     {
       key: 'teacher', title: 'Profesor', render: (_, record) => {
@@ -114,39 +114,41 @@ export const EventsPage = () => {
                 })
               }} />}
           {/* //envio correo Admin */}
-          <FabButton isActive tootTipText={''} action={() => {
-            Swal.fire({
-              title: '¿Estás seguro?',
-              text: `Estas a punto de enviar un correo al docente de esta reservación`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, continuar',
-              cancelButtonText: 'Cancelar'
-            }).then(async (result) => {
-              if (result.isConfirmed) {
-                const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(record.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${record.name}, con estudiantes de la(s) unidad(es) ${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === record.levels[0].level)?.name}.`;
-                await sendCustomEmail({
-                  to: [users.find(user => user.id === record.teacher)!.email!],
-                  message: {
-                    subject: 'Recordatorio de reservación',
-                    text: `Hola, ${users.find(user => user.id === record.teacher)?.name} ${text}`,
-                    html: `<h1>Hola, ${users.find(user => user.id === record.teacher)?.name}</h1> <p>${text}</p> ${footerMail}`
-                  },
-                })
-                  .then(async () => {
-                    await Swal.fire({
-                      title: 'Correo enviado',
-                      text: `Se ha enviado un correo a ${users.find(user => user.id === record.teacher)?.name}`,
-                      icon: 'success',
-                      confirmButtonColor: '#3085d6',
-                      confirmButtonText: 'Continuar',
-                    })
+          {
+            isAdmin&& <FabButton isActive tootTipText={''} action={() => {
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: `Estas a punto de enviar un correo al docente de esta reservación`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(record.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${record.name}, con estudiantes de la(s) unidad(es) ${record.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === record.levels[0].level)?.name}.`;
+                  await sendCustomEmail({
+                    to: [users.find(user => user.id === record.teacher)!.email!],
+                    message: {
+                      subject: 'Recordatorio de reservación',
+                      text: `Hola, ${users.find(user => user.id === record.teacher)?.name} ${text}`,
+                      html: `<h1>Hola, ${users.find(user => user.id === record.teacher)?.name}</h1> <p>${text}</p> ${footerMail}`
+                    },
                   })
-              }
-            })
-          }} Icon={IoMail} />
+                    .then(async () => {
+                      await Swal.fire({
+                        title: 'Correo enviado',
+                        text: `Se ha enviado un correo a ${users.find(user => user.id === record.teacher)?.name}`,
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Continuar',
+                      })
+                    })
+                }
+              })
+            }} Icon={IoMail} />
+          }
 
         </>
       )

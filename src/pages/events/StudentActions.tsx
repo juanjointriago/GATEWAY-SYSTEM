@@ -60,11 +60,11 @@ export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) =>
                         <div onClick={() => {
                             const student = event.students[userId];
                             if (!event.limitDate) {
-                                Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite para esta clase', 'warning')
+                                Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite de reservación para esta clase', 'warning')
                                 return
                             }
                             if (today > new Date(event.limitDate).getTime()) {
-                                Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite', 'error')
+                                Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite de reservación', 'error')
                                 return
                             }
                             Swal.fire({
