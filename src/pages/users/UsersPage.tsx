@@ -5,7 +5,7 @@ import { useAuthStore, useUserStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoBook, IoPencil } from "react-icons/io5";
+import { IoBook, IoPencil, IoPerson } from "react-icons/io5";
 import { useState } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
@@ -13,10 +13,12 @@ import Swal from "sweetalert2";
 import { EditUserUnits } from "../../components/shared/forms/EditUserUnits";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { environment } from "../../environment";
+import { EditStudentSheet } from "../../components/shared/forms/EditStudentSheet";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openUnitModal, setOpenUnitModal] = useState(false);
+  const [openStudentSheetModal, setOpenStudentSheetModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState<string>();
   const [userforUnit, setUserforUnit] = useState<string>();
   const user = useAuthStore(state => state.user);
@@ -52,6 +54,7 @@ export const UsersPage = () => {
         }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
         {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUserToEdit(record.id) }} Icon={IoPencil} />}
         {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenUnitModal(true); setUserforUnit(record.id) }} Icon={IoBook} />}
+        {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenStudentSheetModal(true); setUserforUnit(record.id) }} Icon={IoPerson} />}
       </>
     },
   ]
@@ -75,6 +78,7 @@ export const UsersPage = () => {
         </div>}
         {isAdmin && userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
         {isAdmin && userforUnit && <ModalGeneric title="Administrar Libros" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserUnits userId={userforUnit} />} />}
+        {isAdmin && userforUnit && <ModalGeneric title="Ficha Estudiantil" isVisible={openStudentSheetModal} setIsVisible={setOpenStudentSheetModal} children={<EditStudentSheet userId={userforUnit} />} />}
         {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={sortedUsers} modalChildren={<></>} modalTitle="Registrar usuarios" />
           : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} />}
       </div>
