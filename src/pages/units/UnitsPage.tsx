@@ -24,7 +24,6 @@ export const UnitsPage = () => {
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const books = useUnitStore(state => state.units);
-  console.log('✅ LIBROS',{books})
   const [openModal, setOpenModal] = useState(false);
   const [unitToEdit, setUnitToEdit] = useState<unit>()
 
@@ -93,8 +92,10 @@ export const UnitsPage = () => {
   ]
 
   // const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
-
+  // user && console.log('USUARIO ACTUAL =>',user.uid,' UNIDADES ASIGNADAS =>',  user.unitsForBooks)
   const activeUnits = books
+  // books && user && console.log('✅ LIBROS DE ',books.filter((unit) => unit.sublevel === user.unitsForBooks[0]))
+
   return (
     <>
       <div className="pt-5">
