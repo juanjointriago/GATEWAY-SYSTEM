@@ -24,6 +24,7 @@ export const UnitsPage = () => {
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const books = useUnitStore(state => state.units);
+  console.log('✅ LIBROS',{books})
   const [openModal, setOpenModal] = useState(false);
   const [unitToEdit, setUnitToEdit] = useState<unit>()
 

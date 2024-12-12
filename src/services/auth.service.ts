@@ -7,8 +7,7 @@ import { FirestoreUser, newUSer } from "../interface";
 export class AuthService {
     static login = async (email: string, password: string): Promise<FirestoreUser | undefined> => {
         const auth = getAuth();
-        // console.debug('login', { email, password })
-
+        console.debug('✅login', { email, password })
         Swal.fire({
             title: "Ingresando al Sistema...",
             text: "Espera un poco...",
@@ -19,8 +18,9 @@ export class AuthService {
         });
         try {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
+            console.log('✅',user.displayName)
             const firebaseUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, user.uid);
-            // console.log('Auth.Service/static login/ getItemById=>', { firebaseUser });
+            console.log('Auth.Service/static login/ getItemById=>', { firebaseUser });
             Swal.close();
             if (firebaseUser && firebaseUser.isActive === false) {
                 // console.log("Caso Usuario inactivo")

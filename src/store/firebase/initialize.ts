@@ -17,6 +17,10 @@ const firebaseConfig = {
 //firebase initApp
 
 
+// console.log('✅',import.meta.env.VITE_APIKEY)
+// console.log('✅',import.meta.env.VITE_AUTHDOMAIN)
+// console.log('✅',import.meta.env.VITE_PROJECTID)
+// console.log('✅',import.meta.env.VITE_STORAGEBUCKET)
 
 const app = initializeApp(firebaseConfig);
 const db =  getFirestore(app);

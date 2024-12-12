@@ -17,6 +17,8 @@ export const SideMenu = () => {
   const getAllLevels = useLevelStore(state => state.getAndSetLevels);
   const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
   const getAllUnits =  useUnitStore(state => state.getAndSetUnits);
+  const books = useUnitStore(state => state.units);
+  console.log('✅ Inside SideMenu loadbooks =>',{books})
   // const getAllEvents = useEventStore(state => state.getEventsQuery);
   const getAllEvents = useEventStore(state => state.getAllEvents);
 
