@@ -10,6 +10,8 @@ import { FaqPage } from '../pages/faq/FaqPage'
 import { SupportPage } from '../pages/support/SupportPage'
 import { LocationsPage } from '../pages/locations/LocationsPage'
 import { NotFound } from '../pages/errorPage/NotFound'
+import { LanddingLayout } from '../layouts/LanddingLayout'
+import { Policies } from '../pages/auth/Policies'
 
 export const router = createBrowserRouter([
     {
@@ -75,6 +77,16 @@ export const router = createBrowserRouter([
                     {
                         path: 'forgot-password',
                         element: <ForgotPassword />
+                    },
+                ]
+            },
+            {
+                path: '/',
+                element: <LanddingLayout />,
+                children: [
+                    {
+                        path: 'policies',
+                        element: <Policies />
                     },
                 ]
             },
