@@ -78,7 +78,7 @@ export const UsersPage = () => {
         </div>}
         {isAdmin && userToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUserform userId={userToEdit} />} />}
         {isAdmin && userforUnit && <ModalGeneric title="Administrar Libros" isVisible={openUnitModal} setIsVisible={setOpenUnitModal} children={<EditUserUnits userId={userforUnit} />} />}
-        {isAdmin && userforUnit && <ModalGeneric title="Ficha Estudiantil" isVisible={openStudentSheetModal} setIsVisible={setOpenStudentSheetModal} children={<EditStudentSheet userId={userforUnit} />} />}
+        {isAdmin && userforUnit && <ModalGeneric title="Progress Sheet" isVisible={openStudentSheetModal} setIsVisible={setOpenStudentSheetModal} children={<EditStudentSheet userId={userforUnit} />} />}
         {isAdmin ? <TableContainer hasAddBtn={false} columns={userCols} data={sortedUsers} modalChildren={<></>} modalTitle="Registrar usuarios" />
           : <TableContainer hasAddBtn={isAdmin} columns={userCols} data={users} />}
       </div>

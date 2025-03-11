@@ -26,6 +26,7 @@ export const adddItem = async (collectionName: string, data: DocumentData) => {
  * @returns 
  */
 export const setItem = async (collectionName: string, data: DocumentData) => {
+    if(!collectionName || !data || !data.id) throw new Error('CollectionName, data y data.id son requeridos');
     return await setDoc(doc(db, collectionName, data.id), data)
 }
 

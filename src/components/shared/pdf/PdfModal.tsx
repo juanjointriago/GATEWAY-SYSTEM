@@ -13,7 +13,7 @@ interface Props {
     errorMsg?: string;
 }
 
-export const PdfModal: FC<Props> = ({ title, src, isVisible, setIsVisible, errorMsg = 'Este producto no tiene ficha técnica' }) => {
+export const PdfModal: FC<Props> = ({ title, src, isVisible, setIsVisible, errorMsg = 'Este Libro no tiene un archivo valido' }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [pdfFileUrl, setPdfFileUrl] = useState('');
     const defaultLayoutPluginInstance = defaultLayoutPlugin({
