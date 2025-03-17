@@ -5,3 +5,4 @@ export interface ColumnProps<T>{
     key: string
     render?: (column:ColumnProps<T>, item:T ) => ReactElement | ReactNode
 }
+
