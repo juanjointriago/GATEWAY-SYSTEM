@@ -115,7 +115,7 @@ export const EventsPage = () => {
               }} />}
           {/* //envio correo Admin */}
           {
-            isAdmin&& <FabButton isActive tootTipText={''} action={() => {
+            isAdmin && <FabButton isActive tootTipText={''} action={() => {
               Swal.fire({
                 title: '¿Estás seguro?',
                 text: `Estas a punto de enviar un correo al docente de esta reservación`,
@@ -163,7 +163,7 @@ export const EventsPage = () => {
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Reservaciones</h1>
 
-      {eventToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditEventControl eventId={eventToEdit} />} />}
+      {eventToEdit && <ModalGeneric title={isAdmin?'Actualizar datos':' Progress Sheet'} isVisible={openModal} setIsVisible={setOpenModal} children={!isAdmin?<EditEventControl eventId={eventToEdit} />:<>Formulario para Progress sheet {eventToEdit}</>} />}
       {sortedEvents && <TableContainer
         hasAddBtn={isAdmin}
         columns={eventCols}

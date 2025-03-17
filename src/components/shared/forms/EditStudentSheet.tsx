@@ -19,13 +19,27 @@ export const EditStudentSheet: FC<Props> = ({ userId }) => {
             src={user?.photoURL ?? user?.photoUrl}
             alt="Image"
           />
+          <div className="border-black border-2 rounded-lg m-2 p-2 pb-5">
+            <div className="flex flex-row justify-between pt-5">
+              <div className="text-gray-500">My Preferred Name is:</div>
+              <div className=" ml-10">____________</div>
+            </div>
+            <div className="flex flex-row justify-between pt-10">
+              <div className="text-gray-500">Ocupation:</div>
+              <div className=" ml-10">____________</div>
+            </div>
+            <div className="flex flex-row justify-between pt-10 pb-5">
+              <div className="text-gray-500">Phone:</div>
+              <div className=" ml-10">____________</div>
+            </div>
+          </div>
           <div className="border-black border-2 rounded-lg p-7 m-3">
-            <div className="text-center mb-5">Headline</div>
+            <div className="text-center mb-5">HEADLINE</div>
             <div className="flex flex-row justify-between">
               <div className="text-gray-500">ID Nro:</div>
-              <div className=" ml-10">1234</div>
+              <div className=" ml-10">####</div>
               <div className="text-gray-500 pl-5">REG Nro:</div>
-              <div className=" ml-10">12345</div>
+              <div className=" ml-10">####</div>
             </div>
             <div className="flex flex-row justify-between">
               <div className="text-gray-500">INSCRIPTION DATE:</div>
@@ -52,6 +66,9 @@ export const EditStudentSheet: FC<Props> = ({ userId }) => {
               <div className=" ml-10">__________________________</div>
             </div>
           </div>
+        </div>
+        <div className="border-black border-2 rounded-lg p-7 m-5">
+          
         </div>
       </div>
     </>

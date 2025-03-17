@@ -12,6 +12,7 @@ import { LocationsPage } from '../pages/locations/LocationsPage'
 import { NotFound } from '../pages/errorPage/NotFound'
 import { LanddingLayout } from '../layouts/LanddingLayout'
 import { Policies } from '../pages/auth/Policies'
+import { FeesPage } from '../pages/fees/FeesPage'
 
 export const router = createBrowserRouter([
     {
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'units',
                         element: <UnitsPage />
+                    },
+                    {
+                        path: 'fees',
+                        element: <FeesPage />
                     },
                     {
                         path: 'locations',
