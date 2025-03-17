@@ -7,7 +7,7 @@ import { immer } from "zustand/middleware/immer";
 interface ProgressSheetStore{
     progressSheets:progressSheetInterface[];
     getAndSetProgressSheets: ()=> Promise<void>;
-    getAllProgressSheets: ()=> Promise<void>;
+    getAllProgressSheets: ()=> progressSheetInterface[];
     getProgressSheetById: (id: string) => progressSheetInterface | undefined;
     createProgressSheet: (progressSheet: progressSheetInterface) => Promise<void>;
     updateProgressSheet: (progressSheet: progressSheetInterface) => Promise<void>;
@@ -25,10 +25,7 @@ const storeAPI: StateCreator<ProgressSheetStore,
             console.warn(error);
         }
     },
-    getAllProgressSheets: async () => {
-        const progressSheets = await ProgressSheetService.getProgressSheet();
-        set({ progressSheets: [...progressSheets] })
-    },
+    getAllProgressSheets:  () =>   get().progressSheets ,
 
     getProgressSheetById: (id: string) => get().progressSheets.find(progressSheet => progressSheet.id === id),
     createProgressSheet: async (progressSheet: progressSheetInterface) => {
