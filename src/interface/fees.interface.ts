@@ -7,6 +7,7 @@ export interface fee{
     isSigned:boolean;
     ci:string;
     imageUrl?:string;
+    isActive: boolean;
     createdAt: number;
     updatedAt: number
 }
