@@ -1,7 +1,7 @@
 export interface fee{
     uid: string;
     studentUid?: string;
-    code:string;
+    code?:string;
     qty: number;
     reason:string;
     isSigned:boolean;
