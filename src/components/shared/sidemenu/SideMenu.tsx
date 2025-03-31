@@ -7,6 +7,7 @@ import { useLevelStore, useSubLevelStore, useUnitStore, useUserStore } from "../
 import { useEffect } from "react";
 import { menuItemsByRole } from './menu';
 import { useEventStore } from '../../../stores/events/event.store';
+import { useFeesStore } from '../../../stores/fees/fess.store';
 // import { useNavigate } from "react-router-dom";
 
 
@@ -21,6 +22,7 @@ export const SideMenu = () => {
   // console.log('✅ Inside SideMenu loadbooks =>',{books})
   // const getAllEvents = useEventStore(state => state.getEventsQuery);
   const getAllEvents = useEventStore(state => state.getAllEvents);
+  const getAllFees = useFeesStore(state => state.getAndSetFees);
 
 
   const authStatus = useAuthStore(state => state.status);
@@ -31,8 +33,9 @@ export const SideMenu = () => {
     getAllLevels();
     getAllSubLevels();
     getAllEvents();
-    getAllUnits()
-  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits]);
+    getAllUnits();
+    getAllFees();
+  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits, getAllFees]);
 
 
   if (authStatus === 'unauthorized') {

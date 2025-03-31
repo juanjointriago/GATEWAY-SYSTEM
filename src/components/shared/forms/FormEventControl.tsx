@@ -178,6 +178,7 @@ export const FormEventControl: FC = () => {
                                 <Select
                                     name={name}
                                     id={name}
+                                    ref={ref}
                                     // {...field}
                                     components={animatedComponents}
                                     // defaultInputValue={defaultValues.teacher ? getUserByRole('teacher')?.find(user => user.id === defaultValues.teacher)?.name : 'Profesor'}
@@ -187,7 +188,6 @@ export const FormEventControl: FC = () => {
                                     onChange={onChange}
                                     placeholder="Profesor"
                                     onBlur={onBlur}
-                                    ref={ref}
                                 />
                             )}
                         />
@@ -337,6 +337,7 @@ export const FormEventControl: FC = () => {
                     <button
                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
                         type="submit"
+                        // disabled={isLoading}
                     >💾</button>
                 </div>
             </form>

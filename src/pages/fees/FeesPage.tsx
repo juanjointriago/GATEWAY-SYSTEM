@@ -6,9 +6,11 @@ import { useFeesStore } from "../../stores/fees/fess.store";
 import { useAuthStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { AddFeeForm } from "../../components/shared/forms/AddFeeForm";
+import { generatePDF } from "../../helpers/invoice.helper";
 
 export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
+  const fees = useFeesStore((state) => state.fees);
   const user = useAuthStore((state) => state.user);
   const [showModal, setShowModal] = useState(false);
   const columns = useMemo<ColumnDef<fee>[]>(
@@ -19,10 +21,16 @@ export const FeesPage = () => {
         header: () => <span>Nro.</span>,
       },
       {
-        accessorFn: (row) => row.code,
-        id: "code",
+        accessorFn: (row) => row.place,
+        id: "place",
         cell: (info) => info.getValue(),
-        header: () => <span>Nro</span>,
+        header: () => <span>Lugar</span>,
+      },
+      {
+        accessorFn: (row) => row.createdAt,
+        id: "createdAt",
+        cell: (info) => info.getValue(),
+        header: () => <span>Fecha</span>,
       },
       {
         accessorFn: (row) => row.reason,
@@ -31,10 +39,28 @@ export const FeesPage = () => {
         header: () => <span>Motivo</span>,
       },
       {
+        accessorFn: (row) => row.studentUid,
+        id: "studentUid",
+        cell: (data) => data.getValue(),
+        header: () => <span>Estudiante</span>,
+      },
+      {
+        accessorFn: (row) => row.imageUrl,
+        id: "imageUrl",
+        cell: (data) => (
+          <img
+            src={data.getValue() as string}
+            alt="No disponible"
+            className="w-20 h-20 rounded-full object-cover"
+          />
+        ),
+        header: () => <span>Imagen</span>,
+      },
+      {
         accessorFn: (row) => row.qty,
         id: "qty",
-        cell: (info) => info.getValue(),
-        header: () => <span>Cantidad</span>,
+        cell: (info) => <div>{"$" + info.getValue()}</div>,
+        header: () => <span>Valor</span>,
       },
       // { accessorFn: row =>row.studentUid, id: "studentUid", cell: (info) => info.getValue(), header:(item)=><span>{getStudentByUid(item.column)}</span> },
     ],
@@ -69,9 +95,14 @@ export const FeesPage = () => {
         isVisible={showModal}
         setIsVisible={setShowModal}
         title={"Registro de pago"}
-        children={<AddFeeForm/>}
+        children={<AddFeeForm />}
       />
-      <TableGeneric columns={columns} data={[]} />
+      <TableGeneric
+        hasActions
+        onGeneratePDF={async(row: fee) => await generatePDF(row)}
+        columns={columns}
+        data={fees}
+      />
     </div>
   );
 };
