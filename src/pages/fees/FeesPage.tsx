@@ -6,13 +6,15 @@ import { useFeesStore } from "../../stores/fees/fess.store";
 import { useAuthStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { AddFeeForm } from "../../components/shared/forms/AddFeeForm";
-import { generatePDF } from "../../helpers/invoice.helper";
+import PDFPreview from "../../components/shared/pdf/PDFPreview";
 
 export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
   const fees = useFeesStore((state) => state.fees);
   const user = useAuthStore((state) => state.user);
   const [showModal, setShowModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<fee | null>(null); // Estado para la fila seleccionada
+  const [showPreview, setShowPreview] = useState(false); // Estado para
   const columns = useMemo<ColumnDef<fee>[]>(
     () => [
       {
@@ -70,6 +72,16 @@ export const FeesPage = () => {
     getAndSetFees();
   }, [getAndSetFees]);
 
+  const handleGeneratePDF = (row: fee) => {
+    setSelectedRow(row); // Guardar la fila seleccionada
+    setShowPreview(true); // Mostrar la vista previa
+  };
+
+  const handleClosePreview = () => {
+    setSelectedRow(null); // Limpiar la fila seleccionada
+    setShowPreview(false); // Ocultar la vista previa
+  };
+
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">
@@ -92,6 +104,7 @@ export const FeesPage = () => {
       </div>
       {/**Table comp */}
       <ModalGeneric
+      key={'frm'}
         isVisible={showModal}
         setIsVisible={setShowModal}
         title={"Registro de pago"}
@@ -99,10 +112,24 @@ export const FeesPage = () => {
       />
       <TableGeneric
         hasActions
-        onGeneratePDF={async(row: fee) => await generatePDF(row)}
+        // onGeneratePDF={async(row: fee) => await generatePDF(row)}
+        onGeneratePDF={handleGeneratePDF}
         columns={columns}
         data={fees}
       />
+      {showPreview && selectedRow && (
+        <div className="modal">
+          <div className="modal-content">
+            <button
+              onClick={handleClosePreview}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Cerrar Vista Previa
+            </button>
+            <PDFPreview row={selectedRow} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

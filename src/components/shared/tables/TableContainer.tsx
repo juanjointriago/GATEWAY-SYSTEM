@@ -145,7 +145,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
         />
       </div>
       {/* Range DatePicker */}
-      {user&& user.role === 'admin' && <div id="date-range-picker" className="flex items-center ml-5">
+      {user && user.role === 'admin' && <div id="date-range-picker" className="flex items-center ml-5">
         <span className="mx-4 text-gray-500">Desde</span>
         <div className="relative">
           <input id={'start-date'} name={'start-date'} type="date" onChange={e => {

@@ -9,9 +9,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useReducer, useState } from "react";
+import { useReducer, useRef, useState } from "react";
 import { Filter } from "./Filter";
 import { environment } from "../../../environment";
+import { WorkBook, utils, writeFileXLSX } from 'xlsx';
+import { IoBarChart } from "react-icons/io5";
+import { MdPictureAsPdf } from "react-icons/md";
+import { useAuthStore } from "../../../stores";
+
+
 
 interface Props<T> {
   columns: ColumnDef<T>[];
@@ -37,6 +43,15 @@ export const TableGeneric = <T,>({
 }: Props<T>) => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const rerender = useReducer(() => ({}), {})[1];
+    const tableRef = useRef<HTMLTableElement | null>(null);
+    const user = useAuthStore(state => state.user);
+
+  
+
+   const handleDownloadExcel = () => {
+      const wb: WorkBook = utils.table_to_book(tableRef.current);
+      writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
+    }
 
   // Agregar columna de acciones dinámicamente
   const columnsWithActions = hasActions?[
@@ -85,7 +100,13 @@ export const TableGeneric = <T,>({
 
   return (
     <div className="p-2">
-      <table className="table-auto w-full border-collapse border border-gray-300">
+      <div className="flex flex-row">
+         {user && user.role === 'admin' && <button className="mr-1 ml-q bg-green-800 mb-5 text-white px-4 py-2 rounded hover:bg-green-700" type="button"
+          onClick={handleDownloadExcel}><IoBarChart /> </button>}
+          {user && user.role === 'admin' && <button className="bg-red-800 mb-5 text-white px-4 py-2 rounded hover:bg-red-700" type="button"
+            onClick={()=>{}}><MdPictureAsPdf /> </button>}
+                    </div>
+      <table ref={tableRef} className="table-auto w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
