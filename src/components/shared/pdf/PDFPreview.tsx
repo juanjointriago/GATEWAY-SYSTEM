@@ -1,72 +1,120 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
 import logo from "../../../assets/logo.png"; // Importa el logo desde la carpeta assets
 import { fee } from "../../../interface/fees.interface";
 
-const generatePDFBlob = async (row: fee): Promise<Blob> => {
+const generatePDFBlob = async (
+  row: fee,
+  studentName: string
+): Promise<Blob> => {
   const doc = new jsPDF();
 
   try {
     // Agregar el logo al PDF
     const logoWidth = 50; // Ancho del logo
     const logoHeight = 20; // Alto del logo
-    doc.addImage(logo, "PNG", 20, 10, logoWidth, logoHeight);
+    doc.addImage(logo, "PNG", 15, 10, logoWidth, logoHeight);
 
     // Generar el código QR
-    const qrUrl = "https://gateway-english.com/";
+    const qrUrl = `Recibo Nro:${row.code}`;
     const qrCodeBase64 = await QRCode.toDataURL(qrUrl);
 
     // Agregar el código QR al PDF
     const qrWidth = 50; // Ancho del QR
     const qrHeight = 50; // Alto del QR
-    doc.addImage(qrCodeBase64, "PNG", 20, 200, qrWidth, qrHeight); // Posición y tamaño del QR
+    doc.addImage(qrCodeBase64, "PNG", 145, 40, qrWidth, qrHeight); // Posición y tamaño del QR
   } catch (error) {
     console.error("Error al generar el PDF:", error);
   }
 
   // Configuración inicial
-  doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
 
   // Título
-  doc.text("GATEWAY CORPORATION", 20, 40);
+  doc.text("RECIBO DE PAGO", 145, 20);
   doc.setFontSize(10);
-  doc.text("Recibo de Pago", 20, 50);
-
   // Número de recibo
   doc.setFontSize(12);
-  doc.text(`Nro: ${row.code || "0000000000"}`, 150, 40);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Nro:`, 135, 25);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${row.code || "0000000000"}`, 145, 25);
 
   // Lugar y fecha
+  doc.setFont("helvetica", "bold");
+  doc.text(`Lugar y Fecha:`, 155, 35);
+  doc.setFont("helvetica", "normal");
   doc.text(
-    `Lugar y Fecha: ${row.place || "Ciudad"}, ${row.createdAt || "01/01/2023"}`,
-    20,
-    60
+    `${row.place || "Ciudad"}, ${row.createdAt || "01/01/2023"}`,
+    145,
+    40
   );
 
   // Recibí de
-  doc.text(`Recibí de: ${row.customerName || "Nombre del cliente"}`, 20, 70);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Recibí de                         :`, 20, 46);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${row.customerName || "Nombre del cliente"}`, 80, 46);
 
   // La cantidad de
-  doc.text(`La cantidad de: ${row.qty || "0.00"} dólares`, 20, 80);
+  doc.setFont("helvetica", "bold");
+  doc.text(`La cantidad de                :`, 20, 52);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${row.qty || "0.00"} dólares`, 80, 52);
 
   // Por concepto de
-  doc.text(`Por concepto de: ${row.reason || "Descripción del concepto"}`, 20, 90);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Por concepto de             :`, 20, 58);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${row.reason || "Descripción del concepto"}`, 80, 58);
 
-  // Firma y C.I.
-  doc.text("Firmado Electrónicamente", 20, 110);
-  doc.text(`C.I.: ${row.cc || "0000000000"}`, 150, 110);
+  // C.I.
+  doc.setFont("helvetica", "bold");
+  doc.text(`CI Estudiante                  :`, 20, 64);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${row.cc || "0000000000"}`, 80, 64);
+
+  // Nombre Estudiante
+  doc.setFont("helvetica", "bold");
+  doc.text(`Nombres Estudiante      :`, 20, 70);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${studentName || "Nombre del estudiante"}`, 80, 70);
+
+    // Forma de pago
+    doc.setFont("helvetica", "bold");
+    doc.text(`Forma de Pago               :`, 20, 76);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${row.paymentMethod || "Cash"}`, 80, 76);
+
+    // Forma de pago
+    doc.setFont("helvetica", "bold");
+    doc.text(`Nro Comprobante           :`, 20, 82);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${row.paymentMethod !== 'cash'? row.docNumber : 'Efectivo'}`, 80, 82);
+
+  // Firma
+  doc.setFontSize(5);
+  doc.setFont("helvetica", "bold");
+  doc.text(
+    `Comprobante de pago: ${row.code}, recuerde esto no es una factura y sirve de comprobante de pago, la firma de este recibo es de manera electronica, GATEWAY CORPORATION`,
+    20,
+    90
+  );
 
   // Retornar el PDF como Blob
   return doc.output("blob");
 };
-
-const PDFPreview = ({ row }: { row: fee }) => {
+interface Props {
+  row: fee, 
+  studentName: string
+}
+const PDFPreview:FC<Props> = ({row, studentName}) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const handleGeneratePreview = async () => {
-    const pdfBlob = await generatePDFBlob(row);
+    const pdfBlob = await generatePDFBlob(row, studentName);
     const pdfBlobUrl = URL.createObjectURL(pdfBlob);
     setPdfUrl(pdfBlobUrl);
   };

@@ -9,11 +9,9 @@ import Select from "react-select";
 import { useFeesStore } from "../../../stores/fees/fess.store";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Swal from "sweetalert2";
-import { v6 as uuid } from 'uuid'
-
+import { v6 as uuid } from "uuid";
 
 export const AddFeeForm = () => {
-  //   const { register } = useFormContext();
   const getUserByRole = useUserStore((state) => state.getUserByRole);
   const createFee = useFeesStore((state) => state.createFee);
   const [isLoading] = useState(false);
@@ -30,6 +28,7 @@ export const AddFeeForm = () => {
     control,
     handleSubmit,
     register,
+    watch,
     reset,
     formState: { errors },
   } = useForm<fee>({
@@ -42,8 +41,15 @@ export const AddFeeForm = () => {
       isActive: true,
       isSigned: true,
       reason: "",
+      paymentMethod: "cash",
+      place: "",
+      docNumber: "",
+      customerName: "",
+      imageUrl: "",
     },
   });
+
+  const paymentMethod = watch("paymentMethod");
 
   const customStyles = {
     control: (provided: any) => ({
@@ -76,10 +82,15 @@ export const AddFeeForm = () => {
         return;
       }
 
-      if (!selectedFile) {
-        Swal.fire("Error", "Por favor seleccione una imagen", "error");
+      if (paymentMethod !== "cash" && !selectedFile) {
+        Swal.fire("Error", "Por favor ssssseleccione una imagen", "error");
         return;
       }
+
+      // if (!selectedFile) {
+      //   Swal.fire("Error", "Por favor seleccione una imagen", "error");
+      //   return;
+      // }
 
       setIsUploading(true);
 
@@ -88,23 +99,33 @@ export const AddFeeForm = () => {
       const fileName = `${timestamp}-${student.cc}`;
       const storage = getStorage();
       const storageRef = ref(storage, `fees/${fileName}`);
-      await uploadBytes(storageRef, selectedFile);
-      const imageUrl = await getDownloadURL(storageRef);
+      if (selectedFile) {
+        await uploadBytes(storageRef, selectedFile);
+      }
+      const imageUrl = !selectedFile
+        ? undefined
+        : await getDownloadURL(storageRef);
 
       // Crear el objeto fee
       const feeToSave: fee = {
         ...fee,
-        id:uuid(),
+        id: uuid(),
+        cc: student.cc,
+      };
+
+      const feeToSaveImgUrl = {
+        ...feeToSave,
+        id: uuid(),
         cc: student.cc,
         imageUrl,
       };
 
       // Guardar el fee en Firebase
-      await createFee(feeToSave);
+      await createFee(imageUrl ? feeToSaveImgUrl : feeToSave);
 
       // Mostrar mensaje de éxito
       Swal.fire("Éxito", "El registro se ha guardado correctamente", "success");
-      
+
       // Limpiar el formulario
       reset();
 
@@ -117,17 +138,19 @@ export const AddFeeForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="max-w-md mx-auto p-2">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full"
         noValidate={true}
       >
-        <div className="mb-4">
-          <label>Nro de recibo:</label>
+        <div className="mb-1">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Nro de recibo:
+          </label>
           <input type="text" value={generateInvoiceNumber()} readOnly />
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Escoja estudiante
           </label>
@@ -172,7 +195,7 @@ export const AddFeeForm = () => {
             </p>
           )}
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Valor
           </label>
@@ -197,7 +220,7 @@ export const AddFeeForm = () => {
           )}
         </div>
         {/* Place NameInput */}
-        <div className="mb-4">
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Lugar
           </label>
@@ -213,7 +236,7 @@ export const AddFeeForm = () => {
           )}
         </div>
         {/* Date Input */}
-        <div className="mb-4">
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Fecha
           </label>
@@ -231,13 +254,15 @@ export const AddFeeForm = () => {
           )}
         </div>
         {/* Customer NameInput */}
-        <div className="mb-4">
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Cliente
           </label>
           <input
             type="text"
-            {...register("customerName", { required: "Nombre del cliente es requerido" })}
+            {...register("customerName", {
+              required: "Nombre del cliente es requerido",
+            })}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
           {errors.customerName && (
@@ -246,8 +271,8 @@ export const AddFeeForm = () => {
             </p>
           )}
         </div>
-         {/* Reason Input */}
-         <div className="mb-4">
+        {/* Reason Input */}
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Motivo
           </label>
@@ -262,32 +287,96 @@ export const AddFeeForm = () => {
             </p>
           )}
         </div>
-        {/* IMAGE */}
-        <div className="mb-4">
+        {/* Forma de pago */}
+        <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Seleccionar imagen
+            Forma de pago
           </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                if (!file.type.startsWith("image/")) {
-                  console.error("El archivo debe ser una imagen.");
-                  return;
-                }
-                if (file.size > 5 * 1024 * 1024) {
-                  console.error("El archivo no debe exceder los 5 MB.");
-                  return;
-                }
-                setSelectedFile(file);
-              }
-              // setSelectedFile(e.target.files?.[0] || null);
-            }}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          <Controller
+            name="paymentMethod"
+            control={control}
+            rules={{ required: "Por favor seleccione una forma de pago" }}
+            render={({ field: { onChange, value, name, ref } }) => (
+              <select
+                id={name}
+                ref={ref}
+                value={value}
+                onChange={onChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              >
+                <option value="cash">Efectivo</option>
+                <option value="transference">Transferencia</option>
+                <option value="tc">Tarjeta de crédito</option>
+                <option value="deposit">Depósito</option>
+              </select>
+            )}
           />
+          {errors.paymentMethod && (
+            <p className="text-red-500 text-xs italic">
+              {errors.paymentMethod.message}
+            </p>
+          )}
         </div>
+        {/* Document Number Input */}
+        {(paymentMethod === "transference" ||
+          paymentMethod === "deposit" ||
+          paymentMethod === "tc") && (
+          <div className="mb-1">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Nro de Comprobante
+            </label>
+            <input
+              type="text"
+              {...register("docNumber", {
+                required: "Escribir el Nro de comprobante",
+              })}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+            {errors.docNumber && (
+              <p className="text-red-500 text-xs italic">
+                {errors.docNumber.message}
+              </p>
+            )}
+          </div>
+        )}
+        {/* Input para subir imagen (solo para transferencia o depósito) */}
+        {(paymentMethod === "transference" ||
+          paymentMethod === "deposit" ||
+          paymentMethod === "tc") && (
+          <div className="mb-2">
+            <label className="block text-gray-700 text-sm font-bold mt-2">
+              Suba la imagen de su deposito/tranferencia o voucher
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (!file.type.startsWith("image/")) {
+                    Swal.fire(
+                      "Error",
+                      "El archivo debe ser una imagen",
+                      "error"
+                    );
+                    return;
+                  }
+                  if (file.size > 5 * 1024 * 1024) {
+                    Swal.fire(
+                      "Error",
+                      "El archivo no debe exceder los 5 MB",
+                      "error"
+                    );
+                    return;
+                  }
+                  setSelectedFile(file);
+                }
+              }}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+        )}
+
         {/* Submit Button */}
         <button
           type="submit"

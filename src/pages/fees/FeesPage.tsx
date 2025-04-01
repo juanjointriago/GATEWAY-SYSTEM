@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fee } from "../../interface/fees.interface";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { useFeesStore } from "../../stores/fees/fess.store";
-import { useAuthStore } from "../../stores";
+import { useAuthStore, useUserStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { AddFeeForm } from "../../components/shared/forms/AddFeeForm";
 import PDFPreview from "../../components/shared/pdf/PDFPreview";
@@ -12,6 +12,7 @@ export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
   const fees = useFeesStore((state) => state.fees);
   const user = useAuthStore((state) => state.user);
+  const getUserById = useUserStore((state) => state.getUserById);
   const [showModal, setShowModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<fee | null>(null); // Estado para la fila seleccionada
   const [showPreview, setShowPreview] = useState(false); // Estado para
@@ -19,50 +20,75 @@ export const FeesPage = () => {
     () => [
       {
         accessorKey: "code",
-        cell: (info) => info.getValue(),
+        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
         header: () => <span>Nro.</span>,
+      },
+      {
+        accessorKey: "docNumber",
+        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() ? info.getValue() as string :'Efectivo'}</p>,
+        header: () => <span>Comprobante</span>,
       },
       {
         accessorFn: (row) => row.place,
         id: "place",
-        cell: (info) => info.getValue(),
+        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
         header: () => <span>Lugar</span>,
       },
       {
         accessorFn: (row) => row.createdAt,
         id: "createdAt",
-        cell: (info) => info.getValue(),
+        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
         header: () => <span>Fecha</span>,
       },
       {
         accessorFn: (row) => row.reason,
         id: "reason",
-        cell: (info) => info.getValue(),
+        cell: (info) => <p className="text-start text-xs">{info.getValue() as string}</p>,
         header: () => <span>Motivo</span>,
       },
       {
-        accessorFn: (row) => row.studentUid,
-        id: "studentUid",
-        cell: (data) => data.getValue(),
-        header: () => <span>Estudiante</span>,
+        accessorFn: (row) => row.cc,
+        id: "cc",
+        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
+        header: () => <span>CI Estudiante</span>,
+      },
+      {
+        accessorFn: (row) => row.paymentMethod,
+        id: "paymentMethod",
+        cell: (info) => (
+            <span className="text-start text-xs">
+              {info.getValue() === "cash"
+                ? "💵 Cash"
+                : ((info.getValue() === "transference" || "deposit") as string)
+                ? "📄 Trasnference / Deposit"
+                : "💳 Credit/Debit Card"}
+            </span>
+        ),
+        enableColumnFilter: false,
+        header: () => <span>Forma de pago</span>,
+      },
+      {
+        accessorFn: (row) => row.qty,
+        id: "qty",
+        cell: (info) => <p className="text-start text-nowrap text-xs">{"$"+info.getValue() as string}</p>,
+        header: () => <span>Valor</span>,
       },
       {
         accessorFn: (row) => row.imageUrl,
         id: "imageUrl",
         cell: (data) => (
-          <img
+          <>
+          {
+            data.getValue()?<img
             src={data.getValue() as string}
             alt="No disponible"
             className="w-20 h-20 rounded-full object-cover"
-          />
+          />:<p className="text-start text-nowrap text-xs">{data.getValue() as string}</p>
+          }
+          </>
         ),
-        header: () => <span>Imagen</span>,
-      },
-      {
-        accessorFn: (row) => row.qty,
-        id: "qty",
-        cell: (info) => <div>{"$" + info.getValue()}</div>,
-        header: () => <span>Valor</span>,
+        enableColumnFilter: false,
+        header: () => <span>Evidencia</span>,
       },
       // { accessorFn: row =>row.studentUid, id: "studentUid", cell: (info) => info.getValue(), header:(item)=><span>{getStudentByUid(item.column)}</span> },
     ],
@@ -104,7 +130,7 @@ export const FeesPage = () => {
       </div>
       {/**Table comp */}
       <ModalGeneric
-      key={'frm'}
+        key={"frm"}
         isVisible={showModal}
         setIsVisible={setShowModal}
         title={"Registro de pago"}
@@ -126,7 +152,7 @@ export const FeesPage = () => {
             >
               Cerrar Vista Previa
             </button>
-            <PDFPreview row={selectedRow} />
+            <PDFPreview row={selectedRow} studentName={getUserById(selectedRow!.studentUid!)!.name}/>
           </div>
         </div>
       )}

@@ -1,3 +1,5 @@
+type paymentMethod = 'cash' | 'transference' | 'tc' | 'deposit';
+
 export interface fee{
     id?: string;
     uid: string;
@@ -7,9 +9,11 @@ export interface fee{
     code?:string;
     qty: number;
     reason:string;
+    paymentMethod: paymentMethod;
+    docNumber?: string;
     isSigned:boolean;
     cc:string;
-    imageUrl?:string;
+    imageUrl?:string | undefined;
     isActive: boolean;
     createdAt: number;
     updatedAt: number
