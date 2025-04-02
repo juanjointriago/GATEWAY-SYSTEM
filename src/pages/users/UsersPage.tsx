@@ -1,5 +1,5 @@
 import { FirestoreUser } from "../../interface";
-import { useAuthStore, useUserStore } from "../../stores";
+import { useAuthStore, useLevelStore, useSubLevelStore, useUserStore } from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
@@ -25,6 +25,10 @@ export const UsersPage = () => {
   const user = useAuthStore((state) => state.user);
   const isAdmin = user && user.role === "admin";
   const users = useUserStore((state) => state.users);
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedSubLevel, setSelectedSubLevel] = useState<string | null>(null);
+  const levels = useLevelStore((state) => state.levels);
+  const subLevels = useSubLevelStore((state) => state.subLevels);
   
   // const getAllUsers = useUserStore(state => state.getAllUsers);
   const updateUserById = useUserStore((state) => state.updateUser);
@@ -52,17 +56,54 @@ export const UsersPage = () => {
         accessorFn: (row) => row.level,
         id: "level",
         cell: (info) => <LevelById levelId={info.getValue() as string} />,
-        header: () => <span>Modalidad</span>,
+        header: () => (
+          <div>
+            <span>Modalidad</span>
+            <select
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={selectedLevel || ""}
+              onChange={(e) => setSelectedLevel(e.target.value || null)}
+            >
+              <option value="">Todos</option>
+              {levels.map((level) => (
+                <option key={level.id} value={level.id}>
+                  {level.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        ),
         enableColumnFilter: false,
+        enableSorting: false,
+        filterFn: (row, columnId, filterValue) => {
+          return filterValue ? row.getValue(columnId) === filterValue : true;
+        },
       },
       {
         accessorFn: (row) => row.subLevel,
         id: "subLevel",
         cell: (info) => <SubLevelById subLevelId={info.getValue() as string} />,
-        header: () => <span>Curso</span>,
+        header: () => (
+          <div>
+            <span>Curso</span>
+            <select
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={selectedSubLevel || ""}
+              onChange={(e) => setSelectedSubLevel(e.target.value || null)}
+            >
+              <option value="">Todos</option>
+              {subLevels.map((subLevel) => (
+                <option key={subLevel.id} value={subLevel.id}>
+                  {subLevel.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        ),
         enableColumnFilter: false,
+        enableSorting: false,
         filterFn: (row, columnId, filterValue) => {
-          return row.getValue(columnId) === filterValue;
+          return filterValue ? row.getValue(columnId) === filterValue : true;
         },
       },
       {
@@ -104,10 +145,19 @@ export const UsersPage = () => {
         enableColumnFilter: false,
       },
     ],
-    []
+    [levels, subLevels, selectedLevel, selectedSubLevel]
   );
 
-  const sortedUsers = users.sort( (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Filtrar usuarios dinámicamente según los filtros seleccionados
+    const filteredUsers = useMemo(() => {
+      return users.filter((user) => {
+        const matchesLevel = selectedLevel ? user.level === selectedLevel : true;
+        const matchesSubLevel = selectedSubLevel
+          ? user.subLevel === selectedSubLevel
+          : true;
+        return matchesLevel && matchesSubLevel;
+      });
+    }, [users, selectedLevel, selectedSubLevel]);
 
   return (
     <>
@@ -140,8 +190,7 @@ export const UsersPage = () => {
           />
         )}
         {/* Modal */}
-        {isAdmin ? (  <TableGeneric columns={columns} data={sortedUsers} />)
-        : ( <TableGeneric columns={columns} data={sortedUsers} />)}
+        { <TableGeneric columns={columns} data={filteredUsers} /> }
       </div>
     </>
   );

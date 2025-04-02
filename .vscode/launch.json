@@ -8,8 +8,15 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Iniciar Chrome para localhost",
+            "name": "React VITE",
             "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "REACT 3000",
+            "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}"
         }
     ]
