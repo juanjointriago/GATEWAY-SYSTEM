@@ -271,15 +271,31 @@ export const AddFeeForm = () => {
             </p>
           )}
         </div>
-        {/* Reason Input */}
-        <div className="mb-1">
+{/* Select para el motivo del pago */}
+<div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Motivo
+            Motivo del pago
           </label>
-          <input
-            type="text"
-            {...register("reason", { required: "Escribir el motivo del pago" })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          <Controller
+            name="reason"
+            control={control}
+            rules={{ required: "Por favor seleccione un motivo de pago" }}
+            render={({ field: { onChange, value, name, ref } }) => (
+              <select
+                id={name}
+                ref={ref}
+                value={value}
+                onChange={onChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              >
+                <option value="">Seleccione un motivo</option>
+                <option value="Abono mensualidad">Abono mensualidad</option>
+                <option value="Pago mensualidad">Pago mensualidad</option>
+                <option value="Pago total programa de inglés">
+                  Pago total programa de inglés
+                </option>
+              </select>
+            )}
           />
           {errors.reason && (
             <p className="text-red-500 text-xs italic">
@@ -287,7 +303,7 @@ export const AddFeeForm = () => {
             </p>
           )}
         </div>
-        {/* Forma de pago */}
+        {/*de pago */}
         <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Forma de pago
