@@ -256,7 +256,7 @@ export const AddFeeForm = () => {
         {/* Customer NameInput */}
         <div className="mb-1">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Cliente
+            Cliente / Representante
           </label>
           <input
             type="text"
