@@ -7,7 +7,8 @@ import { getInitials } from "./helper";
 import { colors } from "../../theme/theme";
 import { v6 as uuid } from "uuid";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { IoSchool } from "react-icons/io5"
+import { IoSchool } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   record: students;
@@ -35,10 +36,11 @@ export const StudentsList: FC<Props> = ({ record }) => {
     allStudents.find((student) => student.id === studentId)
   );
   const [isVisible, setIsVisible] = useState(false);
-    const user = useAuthStore(state => state.user);
-  
-  const isAdmin = user && user.role === 'admin';
-//   const isTeacher = user && user.role === 'teacher';
+  const user = useAuthStore((state) => state.user);
+
+  const isAdmin = user && user.role === "admin";
+  //   const isTeacher = user && user.role === 'teacher';
+  const navigate = useNavigate(); // Hook para redirigir
 
   return (
     <div key={uuid()} className="flex flex-row">
@@ -117,9 +119,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
                       isActive
                       tootTipText={""}
                       action={() => {
-                        console.log('Redireccionar a nueva pagina progress sheet con la informacion del estudiante')
-                        // setOpenModal(true);
-                        // setEventToEdit(record.id);
+                        navigate(`/dashboard/progress-sheet/${student?.uid}`); // Redirigir al progress-sheet con el uid del estudiante
                       }}
                       Icon={IoSchool}
                     />

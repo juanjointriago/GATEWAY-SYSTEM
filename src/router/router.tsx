@@ -13,6 +13,7 @@ import { NotFound } from '../pages/errorPage/NotFound'
 import { LanddingLayout } from '../layouts/LanddingLayout'
 import { Policies } from '../pages/auth/Policies'
 import { FeesPage } from '../pages/fees/FeesPage'
+import { ProgressSheetPage } from '../pages/progress-sheet/ProgressSheetPage'
 
 export const router = createBrowserRouter([
     {
@@ -64,6 +65,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'locations',
                         element: <LocationsPage />
+                    },
+                    {
+                        path: 'progress-sheet/:uid', // Nueva ruta para ProgressSheetPage
+                        element: <ProgressSheetPage />
                     },
                 ],
             },
