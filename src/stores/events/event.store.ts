@@ -10,6 +10,7 @@ interface EventStore {
     getAllEvents: () => Promise<void>;
     getEventsQuery: () => Promise<void>;
     getEventById: (id: string) => event | undefined;
+    getEventsByStudentId: (id: string) => event[] ;
     createEvent: (event: event) => Promise<void>;
     updateEvent: (event: event) => Promise<void>;
     deleteEvent: (id: string) => Promise<void>;
@@ -41,7 +42,8 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
         set({ events: [...events] })
     },
     getEventById: (id: string) => get().events.find(event => event.id === id),
-
+    
+    getEventsByStudentId: (id: string) => get().events.filter(event => event.students[id]),
     createEvent: async (event: event) => {
         await EventService.createEvent(event);
         set({ events: [...get().events, event] })

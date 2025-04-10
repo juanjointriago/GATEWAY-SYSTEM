@@ -19,7 +19,8 @@ export interface progressSheetInterface {
     expirationDate: string
     myPreferredName: string
     otherContacts: string
-    progressClasses: progressClassesInterface[]
+    progressClasses: progressClassesInterface[];
+    studentId: string;
     createdAt?: number
     updatedAt?: number
 }
