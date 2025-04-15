@@ -19,6 +19,8 @@ const generatePDFBlob = async (
     // Generar el código QR
     const qrUrl = `Recibo Nro:${row.code}`;
     const qrCodeBase64 = await QRCode.toDataURL(qrUrl);
+    // const qrCodeBase64 = await QRCode.toDataURL('https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/Catalogo%20ARKREM-TERRUA%CC%81.pdf?alt=media&token=d659ebfb-27eb-475f-a0bb-7f4c16432204%20');
+
 
     // Agregar el código QR al PDF
     const qrWidth = 50; // Ancho del QR
