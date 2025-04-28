@@ -27,7 +27,7 @@ import Swal from "sweetalert2";
 import { EditEventControl } from "../../components/shared/forms/EditEventControl";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { footerMail, sendCustomEmail } from "../../store/firebase/helper";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 
 export const EventsPage = () => {
@@ -42,13 +42,26 @@ export const EventsPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>();
 
+
+
   const columns = useMemo<ColumnDef<event>[]>(
-    () => [
+    
+    () => {
+      const teacherFilter: FilterFn<event> = (row, columnId, filterValue) => {
+        const teacherId = row.getValue<string>(columnId);
+        const teacher = users.find((user) => user.id === teacherId);
+        return teacher?.name?.toLowerCase().includes(filterValue.toLowerCase()) || false;
+      };
+      return [
       {
         accessorFn: (row) => row.createdAt,
         id: "date",
-        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string && new Date(info.getValue() as string).toDateString()}</p>,
+        cell: (info) =>
+          info.getValue() &&
+          new Date(info.getValue() as string).toLocaleDateString(),
         header: () => <span>Fecha</span>,
+        filterFn: "includesString", // Filtrado por texto
+        enableColumnFilter: true,
       },
       {
         accessorKey: "name",
@@ -57,21 +70,31 @@ export const EventsPage = () => {
       },
       {
         accessorKey: "limitDate",
-        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
+        cell: (info) =>
+          info.getValue() &&
+          new Date(info.getValue() as string).toLocaleDateString(),
+          filterFn: "includesString",
         header: () => <span>F. Limite Resevarcion</span>,
       },
       {
         accessorKey: "teacher",
         cell: (info) => {
-          return info.getValue() &&
-          users.find((user) => user.id === info.getValue() as string) && (
-            <span>{users.find((user) => user.id === info.getValue() as string)?.name}</span>
-          )},
+          const teacher = users.find(
+            (user) => user.id === info.getValue() as string
+          );
+          return teacher ? <span>{teacher.name}</span> : <span>Sin docente</span>;
+        },
         header: () => <span>Docente</span>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        filterFn: teacherFilter,
+        enableColumnFilter: true,
       },
       {
         accessorKey: "meetLink",
-        cell: (info) => {return (
+        id: "meetLink",
+        cell: (info) => {
+          console.log('meetLink =>',info.row.original);
+          return (
           <>
             {info.getValue() ? (
               <NavLink
@@ -131,9 +154,10 @@ export const EventsPage = () => {
       },
       {
         accessorKey: "isActive",
+        header: () => <span>Acciones</span>,
         cell: (info) => {
          return (
-          <>
+          <div className="flex flex-direction-row">
             {/* //Cambiar estado */}
             {isAdmin ? (
               <ToggleButton
@@ -268,14 +292,16 @@ export const EventsPage = () => {
                 Icon={IoMail}
               />
             )}
-          </>
+          </div>
         ) 
         },
         enableColumnFilter: false,
       }
-    ],
-    []
+    ]},
+    [ isAdmin, levels, sublevels, users, updateEvent, deleteEvent, setEventToEdit, isTeacher, user, ]
   );
+
+
 
   // const eventCols: Array<ColumnProps<event>> = [
   //   {
@@ -528,12 +554,12 @@ export const EventsPage = () => {
   //   },
   // ];
 
+
   const events = useEventStore((state) => state.events);
-  // const sortedEvents = events.sort(
-  //   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  // );
-  // .filter(event => event.isActive);
-  // console.log('events', events.length)
+  const sortedEvents = events.filter(event => event.isActive).sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  console.log('events', events.length)
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">
@@ -557,10 +583,27 @@ export const EventsPage = () => {
       {events && (
         <TableGeneric
           columns={columns}
-          data={events}
-          hasActions={isAdmin}
+          data={(user &&
+                (user.role === "admin"
+                  ? sortedEvents
+                  : user.role === "teacher"
+                  ? sortedEvents.filter((event) => event.teacher === user.id)
+                  : sortedEvents.filter(
+                      (event) =>
+                        event.students[user.id!] &&
+                        event.isActive &&
+                        event.levels[0].level === user.level
+                    )) )?? []}
         />
-        // <TableContainer
+       
+      )}
+      
+    </div>
+  );
+};
+
+
+ // <TableContainer
         //   hasAddBtn={isAdmin}
         //   columns={eventCols}
         //   data={
@@ -579,8 +622,256 @@ export const EventsPage = () => {
         //   modalChildren={<FormEventControl />}
         //   modalTitle="Crear Reservación"
         // />
-      )}
-      
-    </div>
-  );
-};
+
+
+
+  // const eventCols: Array<ColumnProps<event>> = [
+  //   {
+  //     key: "date",
+  //     title: "Fecha - Hora",
+  //     render: (_, record) => (
+  //       <span>
+  //         {new Date(record.date).toLocaleTimeString([], {
+  //           year: "2-digit",
+  //           month: "2-digit",
+  //           day: "2-digit",
+  //           hour: "2-digit",
+  //           minute: "2-digit",
+  //         })}
+  //       </span>
+  //     ),
+  //   },
+  //   // { key: 'date', title: 'Hora', render: (_, record) => <>{record.date && new Date(record.date).toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" })}</> },
+  //   {
+  //     key: "name",
+  //     title: "Nombre",
+  //     render: (_, record) => <div>{record.name} </div>,
+  //   },
+  //   {
+  //     key: "limitDate",
+  //     title: "Fecha Limite Para reservar",
+  //     render: (_, record) => (
+  //       <>{record.limitDate ? record.limitDate : "No asignado"}</>
+  //     ),
+  //   },
+  //   {
+  //     key: "teacher",
+  //     title: "Profesor",
+  //     render: (_, record) => {
+  //       return (
+  //         <>
+  //           {" "}
+  //           {record.teacher &&
+  //             users.find((user) => user.id === record.teacher) && (
+  //               <AvatarButton
+  //                 initialLetter={getInitials(
+  //                   users.find((user) => user.id === record.teacher)?.name ??
+  //                     "XX"
+  //                 )}
+  //                 tootTipText={`${
+  //                   users.find((user) => user.id === record.teacher)?.name
+  //                 }✨`}
+  //                 isActive
+  //               />
+  //             )}
+  //         </>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     key: "meetLink",
+  //     title: "Enlace de Meet",
+  //     render: (_, record) => (
+  //       <>
+  //         {record.meetLink ? (
+  //           <NavLink
+  //             to={record.meetLink}
+  //             target="_blank"
+  //             end
+  //             rel="noreferrer noopener"
+  //           >
+  //             <span className="text-sm text-blue-500 md:block">
+  //               🧑‍💻 Ir a reunión
+  //             </span>
+  //           </NavLink>
+  //         ) : (
+  //           <span className="text-sm  text-blue-500 md:block">
+  //             Sin enlace configurado
+  //           </span>
+  //         )}
+  //       </>
+  //     ),
+  //   },
+  //   {
+  //     key: "students",
+  //     title: isAdmin || isTeacher ? "Estudiantes" : "Gestión clase",
+  //     render: (_, record) => (
+  //       <>
+  //         {isAdmin || isTeacher ? (
+  //           <>
+  //             {" "}
+  //             {!record.students.length ? (
+  //               <StudentsList key={record.id} record={record.students} />
+  //             ) : (
+  //               <div>Sin asistentes</div>
+  //             )}{" "}
+  //           </>
+  //         ) : (
+  //           <>
+  //             {" "}
+  //             {user && user.role === "student" ? (
+  //               <StudentActions
+  //                 userId={user.id!}
+  //                 students={record.students}
+  //                 event={record}
+  //                 Icon={IoCalendarClearOutline}
+  //               />
+  //             ) : null}{" "}
+  //           </>
+  //         )}
+  //       </>
+  //     ),
+  //   },
+  //   {
+  //     key: "isActive",
+  //     title: `${isAdmin ? "Acciones" : "Estado"}`,
+  //     render: (_, record) => (
+  //       <>
+  //         {/* //Cambiar estado */}
+  //         {isAdmin ? (
+  //           <ToggleButton
+  //             isActive={record.isActive}
+  //             action={() => {
+  //               Swal.fire({
+  //                 title: "¿Estás seguro?",
+  //                 text: `Estas a punto de ${
+  //                   record.isActive ? "ocultar" : "mostrar"
+  //                 } esta reservación`,
+  //                 icon: "warning",
+  //                 showCancelButton: true,
+  //                 confirmButtonColor: "#3085d6",
+  //                 cancelButtonColor: "#d33",
+  //                 confirmButtonText: "Sí, continuar",
+  //                 cancelButtonText: "Cancelar",
+  //               }).then(async (result) => {
+  //                 if (result.isConfirmed) {
+  //                   await updateEvent({
+  //                     ...record,
+  //                     isActive: !record.isActive,
+  //                   });
+  //                   window.location.reload();
+  //                 }
+  //               });
+  //             }}
+  //           />
+  //         ) : (
+  //           <div>{record.isActive ? "Público" : "Privado"}</div>
+  //         )}
+  //         {/* //Editar reservación */}
+  //         {isAdmin && (
+  //           <FabButton
+  //             isActive
+  //             tootTipText={""}
+  //             action={() => {
+  //               setOpenModal(true);
+  //               setEventToEdit(record.id);
+  //             }}
+  //             Icon={IoPencil}
+  //           />
+  //         )}
+  //         {/* //Eliminar reservación */}
+  //         {isAdmin && (
+  //           <FabButton
+  //             isActive
+  //             Icon={IoTrash}
+  //             action={() => {
+  //               Swal.fire({
+  //                 title: "¿Estás seguro?",
+  //                 text: `Estas a punto de eliminar esta reservación`,
+  //                 icon: "warning",
+  //                 showCancelButton: true,
+  //                 confirmButtonColor: "#3085d6",
+  //                 cancelButtonColor: "#d33",
+  //                 confirmButtonText: "Sí, continuar",
+  //                 cancelButtonText: "Cancelar",
+  //               }).then(async (result) => {
+  //                 if (result.isConfirmed) {
+  //                   await deleteEvent(record.id!);
+  //                   window.location.reload();
+  //                 }
+  //               });
+  //             }}
+  //           />
+  //         )}
+  //         {/* //envio correo Admin */}
+  //         {isAdmin && (
+  //           <FabButton
+  //             isActive
+  //             tootTipText={""}
+  //             action={() => {
+  //               Swal.fire({
+  //                 title: "¿Estás seguro?",
+  //                 text: `Estas a punto de enviar un correo al docente de esta reservación`,
+  //                 icon: "warning",
+  //                 showCancelButton: true,
+  //                 confirmButtonColor: "#3085d6",
+  //                 cancelButtonColor: "#d33",
+  //                 confirmButtonText: "Sí, continuar",
+  //                 cancelButtonText: "Cancelar",
+  //               }).then(async (result) => {
+  //                 if (result.isConfirmed) {
+  //                   const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(
+  //                     record.date
+  //                   ).toLocaleTimeString([], {
+  //                     year: "2-digit",
+  //                     month: "2-digit",
+  //                     day: "2-digit",
+  //                     hour: "2-digit",
+  //                     minute: "2-digit",
+  //                   })} con el nombre de ${
+  //                     record.name
+  //                   }, con estudiantes de la(s) unidad(es) ${record.levels[0].subLevels
+  //                     .map(
+  //                       (sublevel) =>
+  //                         sublevels.find((sub) => sub.id === sublevel)?.name
+  //                     )
+  //                     .join(", ")}, en modalida de ${
+  //                     levels.find(
+  //                       (level) => level.id === record.levels[0].level
+  //                     )?.name
+  //                   }.`;
+  //                   await sendCustomEmail({
+  //                     to: [
+  //                       users.find((user) => user.id === record.teacher)!
+  //                         .email!,
+  //                     ],
+  //                     message: {
+  //                       subject: "Recordatorio de reservación",
+  //                       text: `Hola, ${
+  //                         users.find((user) => user.id === record.teacher)?.name
+  //                       } ${text}`,
+  //                       html: `<h1>Hola, ${
+  //                         users.find((user) => user.id === record.teacher)?.name
+  //                       }</h1> <p>${text}</p> ${footerMail}`,
+  //                     },
+  //                   }).then(async () => {
+  //                     await Swal.fire({
+  //                       title: "Correo enviado",
+  //                       text: `Se ha enviado un correo a ${
+  //                         users.find((user) => user.id === record.teacher)?.name
+  //                       }`,
+  //                       icon: "success",
+  //                       confirmButtonColor: "#3085d6",
+  //                       confirmButtonText: "Continuar",
+  //                     });
+  //                   });
+  //                 }
+  //               });
+  //             }}
+  //             Icon={IoMail}
+  //           />
+  //         )}
+  //       </>
+  //     ),
+  //   },
+  // ];
