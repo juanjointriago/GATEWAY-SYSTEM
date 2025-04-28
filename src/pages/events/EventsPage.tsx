@@ -8,7 +8,6 @@ import {
   useSubLevelStore,
   useUserStore,
 } from "../../stores";
-// import { AvatarButton } from "../../components/shared/buttons/AvatarButton";
 import { StudentActions } from "./StudentActions";
 import {
   IoCalendarClearOutline,
@@ -16,6 +15,7 @@ import {
   IoPencil,
   IoTrash,
 } from "react-icons/io5";
+import { MdPerson } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 // import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FabButton } from "../../components/shared/buttons/FabButton";
@@ -30,6 +30,7 @@ import { footerMail, sendCustomEmail } from "../../store/firebase/helper";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
+import { IconType } from "react-icons";
 
 export const EventsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -45,7 +46,7 @@ export const EventsPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>();
 
-
+  const iconEdit:IconType = isAdmin?IoPencil:MdPerson
 
   const columns = useMemo<ColumnDef<event>[]>(
     
@@ -224,7 +225,7 @@ export const EventsPage = () => {
                   setOpenModal(true);
                   setEventToEdit(info.row.original.id);
                 }}
-                Icon={IoPencil}
+                Icon={iconEdit}
               />
             )}
             {/* //Eliminar reservación */}
@@ -348,7 +349,7 @@ export const EventsPage = () => {
           isVisible={openModal}
           setIsVisible={setOpenModal}
           children={
-            !isAdmin ? (
+            isAdmin ? (
               <EditEventControl eventId={eventToEdit} />
             ) : (
               <>Formulario para Progress sheet {eventToEdit}</>
