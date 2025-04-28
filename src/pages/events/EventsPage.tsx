@@ -101,7 +101,7 @@ export const EventsPage = () => {
           return `${formattedDate} ${formattedTime}`;
         },
           filterFn: "includesString",
-        header: () => <span>F. Limite Resevarcion</span>,
+        header: () => <span className="text-xs">F. Limite Resevarcion</span>,
       },
       {
         accessorKey: "teacher",
