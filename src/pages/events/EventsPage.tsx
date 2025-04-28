@@ -59,9 +59,21 @@ export const EventsPage = () => {
       {
         accessorFn: (row) => row.date,
         id: "date",
-        cell: (info) =>
-          info.getValue() &&
-          new Date(info.getValue() as string).toLocaleDateString(),
+        cell: (info) => {
+          const dateValue = info.getValue() as string;
+          if (!dateValue) return "Sin fecha";
+          const date = new Date(dateValue);
+          const formattedDate = date.toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+          });
+          const formattedTime = date.toLocaleTimeString("es-ES", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          return `${formattedDate} ${formattedTime}`;
+        },
         header: () => <span>Fecha</span>,
         filterFn: "includesString", // Filtrado por texto
         enableColumnFilter: true,
