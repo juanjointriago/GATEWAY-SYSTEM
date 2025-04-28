@@ -177,7 +177,7 @@ export const EventsPage = () => {
             </>
           );
         },
-        header: () => <span>Asistentes</span>,
+        header: () => <span className={`${!isAdmin?'text-xs':undefined}`}>{isAdmin?'Asistentes':'Confirmar asistencia'}</span>,
         enableColumnFilter: false,
       },
       {
