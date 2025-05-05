@@ -29,8 +29,8 @@ import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { footerMail, sendCustomEmail } from "../../store/firebase/helper";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
-import { FormUnit } from "../../components/shared/forms/FormUnit";
 import { IconType } from "react-icons";
+import { FormEventControl } from "../../components/shared/forms";
 
 export const EventsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -177,7 +177,7 @@ export const EventsPage = () => {
             </>
           );
         },
-        header: () => <span className={`${!isAdmin?'text-xs':undefined}`}>{isAdmin?'Asistentes':'Confirmar asistencia'}</span>,
+        header: () => <span className={`${isAdmin?'text-xs':undefined}`}>{isAdmin?'Asistentes':'Confirmar asistencia'}</span>,
         enableColumnFilter: false,
       },
       {
@@ -326,7 +326,7 @@ export const EventsPage = () => {
         enableColumnFilter: false,
       }
     ]},
-    [ isAdmin, levels, sublevels, users, updateEvent, deleteEvent, setEventToEdit, isTeacher, user, ]
+    [ isAdmin, levels, sublevels, users, updateEvent, deleteEvent, setEventToEdit, isTeacher, user, iconEdit]
   );
 
 
@@ -374,7 +374,7 @@ export const EventsPage = () => {
         />
        
       )}
-          {<ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={"Crear Unidades"} children={<FormUnit/>} />}
+          {<ModalGeneric isVisible={showModal} setIsVisible={setShowModal} title={"Crear Reservaciones"} children={<FormEventControl/>} />}
     </div>
   );
 };

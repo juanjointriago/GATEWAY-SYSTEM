@@ -59,12 +59,20 @@ export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) =>
                     <TootipBase title="" tootTipText={changeVisualAction(`${students[userId].status}`)}>
                         <div onClick={() => {
                             const student = event.students[userId];
+                            console.log('Estudiantes => ',event.students)
+                            const aceptedStudents = Object.values(event.students).filter((student) => student.status === 'CONFIRMED').length;
+                            console.log('Aceptados => ',aceptedStudents);
                             if (!event.limitDate) {
-                                Swal.fire('¡Lo sentimos!', 'No se ha asignado una fecha límite de reservación para esta clase', 'warning')
+                                Swal.fire("We're sorry! - ¡Lo sentimos!", 'No booking deadline has been assigned for this class. - No se ha asignado una fecha límite de reservación para esta clase', 'warning')
                                 return
                             }
                             if (today > new Date(event.limitDate).getTime()) {
-                                Swal.fire('¡Lo sentimos!', 'Estás fuera de la fecha limite de reservación', 'error')
+                                Swal.fire("We're sorry! - ¡Lo sentimos!", 'You are out of the reservation deadline - Estás fuera de la fecha limite de reservación', 'error')
+                                return
+                            }
+                            if (event.maxAssistantsNumber <=aceptedStudents) {
+                                console.log('Nro de estudiantes => ', Object.keys(event.students).length, 'Maximo nro de estudiantes evento =>',event.maxAssistantsNumber);
+                                Swal.fire("We're sorry! - ¡Lo sentimos!", 'This class is already full - Esta clase ya se encuentra llena - ', 'error')
                                 return
                             }
                             Swal.fire({
