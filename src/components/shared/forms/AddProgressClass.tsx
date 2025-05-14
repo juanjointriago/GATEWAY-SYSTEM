@@ -132,7 +132,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
         <div>
           <label className="block text-gray-700">Evento</label>
           <Controller
-            name="eventId"
+            name="eventInfo"
             control={control}
             rules={{ required: "El evento es obligatorio" }}
             render={({ field }) => (
@@ -147,8 +147,8 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
               />
             )}
           />
-          {errors.eventId && (
-            <p className="text-red-500 text-sm">{errors.eventId.message}</p>
+          {errors.eventInfo && (
+            <p className="text-red-500 text-sm">{errors.eventInfo.message}</p>
           )}
         </div>
 

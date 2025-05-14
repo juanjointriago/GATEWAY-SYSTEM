@@ -1,5 +1,9 @@
+type EventInfo = {
+  label: string;
+  value: string;
+}
 export interface progressClassesInterface {
-    eventId:string
+    eventInfo:EventInfo
     a:string
     book:string
     lesson:string
@@ -24,3 +28,36 @@ export interface progressSheetInterface {
     createdAt?: number
     updatedAt?: number
 }
+
+
+
+
+// types/progress-sheet.ts
+export interface ProgressEntry {
+    date: string;
+    hour: string;
+    book: string;
+    progress: string;
+    part: string;
+    test: string;
+    teacher: string;
+    observation: string;
+  }
+  
+  export interface StudentInfo {
+    headline?: string;
+    preferredName: string;
+    fullName: string;
+    idNumber: string;
+    regNumber: string;
+    inscriptionDate: string;
+    expirationDate: string;
+    occupation: string;
+    age: string;
+    birthday: string;
+    phone: string;
+    otherContacts: string;
+    observation: string;
+    gender: 'male' | 'female' | 'undefined';
+    progressEntries: ProgressEntry[];
+  }

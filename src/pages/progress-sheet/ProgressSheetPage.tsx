@@ -83,7 +83,7 @@ export const ProgressSheetPage = () => {
         header: () => <span>Book</span>,
       },
       {
-        accessorFn: (row) => row.eventId,
+        accessorFn: (row) => row.eventInfo.label,
         id: "eventId",
         cell: (info) => <p className="text-start text-xs">{getEventById(info.getValue() as string)?.name}</p>,
         header: () => <span>Reservacion</span>,

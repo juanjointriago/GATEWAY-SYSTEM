@@ -9,6 +9,7 @@ interface ProgressSheetStore{
     getAndSetProgressSheets: ()=> Promise<void>;
     getAllProgressSheets: ()=> progressSheetInterface[];
     getProgressSheetById: (id: string) => progressSheetInterface | undefined;
+    getProgressSheetByStudentId: (id: string) => progressSheetInterface | undefined;
     createProgressSheet: (progressSheet: progressSheetInterface) => Promise<void>;
     updateProgressSheet: (progressSheet: progressSheetInterface) => Promise<void>;
     deleteProgressSheet: (id: string) => Promise<void>;
@@ -29,6 +30,7 @@ const storeAPI: StateCreator<ProgressSheetStore,
     getAllProgressSheets:  () =>   get().progressSheets ,
 
     getProgressSheetById: (id: string) => get().progressSheets.find(progressSheet => progressSheet.id === id),
+    getProgressSheetByStudentId: (id: string) => get().progressSheets.find(progressSheet => progressSheet.studentId === id),
     createProgressSheet: async (progressSheet: progressSheetInterface) => {
         await ProgressSheetService.createProgressSheet(progressSheet);
         set({ progressSheets: [...get().progressSheets, progressSheet] })

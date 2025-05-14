@@ -10,9 +10,10 @@ import { EditUserform } from "../../components/shared/forms/EditUserform";
 import Swal from "sweetalert2";
 import { EditUserUnits } from "../../components/shared/forms/EditUserUnits";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
-import { EditStudentSheet } from "../../components/shared/forms/EditStudentSheet";
+// import { EditStudentSheet } from "../../components/shared/forms/EditStudentSheet";
 import { ColumnDef } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
+import { StudentProgressSheet } from "../progress-sheet/StudentProgressSheet";
 
 
 
@@ -186,7 +187,7 @@ export const UsersPage = () => {
             title="Progress Sheet"
             isVisible={openStudentSheetModal}
             setIsVisible={setOpenStudentSheetModal}
-            children={<EditStudentSheet userId={userforUnit} />}
+            children={<StudentProgressSheet studentID={userforUnit} />}
           />
         )}
         {/* Modal */}
