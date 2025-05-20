@@ -20,6 +20,12 @@ import { useEventStore } from '../../stores/events/event.store';
       backgroundColor: '#ffffff',
       padding: 30,
     },
+    landscapePage: {
+      flexDirection: 'column',
+      backgroundColor: '#ffffff',
+      padding: 30,
+      size: 'landscape',
+    },
     header: {
       fontSize: 16,
       textAlign: 'center',
@@ -45,9 +51,8 @@ import { useEventStore } from '../../stores/events/event.store';
       marginLeft: 10,
     },
     table: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      display: 'table' as any,
-      width: 'auto',
+      flexDirection: 'column',
+      width: '100%',
       marginTop: 20,
       borderStyle: 'solid',
       borderWidth: 1,
@@ -57,6 +62,7 @@ import { useEventStore } from '../../stores/events/event.store';
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: '#000',
+      minHeight: 25,
     },
     tableHeader: {
       backgroundColor: '#f0f0f0',
@@ -66,9 +72,16 @@ import { useEventStore } from '../../stores/events/event.store';
       padding: 5,
       borderRightWidth: 1,
       borderRightColor: '#000',
-      flex: 1,
       fontSize: 8,
+      flexWrap: 'wrap',
+      minWidth: 60,
     },
+    tableTitle: {
+      fontSize: 14,
+      textAlign: 'center',
+      marginBottom: 10,
+      fontWeight: 'bold',
+    }
   });
   
   interface Props {
@@ -127,17 +140,17 @@ export const StudentProgressSheet:FC<Props> = ({ studentID }) => {
 
 
     const TableRow = ({ entry }: { entry: ProgressEntry }) => (
-        <View style={styles.tableRow}>
-          <Text style={[styles.tableCell, { flex: 0.5 }]}>{entry.date}</Text>
-          <Text style={[styles.tableCell, { flex: 0.3 }]}>{entry.hour}</Text>
-          <Text style={[styles.tableCell, { flex: 0.5 }]}>{entry.book}</Text>
-          <Text style={[styles.tableCell, { flex: 0.5 }]}>{entry.progress}</Text>
-          <Text style={[styles.tableCell, { flex: 0.3 }]}>{entry.part}</Text>
-          <Text style={[styles.tableCell, { flex: 0.3 }]}>{entry.test}</Text>
-          <Text style={[styles.tableCell, { flex: 0.5 }]}>{entry.teacher}</Text>
-          <Text style={[styles.tableCell, { flex: 1 }]}>{entry.observation}</Text>
-        </View>
-      );
+      <View style={styles.tableRow}>
+        <Text style={[styles.tableCell, { width: 80 }]}>{entry.date}</Text>
+        <Text style={[styles.tableCell, { width: 60 }]}>{entry.hour}</Text>
+        <Text style={[styles.tableCell, { width: 100 }]}>{entry.book}</Text>
+        <Text style={[styles.tableCell, { width: 100 }]}>{entry.progress}</Text>
+        <Text style={[styles.tableCell, { width: 60 }]}>{entry.part}</Text>
+        <Text style={[styles.tableCell, { width: 60 }]}>{entry.test}</Text>
+        <Text style={[styles.tableCell, { width: 100 }]}>{entry.teacher}</Text>
+        <Text style={[styles.tableCell, { width: 200 }]}>{entry.observation}</Text>
+      </View>
+    );
 
   return (
     <PDFViewer style={{ width: '70rem', height: '800px' }}>
@@ -199,18 +212,22 @@ export const StudentProgressSheet:FC<Props> = ({ studentID }) => {
               <Text style={styles.value}>{studentInfo.observation}</Text>
             </View>
           </View>
+        </Page>
 
+        <Page size="A4" orientation="landscape" style={styles.landscapePage}>
+          <Text style={styles.tableTitle}>PROGRESS TABLE</Text>
+          
           {/* Tabla de Progreso */}
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={[styles.tableCell, { flex: 0.5 }]}>DATE</Text>
-              <Text style={[styles.tableCell, { flex: 0.3 }]}>HOUR</Text>
-              <Text style={[styles.tableCell, { flex: 0.5 }]}>BOOK</Text>
-              <Text style={[styles.tableCell, { flex: 0.5 }]}>PROGRESS</Text>
-              <Text style={[styles.tableCell, { flex: 0.3 }]}>PART</Text>
-              <Text style={[styles.tableCell, { flex: 0.3 }]}>TEST</Text>
-              <Text style={[styles.tableCell, { flex: 0.5 }]}>TEACHER</Text>
-              <Text style={[styles.tableCell, { flex: 1 }]}>OBSERVATION</Text>
+              <Text style={[styles.tableCell, { width: 80 }]}>DATE</Text>
+              <Text style={[styles.tableCell, { width: 60 }]}>HOUR</Text>
+              <Text style={[styles.tableCell, { width: 100 }]}>BOOK</Text>
+              <Text style={[styles.tableCell, { width: 100 }]}>PROGRESS</Text>
+              <Text style={[styles.tableCell, { width: 60 }]}>PART</Text>
+              <Text style={[styles.tableCell, { width: 60 }]}>TEST</Text>
+              <Text style={[styles.tableCell, { width: 100 }]}>TEACHER</Text>
+              <Text style={[styles.tableCell, { width: 200 }]}>OBSERVATION</Text>
             </View>
             {studentInfo.progressEntries.map((entry, index) => (
               <TableRow key={index} entry={entry} />

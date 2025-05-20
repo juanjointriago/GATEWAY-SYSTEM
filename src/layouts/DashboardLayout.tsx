@@ -17,8 +17,6 @@ export const DashboardLayout: FC = () => {
     return <Navigate to="/auth/signin" />
   }
 
-
-
   // console.log(JSON.stringify(authStatus))
   return (
     <div className="overflow-x-auto bg-slate-200 overflow-y-scroll w-screen h-screen text-slate-900 selection:bg-blue-900 selection:text-white">
@@ -28,9 +26,7 @@ export const DashboardLayout: FC = () => {
         <div className="w-full">
           <Outlet />
         </div>
-
       </div>
-
     </div>
   )
 }
