@@ -107,9 +107,10 @@ export const StudentProgressSheet:FC<Props> = ({ studentID }) => {
   const progressEntries :ProgressEntry[] = progressClasses.progressClasses.map((record)=>{
     const event = getEventById(record.eventInfo.value);
     if(!event) return {} as ProgressEntry;
+    const teacher = getUserById(event.teacher || "");
     return {
       ...record,
-      teacher:event?.teacher || "",
+      teacher: teacher?.name || "Sin docente",
       date: new Date(record.createdAt || 0).toLocaleDateString(),
       hour: new Date(record.createdAt || 0).toLocaleTimeString(),
     }
