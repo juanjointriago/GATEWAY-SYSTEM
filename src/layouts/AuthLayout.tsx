@@ -6,7 +6,7 @@ import { Suspense } from "react";
 export const AuthLayout = () => {
   const authStatus = useAuthStore(state => state.status);
   const checkAuthStatus = useAuthStore(state => state.checkAuthStatus);
-  console.log(JSON.stringify(authStatus));
+  console.debug(JSON.stringify(authStatus));
 
   if (authStatus === 'pending') {
     checkAuthStatus();

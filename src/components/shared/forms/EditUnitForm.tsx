@@ -27,7 +27,7 @@ export const EditUnitForm: FC<Props> = ({ unit }) => {
 
 
     const [fileUpload, setFileUpload] = useState<FileList | null>(null)
-    console.log('👀====> ', { currentUnit });
+    console.debug('👀====> ', { currentUnit });
 
     const defaultValues: unit = { ...currentUnit }
     const { register, handleSubmit, reset, formState: { errors } } = useForm<unit>({ defaultValues });
@@ -44,7 +44,7 @@ export const EditUnitForm: FC<Props> = ({ unit }) => {
                 },
             });
             await updateUnit(unitRecord);
-            console.log({ data })
+            console.debug({ data })
             inputFile!.value = ''
             fileRef.current = null;
             Swal.close();
@@ -65,7 +65,7 @@ export const EditUnitForm: FC<Props> = ({ unit }) => {
             await updateUnit(unitRecord, fileUpload[0]);
             Swal.close();
             Swal.fire('Material Actualizado', 'Material de actualizado creado con éxito', 'success');
-            console.log({ data })
+            console.debug({ data })
             inputFile!.value = ''
             fileRef.current = null;
             reset();

@@ -46,12 +46,12 @@ export const FormEventControl: FC = () => {
         // data.levels[0] = { level: getValues('levels.0.level'), subLevels:  };
         // const aditionalStudentsToSave: students = aditionalStudents.map((aditionalStd) => ({ [aditionalStd.value]: { status: 'COMMING' } }));
         const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
-        console.log(aditionalStudentsToSave)
+        console.debug(aditionalStudentsToSave)
         // const studentByLevel = students.map((user) => { if (sublevelsToSave.includes(user.subLevel!)) { return { [user.id!]: { status: 'COMMING' } } } });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.levels[0].subLevels = data.levels[0].subLevels.map((sublevel: any) => sublevel.value)
         const studentByLevel = students.map((student) => { if (data.levels[0].subLevels.includes(student.subLevel!)) { return { [student.id!]: { status: 'COMMING' } } } });
-        console.log('👀FOUND STUDENTS ===> ', { studentByLevel });
+        console.debug('👀FOUND STUDENTS ===> ', { studentByLevel });
         const studentsToSave = studentByLevel.reduce((acc, curr) => ({ ...acc, ...curr }), {});
         const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
         data.students = allstudents as students;//change for STUDENTS
@@ -66,7 +66,7 @@ export const FormEventControl: FC = () => {
             data.levels[0].level = newLevel.value;
             const eventRecord = { id: uuid(), ...data }
             //loading swal 
-            console.log({ eventRecord });
+            console.debug({ eventRecord });
 
             // return;
             Swal.fire({
@@ -78,7 +78,7 @@ export const FormEventControl: FC = () => {
                 },
             })
             await createEvent(eventRecord).then(() => {
-                // console.log('ITS ok');
+                // console.debug('ITS ok');
                 Swal.fire({
                     title: 'Reservación creada',
                     text: `Reservación creada con éxito`,
@@ -230,7 +230,7 @@ export const FormEventControl: FC = () => {
                             control={control}
                             name="levels.0.subLevels"
                             render={({ field: { onBlur, onChange, ref, name } }) => (
-                                // console.log(getValues("levels.0.level")),
+                                // console.debug(getValues("levels.0.level")),
                                 <Select
                                     // {...field}
                                     ref={ref}
@@ -245,7 +245,7 @@ export const FormEventControl: FC = () => {
                                     options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 // onChange={(e: any) => {
-                                //     console.log('SUB-LEVELID', { e });
+                                //     console.debug('SUB-LEVELID', { e });
                                 //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 //     setValue('levels.0.subLevels', e);
                                 // }}
@@ -263,7 +263,7 @@ export const FormEventControl: FC = () => {
                             options={students.map(student => ({ value: student.id, label: student.name })) as any}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
-                                console.log(' STUDENT-ADITIONAL-ID', e);
+                                console.debug(' STUDENT-ADITIONAL-ID', e);
                                 if (!e) return
                                 setAditionalStudents(e)
                             }}

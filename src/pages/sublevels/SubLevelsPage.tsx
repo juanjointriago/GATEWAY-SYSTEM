@@ -20,7 +20,7 @@ export const SubLevelsPage = () => {
   const subLevels = useSubLevelStore(state => state.subLevels);
   const [openModal, setOpenModal] = useState(false);
   const [subLevelToEdit, setSsubLevelToEdit] = useState<string>();
-  // console.log('SUBLEVELS', subLevels)
+  // console.debug('SUBLEVELS', subLevels)
   const subLevelsCols: Array<ColumnProps<subLevel>> = [
     {
       key: 'createdAt', title: 'Fecha de Creación', render: (_, record) => {
@@ -40,7 +40,7 @@ export const SubLevelsPage = () => {
         return <>
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
 
-            console.log(record)
+            console.debug(record)
             Swal.fire({
               title: '¿Estás seguro?',
               text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta Unidad`,
@@ -52,7 +52,7 @@ export const SubLevelsPage = () => {
               cancelButtonText: 'Cancelar'
             }).then(async (result) => {
               if (result.isConfirmed) {
-                console.log('data for update', { ...record, isActive: record.isActive ? false : true });
+                console.debug('data for update', { ...record, isActive: record.isActive ? false : true });
                 // return
                 await updateSublevel({ ...record, isActive: !record.isActive })
                 window.location.reload();

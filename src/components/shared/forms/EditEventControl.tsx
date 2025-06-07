@@ -36,9 +36,9 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     };
 
 
-    console.log('EVENT TO EDIT ', { event: getEventById(eventId) });
-    // console.log('EVENT TO EDIT ', { defaultValues });
-    // console.log('EVENT TO EDIT ',  defaultValues.levels[0].subLevels );
+    console.debug('EVENT TO EDIT ', { event: getEventById(eventId) });
+    // console.debug('EVENT TO EDIT ', { defaultValues });
+    // console.debug('EVENT TO EDIT ',  defaultValues.levels[0].subLevels );
 
     const { control, handleSubmit, formState: { errors } } = useForm<event>({ defaultValues })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,11 +46,11 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
 
     const onSubmit = handleSubmit(async (data: event) => {
         const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
-        console.log(aditionalStudentsToSave);
+        console.debug(aditionalStudentsToSave);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.levels[0].subLevels = data.levels[0].subLevels.map((sublevel: any) => sublevel.value)
         const studentByLevel = students.map((student) => { if (data.levels[0].subLevels.includes(student.subLevel!)) { return { [student.id!]: { status: 'COMMING' } } } });
-        // console.log(' EDIT FORM 👀 FOUND STUDENTS ===> ', { studentByLevel });
+        // console.debug(' EDIT FORM 👀 FOUND STUDENTS ===> ', { studentByLevel });
         const studentsToSave = studentByLevel.reduce((acc, curr) => ({ ...acc, ...curr }), {});
         const allstudents = { ...studentsToSave, ...aditionalStudentsToSave };
         data.students = allstudents as students;//change for STUDENTS
@@ -62,8 +62,8 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const newLevel = data.levels[0].level as any;
             data.levels[0].level = newLevel.value;
-            // console.log('👀 level[0].level =>', data.levels[0].level);
-            console.log({ data });
+            // console.debug('👀 level[0].level =>', data.levels[0].level);
+            console.debug({ data });
             // return;
             Swal.fire({
                 title: 'Actualizando Reservación',
@@ -230,7 +230,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             control={control}
                             name="levels.0.subLevels"
                             render={({ field: { onBlur, onChange, ref, name } }) => (
-                                // console.log(getValues("levels.0.level")),
+                                // console.debug(getValues("levels.0.level")),
                                 <Select
                                     // {...field}
                                     ref={ref}
@@ -247,7 +247,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                                     options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 // onChange={(e: any) => {
-                                //     console.log('SUB-LEVELID', { e });
+                                //     console.debug('SUB-LEVELID', { e });
                                 //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 //     setValue('levels.0.subLevels', e);
                                 // }}
@@ -265,7 +265,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             options={students.map(student => ({ value: student.id, label: student.name })) as any}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
-                                console.log(' STUDENT-ADITIONAL-ID', e);
+                                console.debug(' STUDENT-ADITIONAL-ID', e);
                                 if (!e) return
                                 setAditionalStudents(e)
                             }}

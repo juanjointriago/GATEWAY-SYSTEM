@@ -12,7 +12,7 @@ export const SignInForm = () => {
      * @description Handle form submit
      */
     const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-      // console.log('onSumbit event =>', { event })
+      // console.debug('onSumbit event =>', { event })
       event.preventDefault();
       const { email, password } = event.target as typeof event.target & {
         email: { value: string };

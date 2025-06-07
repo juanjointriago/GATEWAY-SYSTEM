@@ -6,9 +6,9 @@ interface Props {
 }
 export const EditStudentSheet: FC<Props> = ({ userId }) => {
   const getUserById = useUserStore((state) => state.getUserById);
-  // console.log({userId})
+  // console.debug({userId})
   const user = getUserById(userId);
-  console.log({ user });
+  console.debug({ user });
   return (
     // <div>EditStudentSheet{ userId }</div>
     <>

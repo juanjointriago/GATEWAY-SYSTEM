@@ -16,7 +16,7 @@ export const DashboardStudent: FC<Props> = ({ user }) => {
     const units = useUnitStore(state => state.units);
     const booksStudent = units.filter(unit => unit.isActive && (user.unitsForBooks || []).includes(unit.sublevel));
     // const myEvent = 
-    // console.log('sublevel',user.subLevel)
+    // console.debug('sublevel',user.subLevel)
     return (
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

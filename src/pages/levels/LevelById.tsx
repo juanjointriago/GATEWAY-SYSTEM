@@ -5,7 +5,7 @@ interface Props {
     levelId: string;
 }
 export const LevelById: FC<Props> = ({ levelId }) => {
-    // console.log({levelId})
+    // console.debug({levelId})
     const getLevelById = useLevelStore(state => state.getLevelById);
     const [foundLevel, setFoundLevel] = useState<level>();
 
@@ -19,7 +19,7 @@ export const LevelById: FC<Props> = ({ levelId }) => {
     useEffect(() => {
         setLevelFounded();
     }, [levelId])
-    // console.log('LevelById', { foundLevel })
+    // console.debug('LevelById', { foundLevel })
     return (
         <>
             {foundLevel && <div>{foundLevel.name}</div>}

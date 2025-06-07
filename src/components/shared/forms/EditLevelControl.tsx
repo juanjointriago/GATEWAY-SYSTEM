@@ -23,7 +23,7 @@ export const EditLevelControl: FC<Props> = ({ levelId }) => {
 
     const onSubmit = handleSubmit(async (data: level) => {
 
-        console.log('👀==> Data del nivel a editar', { data });
+        console.debug('👀==> Data del nivel a editar', { data });
         // return;
         await editLevel(data).then(() => {
             Swal.fire({

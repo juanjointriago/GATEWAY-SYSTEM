@@ -126,7 +126,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
           onEmptied={() => { setSearchTerms(''); setRowsToShow(data); }}
           onAbort={() => { setSearchTerms(''); setRowsToShow(data); }}
           onChange={(e) => {
-            console.log(e.target.value)
+            console.debug(e.target.value)
             setSearchTerms(e.target.value.trim())
             if (searchTerms.length > 0) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,7 +138,7 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
                 return data["name"] && data["name"].toLowerCase().includes(searchTerms.toLowerCase())
               }
               )
-              console.log("resultados encontrados: ", results)
+              console.debug("resultados encontrados: ", results)
               setRowsToShow(results as T[])
             }
           }}
@@ -149,14 +149,14 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
         <span className="mx-4 text-gray-500">Desde</span>
         <div className="relative">
           <input id={'start-date'} name={'start-date'} type="date" onChange={e => {
-            console.log('start-date => ', e.target.value);
+            console.debug('start-date => ', e.target.value);
             setStartDate(dateToMiliseconds(e.target.value));
             if(startDate && endDate){
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const results = data?.filter((record:any)=>{
                 return record.updatedAt >= startDate && record.updatedAt <= endDate;
               })
-              console.log("resultados encontrados start: ", results?.length)
+              console.debug("resultados encontrados start: ", results?.length)
               setRowsToShow(results as T[])
             }
           }} />

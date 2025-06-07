@@ -20,7 +20,7 @@ export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
   const deleteUnit = useUnitStore(state => state.deleteUnit);
   const user = useAuthStore(state => state.user);
-  // console.log('👀 ==== > USER ', { user })
+  // console.debug('👀 ==== > USER ', { user })
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const books = useUnitStore(state => state.units);
@@ -31,7 +31,7 @@ export const UnitsPage = () => {
   useEffect(() => {
     getAllUnits();
   }, [getAllUnits]);
-  // console.log('UNIDADES', units);
+  // console.debug('UNIDADES', units);
   const unitsCols: Array<ColumnProps<unit>> = [
     { key: 'orderNumber', title: 'Nro', render: (_, record) => <>{record.orderNumber}</> },
     { key: 'sublevel', title: 'Unidad', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
@@ -47,7 +47,7 @@ export const UnitsPage = () => {
         {isAdmin ? <div>
           {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
 
-            console.log(record)
+            console.debug(record)
             Swal.fire({
               title: '¿Estás seguro?',
               text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} este Libro`,
@@ -59,7 +59,7 @@ export const UnitsPage = () => {
               cancelButtonText: 'Cancelar'
             }).then(async(result) => {
               if (result.isConfirmed) {
-                // console.log('data for update', { ...record, isActive: record.isActive ? false : true });
+                // console.debug('data for update', { ...record, isActive: record.isActive ? false : true });
                 // return
                 await updateUnit({ ...record, isActive: record.isActive? false : true });
                 window.location.reload();
@@ -92,9 +92,9 @@ export const UnitsPage = () => {
   ]
 
   // const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
-  // user && console.log('USUARIO ACTUAL =>',user.uid,' UNIDADES ASIGNADAS =>',  user.unitsForBooks)
+  // user && console.debug('USUARIO ACTUAL =>',user.uid,' UNIDADES ASIGNADAS =>',  user.unitsForBooks)
   const activeUnits = books
-  // books && user && console.log('✅ LIBROS DE ',books.filter((unit) => unit.sublevel === user.unitsForBooks[0]))
+  // books && user && console.debug('✅ LIBROS DE ',books.filter((unit) => unit.sublevel === user.unitsForBooks[0]))
 
   return (
     <>

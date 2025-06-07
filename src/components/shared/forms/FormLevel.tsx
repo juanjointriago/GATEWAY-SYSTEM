@@ -33,7 +33,7 @@ export const FormLevel = () => {
             Swal.fire('Error', `${error.message}`, 'error');
             console.error({error});
         });
-        console.log({ data })
+        console.debug({ data })
         reset();
     })
     return (

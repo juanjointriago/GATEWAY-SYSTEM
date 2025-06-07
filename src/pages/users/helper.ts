@@ -1,7 +1,7 @@
 import { colors } from "../../theme/theme"
 
 export const getInitials = (name: string) => {
-    // console.log('👀 getInitials ======> ', { name });
+    // console.debug('👀 getInitials ======> ', { name });
     // return (name.split(" ").length > 1)
     //     ? `${name.split(" ")[0][0]
     //         ? name.split(" ")[0][0].toUpperCase()

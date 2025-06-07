@@ -13,7 +13,7 @@ interface Props<T> {
 
 export const SelectOptionGeneric = <T,>({ data, defaultValue, isMulti, value, setValue }: Props<T>) => {
     const animatedComponents = makeAnimated();
-    console.log(value)
+    console.debug(value)
     return (
         <div>
             <Select
@@ -25,7 +25,7 @@ export const SelectOptionGeneric = <T,>({ data, defaultValue, isMulti, value, se
                 options={data.map((item: any) => ({ value: item.id, label: item.name }))}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onChange={(e: any) => {
-                    console.log(' VALUE-ID', e.value);
+                    console.debug(' VALUE-ID', e.value);
                     if (!e) return
                     setValue(e.value)
                 }}

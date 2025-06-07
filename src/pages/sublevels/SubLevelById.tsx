@@ -13,7 +13,7 @@ export const SubLevelById: FC<Props> = ({ subLevelId }) => {
     const setSubLevel = async () => {
         const newLevel = await getSubLevelById(subLevelId)
         if (newLevel) {
-            // console.log('HAY SUBNIVELLLLL')
+            // console.debug('HAY SUBNIVELLLLL')
             setFoundSubLevel(newLevel)
         }
     }

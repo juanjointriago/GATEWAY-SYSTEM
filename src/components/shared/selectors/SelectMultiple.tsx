@@ -18,8 +18,8 @@ export const SelectMultiple:FC<Props> = ({ data }) => {
         return item.name.toLowerCase().includes(query.toLowerCase())
     });
     
-    // console.log('DATA', data)
-    console.log('Filtered', filteredData)
+    // console.debug('DATA', data)
+    console.debug('Filtered', filteredData)
     return (
         <Combobox value={selectData} onChange={setSelectData} onClose={() => setQuery('')}>
       <ComboboxInput

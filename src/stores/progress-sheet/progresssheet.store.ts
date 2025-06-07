@@ -21,7 +21,7 @@ const storeAPI: StateCreator<ProgressSheetStore,
     getAndSetProgressSheets: async () => {
         try {
             const progressSheets = await ProgressSheetService.getProgressSheet();
-            console.log('------- :) =>',{progressSheets})
+            // console.debug('------- :) =>',{progressSheets})
             set({ progressSheets: [...progressSheets] })
         } catch (error) {
             console.warn(error);

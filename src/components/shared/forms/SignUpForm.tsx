@@ -263,7 +263,7 @@ export const SignUpForm = () => {
       ...defaultValues,
       ...data,
     };
-    console.log(newUser);
+    console.debug(newUser);
     // return
     await signUp(newUser);
     setIsLoading(false);

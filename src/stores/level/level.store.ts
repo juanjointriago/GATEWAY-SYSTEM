@@ -20,7 +20,7 @@ const storeAPI: StateCreator<LevelStore, [["zustand/devtools", never], ["zustand
     getAndSetLevels: async () => {
         try {
             const levels = await LevelService.getLevels()
-            // console.log('NIVELES ENCONTRADOS', { levels })
+            // console.debug('NIVELES ENCONTRADOS', { levels })
             set({ levels: [...levels] })
         } catch (error) {
             console.warn(error)

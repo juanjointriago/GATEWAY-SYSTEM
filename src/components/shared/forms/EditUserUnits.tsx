@@ -8,7 +8,7 @@ interface Props {
     userId: string;
 }
 export const EditUserUnits: FC<Props> = ({ userId }) => {
-    console.log(userId)
+    console.debug(userId)
     const units = useSubLevelStore(store => store.subLevels);
     const getUserById = useUserStore(store => store.getUserById);
     const user = getUserById(userId)!;
@@ -33,7 +33,7 @@ export const EditUserUnits: FC<Props> = ({ userId }) => {
             cancelButtonText: 'Cancelar',
         }).then(async (result) => {
             // return
-            // console.log(updatedUser)
+            // console.debug(updatedUser)
             if (result.isConfirmed) {
                 await updateUser(updatedUser).then(()=>{
                     Swal.fire({
@@ -48,8 +48,8 @@ export const EditUserUnits: FC<Props> = ({ userId }) => {
             }
         })
     }
-    // console.log('units',units.filter(unit => unit.isActive));
-    // console.log('=====> unidades del usuario', { unitsForBooks: user.unitsForBooks });
+    // console.debug('units',units.filter(unit => unit.isActive));
+    // console.debug('=====> unidades del usuario', { unitsForBooks: user.unitsForBooks });
     return (
         <>
             <div>
@@ -61,7 +61,7 @@ export const EditUserUnits: FC<Props> = ({ userId }) => {
                 <div className="grid grid-cols-2 gap-2 p-2">
                     {unitsForBooks && units.filter(unit => unit.isActive).sort((a, b) => a.name > b.name ? 1 : -1).map((unit) => {
 
-                        console.log(`buscando ${unit.id}`, unitsForBooks.includes(unit.id!));
+                        console.debug(`buscando ${unit.id}`, unitsForBooks.includes(unit.id!));
                         return (
                             <div className="flex flex-row" key={unit.id}>
                                 <input className="accent-indigo-500" checked={unitsForBooks.includes(unit.id!)} type="checkbox" id={unit.id} name={unit.name} value={unit.id}

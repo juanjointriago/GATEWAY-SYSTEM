@@ -18,12 +18,12 @@ export class AuthService {
         });
         try {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
-            console.log('✅',user.displayName)
+            console.debug('✅',user.displayName)
             const firebaseUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, user.uid);
-            console.log('Auth.Service/static login/ getItemById=>', { firebaseUser });
+            console.debug('Auth.Service/static login/ getItemById=>', { firebaseUser });
             Swal.close();
             if (firebaseUser && firebaseUser.isActive === false) {
-                // console.log("Caso Usuario inactivo")
+                // console.debug("Caso Usuario inactivo")
                 Swal.fire({
                     title: `Su usuario está en proceso de aprobación`,
                     icon: "info",
@@ -40,12 +40,12 @@ export class AuthService {
                     allowOutsideClick: true,
                     backdrop: true,
                 });
-                // console.log('Login Exitoso', { firebaseUser });
+                // console.debug('Login Exitoso', { firebaseUser });
                 return firebaseUser;
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            console.log({ error })
+            console.debug({ error })
             Swal.close();
             Swal.fire("Error al iniciar sesión", `${error.message}`, 'error');
             throw new Error('Error al iniciar sesión');
@@ -185,7 +185,7 @@ export class AuthService {
             return firebaseUser;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            console.log({ error })
+            console.debug({ error })
             Swal.close();
             Swal.fire("Error al iniciar sesión con GOOGLE", `${error.message}`, 'error');
             throw new Error('Error al iniciar sesión');
@@ -230,7 +230,7 @@ export class AuthService {
                 const FirestoreUser = await getItemById<FirestoreUser>(import.meta.env.VITE_COLLECTION_USERS, user.uid);
                 return FirestoreUser;
             } catch (error) {
-                console.log(error);
+                console.debug(error);
                 throw new Error('Unauthorized, invalid token');
             }
         }

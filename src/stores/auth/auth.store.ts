@@ -29,12 +29,12 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
 
     loginUser: async (email: string, password: string) => {
         const user = await AuthService.login(email, password);
-        console.log('auth.store/StoreAPI/loginUser ', { user });
+        console.debug('auth.store/StoreAPI/loginUser ', { user });
         if (user) {
-            // console.log('login', { email, password })
-            console.log('Caso de que existe usuario =>', { user });
+            // console.debug('login', { email, password })
+            console.debug('Caso de que existe usuario =>', { user });
             set({ status: 'authorized', user });
-            console.log("USUARIO almacenado", get().user);
+            console.debug("USUARIO almacenado", get().user);
         } else {
             set({ status: 'unauthorized', user: undefined });
             throw new Error('Unable to login');
@@ -53,13 +53,13 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
     },
 
     checkAuthStatus: async () => {
-        console.log('start checkAuthStatus=>')
+        console.debug('start checkAuthStatus=>')
         const user = await AuthService.checkStatus();
         if (user) {
-            // console.log('✅Authorized', JSON.stringify(user))
+            // console.debug('✅Authorized', JSON.stringify(user))
             set({ status: 'authorized', ...user });
         } else {
-            // console.log('❌Unauthorized', JSON.stringify(user))
+            // console.debug('❌Unauthorized', JSON.stringify(user))
             set({ status: 'unauthorized', user: undefined });
         }
     },

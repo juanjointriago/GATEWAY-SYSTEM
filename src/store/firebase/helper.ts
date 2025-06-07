@@ -12,7 +12,7 @@ import { db } from "./initialize"
 export const adddItem = async (collectionName: string, data: DocumentData) => {
     try {
         const docRef = await addDoc(collection(db, collectionName), { data })
-        console.log('Document written with ID: ', docRef.id);
+        console.debug('Document written with ID: ', docRef.id);
     } catch (error) {
         console.warn("Error adding document: ", error)
 
@@ -74,7 +74,7 @@ export const getItemById = async <T>(collectionName: string, id: string) => {
 
     const docRef = doc(db, collectionName, id);
     const docSnap = await getDoc(docRef);
-    console.log('Document data:', `${collectionName}`, docSnap.data());
+    console.debug('Document data:', `${collectionName}`, docSnap.data());
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as T
     }
@@ -97,7 +97,7 @@ export const sendCustomEmail = async (dataForSend: email) => {
     const message: email = dataForSend;
     try {
         await addDoc(collection(db, 'mail'), message)
-        console.log('Sending 📧 => ', { message });
+        console.debug('Sending 📧 => ', { message });
     } catch (error) {
         console.warn("Error adding document: ", error)
 

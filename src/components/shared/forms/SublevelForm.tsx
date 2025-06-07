@@ -22,7 +22,7 @@ export const SublevelForm = () => {
     const { register, handleSubmit, reset, formState: { errors } } = useForm<subLevel>({ defaultValues });
     const onSubmit = handleSubmit(async (data: subLevel) => {
         const unitRecord = { id: uuid(), ...data };
-        // console.log({ unitRecord })
+        // console.debug({ unitRecord })
         //return
         await createSublevel(unitRecord).then(() => {
             Swal.fire({

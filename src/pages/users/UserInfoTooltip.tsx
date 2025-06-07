@@ -12,7 +12,7 @@ export const UserInfoTooltip: FC<Props> = ({ userId }) => {
     const setUser = async () => {
         const newUser = await getUserById(userId)
         if (newUser) {
-            // console.log('HAY SUBNIVELLLLL')
+            // console.debug('HAY SUBNIVELLLLL')
             setFoundUser(newUser)
         }
     }

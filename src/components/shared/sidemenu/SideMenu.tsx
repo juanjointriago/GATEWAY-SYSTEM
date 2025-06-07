@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { menuItemsByRole } from './menu';
 import { useEventStore } from '../../../stores/events/event.store';
 import { useFeesStore } from '../../../stores/fees/fess.store';
+import { useNewsStore } from '../../../stores/news/news.store';
 // import { useNavigate } from "react-router-dom";
 
 
@@ -19,7 +20,7 @@ export const SideMenu = () => {
   const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
   const getAllUnits =  useUnitStore(state => state.getAndSetUnits);
   // const books = useUnitStore(state => state.units);
-  // console.log('✅ Inside SideMenu loadbooks =>',{books})
+  // console.debug('✅ Inside SideMenu loadbooks =>',{books})
   // const getAllEvents = useEventStore(state => state.getEventsQuery);
   const getAllEvents = useEventStore(state => state.getAllEvents);
   const getAllFees = useFeesStore(state => state.getAndSetFees);
@@ -27,6 +28,8 @@ export const SideMenu = () => {
 
   const authStatus = useAuthStore(state => state.status);
   const logoutUser = useAuthStore(state => state.logoutUser);
+  const getAndSetNews = useNewsStore((state) => state.getAndSetNews);
+  
   // const navigate = useNavigate()
   useEffect(() => {
     getAllUsers();
@@ -35,13 +38,14 @@ export const SideMenu = () => {
     getAllEvents();
     getAllUnits();
     getAllFees();
-  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits, getAllFees]);
+    getAndSetNews();
+  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits, getAllFees, getAndSetNews]);
 
 
   if (authStatus === 'unauthorized') {
     return <Navigate to="/auth/signin" />
   }
-  // console.log({ user })
+  // console.debug({ user })
 
   return (
     <div id="menu" className=" min-w-[20rem] bg-gray-900 min-h-screen z-10 text-slate-300 w-80 left-0 overflow-y-scroll">

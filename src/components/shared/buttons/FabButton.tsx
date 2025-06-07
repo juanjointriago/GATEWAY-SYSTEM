@@ -9,6 +9,7 @@ interface Props {
   color?: string;
   tootTipText?: string;
   tooltipPosition?: "top" | "bottom" | "left" | "right";
+  className?: string;
 }
 
 export const FabButton: FC<Props> = ({
@@ -18,7 +19,7 @@ export const FabButton: FC<Props> = ({
   iconSize = 20,
   color = "white",
   tootTipText,
-  tooltipPosition = "top",
+  tooltipPosition = "top", ...rest
 }) => {
   const getTooltipPosition = () => {
     switch (tooltipPosition) {
@@ -36,7 +37,7 @@ export const FabButton: FC<Props> = ({
   return (
     <>
       {isActive && (
-        <div className="relative inline-block group">
+        <div className={`relative inline-block group ${rest.className || ""}`}>
           <div
             onClick={action}
             className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500 hover:bg-indigo-600 transition-colors duration-200"

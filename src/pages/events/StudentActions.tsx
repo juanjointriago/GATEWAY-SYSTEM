@@ -69,7 +69,7 @@ export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) =>
                                 return
                             }
                             if (event.maxAssistantsNumber <=aceptedStudents) {
-                                // console.log('Nro de estudiantes => ', Object.keys(event.students).length, 'Maximo nro de estudiantes evento =>',event.maxAssistantsNumber);
+                                // console.debug('Nro de estudiantes => ', Object.keys(event.students).length, 'Maximo nro de estudiantes evento =>',event.maxAssistantsNumber);
                                 Swal.fire("We're sorry! - ¡Lo sentimos!", 'This class is already full - Esta clase ya se encuentra llena - ', 'error')
                                 return
                             }

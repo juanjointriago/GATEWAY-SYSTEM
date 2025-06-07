@@ -21,7 +21,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const levels = useLevelStore(state => state.levels);
     const sublevels = useSubLevelStore(state => state.subLevels);
     const [levelStudent, setLevelStudent] = useState<string>();
-    // console.log(levelStudent)
+    // console.debug(levelStudent)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [selectedSublevels, setSelectedSublevels] = useState<any>();
@@ -257,7 +257,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         { value: 'student', label: 'Student' },
         { value: 'admin', label: 'Administrator Be carefull' }
     ]
-    console.log('EditUserForm Found User by id', { user });
+    console.debug('EditUserForm Found User by id', { user });
     const defaultValues: FirestoreUser = {
         ...user,
         updatedAt: Date.now()
@@ -288,7 +288,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             ...defaultValues,
             ...data
         }
-        console.log('👀====>', { updatedUser });
+        console.debug('👀====>', { updatedUser });
         // return
         Swal.fire({
             title: '¿Estás seguro?',
@@ -309,7 +309,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         // reset(defaultValues);
     }))
 
-    console.log('👀', watch('role'));
+    console.debug('👀', watch('role'));
     return (
         <div>
             {/* <h1 className="text-2xl font-semibold mb-4">{`${user.name}` }</h1> */}
@@ -386,7 +386,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                             // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
-                                console.log('LEVELID', e.value);
+                                console.debug('LEVELID', e.value);
                                 if (!e.value) return
                                 setLevelStudent(e.value);
                             }}
@@ -407,7 +407,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                             options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange={(e: any) => {
-                                console.log('SUB-LEVELID', { e });
+                                console.debug('SUB-LEVELID', { e });
                                 setSelectedSublevels(e);
                             }}
                         />

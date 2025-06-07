@@ -66,7 +66,7 @@ export const UsersPageOld = () => {
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Usuarios</h1>
         {environment.production && <div className=" ml-10 bg-red-600 w-1/5">
           <select aria-placeholder="Modalidad"
-            onChange={(e) => console.log(e.target.value)}
+            onChange={(e) => console.debug(e.target.value)}
             className="h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
             <option>---- Filtros ----</option>
             <option value={'Docente'}>Docente</option>

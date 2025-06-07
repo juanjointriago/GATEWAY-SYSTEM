@@ -30,7 +30,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
 
     getUserById: (id: string) => {
         const user = get().users.find(user => user.id === id)
-        // console.log('FOUND USER =>',{user})
+        // console.debug('FOUND USER =>',{user})
         return user;
     },
     getUserByRole: (role: role) => get().users.filter((user) => user.role === role),
@@ -45,7 +45,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
     },
 
     updateUser: async (user: FirestoreUser) => {
-        console.log(' 👀=====> Editando a ', { user })
+        console.debug(' 👀=====> Editando a ', { user })
         // return 
         await UserService.updateUsers(user);
         set({ users: get().users.map(u => u.id === user.id ? user : u) });

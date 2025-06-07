@@ -18,17 +18,17 @@ const storeAPI: StateCreator<UnitStore, [["zustand/devtools", never], ["zustand/
     getAndSetUnits: async () => {
         try {
             const units = await UnitService.getUnits()
-            // console.log('UNIDADES ENCONTRADAS', { units })
+            // console.debug('UNIDADES ENCONTRADAS', { units })
             set({ units: [...units] });
         } catch (error) {
             console.warn(error)
         }
-        // console.log('getAndSetUnits')
+        // console.debug('getAndSetUnits')
     },
     createUnit: async (unit: unit, file: unitFile) => {
         const newUnit = await UnitService.createUnit(unit, file);
         set({ units: [...get().units, newUnit] });
-        // console.log('createUnit', unit)
+        // console.debug('createUnit', unit)
     },
     updateUnit: async (unit: unit, file: unitFile | null | undefined = null) => {
         const updatedUnits = get().units.map(u => u.id === unit.id ? unit : u);

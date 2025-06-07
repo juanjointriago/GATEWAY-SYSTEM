@@ -16,7 +16,7 @@ interface Props {
  * @description this component return a tootip element for show initial letters
  * @returns 
  */
-export const AvatarButton: FC<Props> = ({ isActive, action = () => console.log('Press AvatarButton'), tootTipText, initialLetter = 'AB', color = 'gray-500', textColor = 'text-gray-100' }) => {
+export const AvatarButton: FC<Props> = ({ isActive, action = () => console.debug('Press AvatarButton'), tootTipText, initialLetter = 'AB', color = 'gray-500', textColor = 'text-gray-100' }) => {
    
     return (
         <>

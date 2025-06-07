@@ -24,7 +24,7 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
         try {
             const events = await EventService.getEvents();
             set({ events: [...events] })
-            console.log('ALL EVENT FOUNDED ===>', { events })
+            console.debug('ALL EVENT FOUNDED ===>', { events })
         } catch (error) {
             console.warn(error);
         }

@@ -138,7 +138,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                             setRowsToShow(data?.filter((record: any) => (record.sublevel as keyof typeof data) === selectedUnit));
                         }}
                         onChange={(e) => {
-                            // console.log(e.target)
+                            // console.debug(e.target)
                             setSearchTerms(e.target.value.trim())
                             const results = data && (selectedUnit !== ''
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,12 +148,12 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                                 : data.filter((data: any) =>
                                     data["name"].toLowerCase().includes(searchTerms.toLowerCase()))
                             )
-                            console.log("resultados encontrados: ", results)
+                            console.debug("resultados encontrados: ", results)
                             setRowsToShow(results as unit[])
                         }}
                     />
                     {(user && ((user.unitsForBooks)||(user.role === 'admin'))) && <Select
-                        //   console.log('BOOKS',books.filter((book) => user!.unitsForBooks.includes(book.id!)) )
+                        //   console.debug('BOOKS',books.filter((book) => user!.unitsForBooks.includes(book.id!)) )
                         components={animatedComponents}
                         placeholder="-- Unidades -- "
                         options={user && (user.role === 'admin'
@@ -161,7 +161,7 @@ export const TableContainerBooks = ({ data, columns, hasAddBtn = true, modalChil
                             : units.filter((unit) => user.unitsForBooks.includes(unit.id!)).map((item) => ({ value: item.id, label: item.name })).sort())}
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onChange={(e: any) => {
-                            console.log(e.value)
+                            console.debug(e.value)
                             setSelectedUnit(e.value);
                             const results = data && data.filter((record) => (record.sublevel as keyof typeof data) === e.value)
                             setRowsToShow(results as unit[])

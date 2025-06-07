@@ -43,7 +43,7 @@ export const FormUnit = () => {
     await createUnit(unitRecord, fileUpload[0]);
     Swal.close();
     Swal.fire('Material almacenado', 'Material de apoyo creado con éxito', 'success');
-    console.log({ data })
+    console.debug({ data })
     inputFile!.value = ''
     fileRef.current = null;
     reset();
@@ -52,7 +52,6 @@ export const FormUnit = () => {
   return (
     <div className="flex ">
       <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
-
         <div className="flex flex-wrap mx-3 mb-6">
           <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
             <label htmlFor="sublevel" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Unidad a la que pertenece</label>

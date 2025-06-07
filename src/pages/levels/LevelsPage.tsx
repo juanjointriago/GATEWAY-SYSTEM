@@ -23,7 +23,7 @@ export const LevelsPage = () => {
   const [levelToEdit, setLevelToEdit] = useState<string>();
 
 
-  // console.log("LEVELS", levels);
+  // console.debug("LEVELS", levels);
   const levelsCols: Array<ColumnProps<level>> = [
     // { key: 'id', title: 'Código' },
     { key: 'name', title: 'Nombre' },
@@ -76,7 +76,7 @@ export const LevelsPage = () => {
     },
   ]
 
-  // console.log({getAllLevels})
+  // console.debug({getAllLevels})
   return (
     <>
       <div className="pt-5">

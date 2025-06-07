@@ -8,7 +8,7 @@ interface Props {
     subLevelId: string
 }
 export const EditSubLEvelForm: FC<Props> = ({ subLevelId }) => {
-    console.log(subLevelId)
+    console.debug(subLevelId)
     const getSubLevelById = useSubLevelStore(state => state.getSubLevelById);
     const updateSubLevel = useSubLevelStore(state => state.updateSubLevel);
     // const levels = useLevelStore(state => state.levels);
@@ -18,7 +18,7 @@ export const EditSubLEvelForm: FC<Props> = ({ subLevelId }) => {
     }
     const { control, handleSubmit, reset, formState: { errors } } = useForm<subLevel>({ defaultValues });
     const onSubmit = handleSubmit(async (data: subLevel) => {
-        // console.log({ unitRecord })
+        // console.debug({ unitRecord })
         //return
         await updateSubLevel(data).then(() => {
             Swal.fire({
