@@ -1,4 +1,4 @@
-import { IoBarChart, IoBook, IoCalendar, IoCash, IoLocate, IoPerson, IoPieChart, IoSpeedometerOutline } from "react-icons/io5";
+import { IoBarChart, IoBook, IoCalendar, IoCash, IoLocate, IoPerson, IoPieChart, IoSpeedometerOutline, IoFootstepsOutline, IoNewspaper } from "react-icons/io5";
 import { IconType } from "react-icons";
 import { role } from "../../../interface";
 
@@ -13,7 +13,8 @@ interface MenuItem {
 
 
 
-const admin: MenuItem[] = [
+const admin: MenuItem[] = [ 
+  { title: 'Noticias', subTitle: 'Informativo de novedades', href: '/dashboard/news', Icon: IoNewspaper, active: true },
   { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
   { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
   { title: 'Usuarios', subTitle: 'Gestión de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
@@ -25,14 +26,17 @@ const admin: MenuItem[] = [
 ]
 
 const student: MenuItem[] = [
+  { title: 'Noticias', subTitle: 'Informativo de novedades', href: '/dashboard/news', Icon: IoNewspaper, active: true },
   { title: 'Dashboard', subTitle: 'Información del Estudiante', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
   { title: 'Clases', subTitle: 'Clases donde el estudiante se encuentra', href: '/dashboard/events', Icon: IoCalendar, active: true },
-  // { title: 'Unidades', subTitle: 'Unidades del estudiante', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
+  { title: 'Unidades', subTitle: 'Unidades del estudiante', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true },
+  { title: 'ProgressSheet', subTitle: 'Mi progreso', href: '/dashboard/student-progress', Icon: IoFootstepsOutline, active: true },
   { title: 'Mis pagos', subTitle: 'Gestión de pago', href: '/dashboard/fees', Icon: IoCash, active: true },
   { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
 ]
 
 const teacher: MenuItem[] = [
+  { title: 'Noticias', subTitle: 'Informativo de novedades', href: '/dashboard/news', Icon: IoNewspaper, active: true },
   { title: 'Dashboard', subTitle: 'Welcome Teacher', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
   { title: 'Reservaciones', subTitle: 'Gestión de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
   { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true  },
