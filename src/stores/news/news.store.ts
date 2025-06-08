@@ -9,7 +9,7 @@ interface NewsStore {
   getAndSetNews: () => Promise<void>;
   getAllNews: () => INew[];
   getNewsById: (id: string) => INew | undefined;
-  createNews: (news: INew, file: newFile) => Promise<void>;
+  createNews: (news: INew, file: newFile) => Promise<INew>; // Cambiado a Promise<INew>
   updateNews: (news: INew) => Promise<void>;
   deleteNews: (id: string) => Promise<void>;
 }
@@ -31,10 +31,13 @@ const storeAPI: StateCreator<
   },
   getAllNews: () => get().news,
   getNewsById: (id: string) => get().news.find((news) => news.id === id),
-  createNews: async (news: INew, file: newFile) => {
+  createNews: async (news: INew, file: newFile): Promise<INew> => {
     try {
-      await NewsService.createNew(news, file);
-      set({ news: [...get().news, news] });
+      const newWithUrl = await NewsService.createNew(news, file);
+      set((state) => ({
+        news: [...state.news, newWithUrl],
+      }));
+      return newWithUrl;
     } catch (error) {
       console.error("Error creating news:", error);
       throw error;

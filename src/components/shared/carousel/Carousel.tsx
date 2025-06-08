@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback, FC } from "react";
 import { INew } from "../../../interface/new.interface";
+import { ModalGeneric } from "../ui/ModalGeneric";
+import { NewDetail } from "../../../pages/news/NewDetail";
 interface Props {
   news: INew[];
 }
 export const Carousel: FC<Props> = ({ news }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showModalDetail, setShowModalDetail] = useState(false);
+  const [selectedNew, setSelectedNew] = useState<INew | null>(null);
 
   // Auto-avance del carrusel
   useEffect(() => {
@@ -108,7 +112,7 @@ export const Carousel: FC<Props> = ({ news }) => {
             </span>
           </button>
 
-          {/* Indicadores mejorados */}
+          {/* Indicadores laterales */}
           <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
             {news.map((_, index) => (
               <button
@@ -146,8 +150,10 @@ export const Carousel: FC<Props> = ({ news }) => {
                 <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base">
                   {slide.description}
                 </p>
-                <button onClick={() => console.debug(`Ver más sobre ${slide.id}`)}
-                className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300">
+                <button
+                  onClick={() => {setSelectedNew(slide); setShowModalDetail(true);}}
+                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300"
+                >
                   Ver más ...
                 </button>
               </div>
@@ -155,6 +161,16 @@ export const Carousel: FC<Props> = ({ news }) => {
           ))}
         </div>
       </div>
+      {/* Detail New Modal */}
+
+      {selectedNew && selectedNew.id && (
+        <ModalGeneric
+          isVisible={showModalDetail}
+          setIsVisible={setShowModalDetail}
+          title={""}
+          children={<NewDetail uuid={selectedNew.id} />}
+        />
+      )}
     </section>
   );
 };

@@ -6,14 +6,12 @@ import { AiFillHdd } from "react-icons/ai";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { useState } from "react";
 import { AddNewForm } from "../../components/shared/forms/AddNewForm";
-import { NewDetail } from "./NewDetail";
 import { useNewsStore } from "../../stores/news/news.store";
 
 export const NewsPage = () => {
   const user = useAuthStore((state) => state.user);
   const isAdmin = user && user.role === "admin";
   const [showModalAdd, setShowModalAdd] = useState(false);
-  const [showModalDetail, setShowModalDetail] = useState(false);
   const news = useNewsStore((state) => state.news);
   console.debug('NEWS',news);
 
@@ -47,13 +45,7 @@ export const NewsPage = () => {
         title={"Agregar Nueva Noticia"}
         children={<AddNewForm />}
       />
-      {/* Detail New Modal */}
-      <ModalGeneric
-        isVisible={showModalDetail}
-        setIsVisible={setShowModalDetail}
-        title={""}
-        children={<NewDetail uuid="" />}
-      />
+
     </div>
   );
 };
