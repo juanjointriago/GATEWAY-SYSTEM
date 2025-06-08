@@ -16,8 +16,8 @@ export const DashboardLayout: FC = () => {
   if (authStatus === 'unauthorized') {
     return <Navigate to="/auth/signin" />
   }
-  {console.debug('PhotoURL:', user?.photoUrl)}
-  console.debug('',{user})
+  // {console.debug('PhotoURL:', user?.photoUrl)}
+  // console.debug('',{user})
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
       {/* Header con información del usuario */}

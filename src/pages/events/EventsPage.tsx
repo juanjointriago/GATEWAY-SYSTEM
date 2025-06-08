@@ -121,7 +121,7 @@ export const EventsPage = () => {
         accessorKey: "meetLink",
         id: "meetLink",
         cell: (info) => {
-          console.debug('meetLink =>',info.row.original);
+          // console.debug('meetLink =>',info.row.original);
           return (
           <>
             {info.getValue() ? (
@@ -335,7 +335,7 @@ export const EventsPage = () => {
   const sortedEvents = events.filter(event => event.isActive).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
-  console.debug('events', events.length)
+  // console.debug('events', events.length)
   return (
     <div className="pt-5">
       <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">

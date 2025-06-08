@@ -20,8 +20,8 @@ import { LanddingLayout } from "../layouts/LanddingLayout";
 import { Policies } from "../pages/auth/Policies";
 import { FeesPage } from "../pages/fees/FeesPage";
 import { ProgressSheetPage } from "../pages/progress-sheet/ProgressSheetPage";
-import { PrograssSheetMain } from "../pages/progress-sheet/PrograssSheetMain";
 import { NewsPage } from "../pages/news/NewsPage";
+import { ProgressSheetMain } from "../pages/progress-sheet/PrograssSheetMain";
 
 export const router = createBrowserRouter([
   {
@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "student-progress", 
-            element: <PrograssSheetMain /> 
+            element: <ProgressSheetMain /> 
           },
           {
             path: "users",

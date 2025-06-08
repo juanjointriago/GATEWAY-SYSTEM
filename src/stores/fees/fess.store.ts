@@ -20,7 +20,7 @@ const storeAPI: StateCreator<FeesStore,
         try {
             const fees = await FeesService.getFees();
             set({ fees: [...fees] })
-            console.debug('ALL FEES FOUNDED ===>', { fees })
+            // console.debug('ALL FEES FOUNDED ===>', { fees })
         } catch (error) {
             console.warn(error)
         }

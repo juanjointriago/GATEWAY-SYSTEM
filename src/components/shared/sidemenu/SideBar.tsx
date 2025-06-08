@@ -1,16 +1,40 @@
 import { FC, useState, useEffect } from "react";
 import { SideMenuItem } from "./SideMenuItem";
-import { useAuthStore } from "../../../stores";
+import { useAuthStore, useLevelStore, useSubLevelStore, useUnitStore, useUserStore } from "../../../stores";
 import { menuItemsByRole } from "./menu";
 import { IoIosArrowBack } from "react-icons/io";
 import { BiLogOut } from "react-icons/bi";
 import { RiMenu4Line } from "react-icons/ri";
+import { useEventStore } from "../../../stores/events/event.store";
+import { useFeesStore } from "../../../stores/fees/fess.store";
+import { useNewsStore } from "../../../stores/news/news.store";
 
 export const SideBar: FC = () => {
     const [isOpen, setIsOpen] = useState(false); // Cambiado a false por defecto
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const user = useAuthStore(state => state.user);
     const logout = useAuthStore(state => state.logoutUser);
+
+    const getAllEvents = useEventStore(state => state.getAllEvents);
+    const getAllUsers = useUserStore(state => state.getAllUsers);
+    const getAllLevels = useLevelStore(state => state.getAndSetLevels);
+    const getAllSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
+    const getAllUnits = useUnitStore(state => state.getAndSetUnits);
+    const getAllFees = useFeesStore(state => state.getAndSetFees);
+    const getAllNews = useNewsStore(state => state.getAndSetNews);
+    
+
+    useEffect(() => {
+      getAllEvents();
+      getAllUsers();
+      getAllLevels();
+      getAllSubLevels();
+      getAllUnits();
+      getAllFees();
+      getAllNews();
+    }, [getAllEvents, getAllUsers, getAllLevels, getAllSubLevels, getAllUnits, getAllFees, getAllNews])
+    
+
 
     useEffect(() => {
         const handleResize = () => {
