@@ -10,7 +10,7 @@ export const ProgressSheetMain: FC = () => {
   const users  = useUserStore(state=>state.users);
 
   // Si el usuario es estudiante, mostrar su progress sheet
-  if (user?.role === 'student' && user.id) {
+  if (user?.role === 'student' && user.uid) {
     console.debug('Mostrando Progress Sheet para el estudiante:', user.uid);
     return <StudentProgressSheet studentID={user.uid} />;
   }

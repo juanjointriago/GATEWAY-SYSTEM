@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { useProgressSheetStore } from '../../stores/progress-sheet/progresssheet.store';
 import { useUserStore } from '../../stores';
 import { useEventStore } from '../../stores/events/event.store';
+import { NoGradesMessage } from './NoGradesMessage';
   
   // Definimos los estilos
   const styles = StyleSheet.create({
@@ -96,7 +97,7 @@ export const StudentProgressSheet:FC<Props> = ({ studentID }) => {
   const getEventById =  useEventStore(state => state.getEventById);
   if(!student) {
     Swal.fire(" Error", "No se encontró un estudiante con ese UID", "error");
-    return;
+    return <NoGradesMessage/>;
   }
   const progressClasses = getProgressSheetByStudentId(studentID);
   if( (progressClasses?.progressClasses.length === 0) || !progressClasses) {
