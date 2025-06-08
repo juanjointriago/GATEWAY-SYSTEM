@@ -44,7 +44,27 @@ export default {
       transitionProperty: {
         'width': 'width',
         'spacing': 'margin, padding',
-      }
+        'all': 'all',
+      },
+      zIndex: {
+        '999': '999',
+        '40': '40',
+        '50': '50',
+        '60': '60',
+        '56': '56',
+        '57': '57',
+      },
+      scale: {
+        '110': '1.1'
+      },
+      colors: {
+        indigo: {
+          600: '#4F46E5',
+        },
+      },
+      spacing: {
+        '16': '4rem',
+      },
     },
   },
   plugins: [

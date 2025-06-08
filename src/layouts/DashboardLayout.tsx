@@ -1,10 +1,9 @@
 import { FC } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { Loading } from "../components/shared/ui/Loading";
-
 import { useAuthStore } from "../stores/auth/auth.store";
-import { SideMenu } from "../components";
-// import { SideBar } from "../components/shared/sidemenu/SideBar";
+import { SideBar } from "../components/shared/sidemenu/SideBar";
+
 export const DashboardLayout: FC = () => {
   const authStatus = useAuthStore(state => state.status);
   const checkAuthStatus = useAuthStore(state => state.checkAuthStatus);
@@ -17,16 +16,30 @@ export const DashboardLayout: FC = () => {
     return <Navigate to="/auth/signin" />
   }
 
-  // console.debug(JSON.stringify(authStatus))
   return (
-    <div className="overflow-x-auto bg-slate-200 overflow-y-scroll w-screen h-screen text-slate-900 selection:bg-blue-900 selection:text-white">
-      <div className="flex flex-row relative w-screen">
-        <SideMenu />
-        {/* <SideBar /> */}
-        <div className="w-full">
-          <Outlet />
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
+      {/* Header fijo */}
+      <header className="h-16 bg-indigo-600 shadow-lg z-40">
+        <div className="flex items-center justify-between h-full px-4">
+          {/* Logo o título */}
+          <h1 className="text-xl font-semibold text-white">Gateway System</h1>
         </div>
+      </header>
+
+      {/* Contenedor principal */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <SideBar />
+
+        {/* Contenido principal con scroll */}
+        <main className="flex-1 overflow-auto bg-gray-50">
+          <div className="container mx-auto p-4">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <Outlet />
+            </div>
+          </div>
+        </main>
       </div>
     </div>
-  )
-}
+  );
+};

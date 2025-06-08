@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { FC } from "react";
 import { IconType } from "react-icons";
-import { IoChevronDown, IoChevronForward } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
-import { useSubLevelStore } from "../../../stores";
 
 interface Props {
   href: string;
@@ -12,49 +10,39 @@ interface Props {
   expanded?: boolean;
 }
 
-export const SideMenuItem = ({
+export const SideMenuItem: FC<Props> = ({
   href,
   Icon,
   title,
-  subTitle,
   expanded = false,
-}: Props) => {
-  const [hasOpen, setHasOpen] = useState(false);
-  const units = useSubLevelStore((state) => state.subLevels);
-
+}) => {
   return (
-    <NavLink key={href} to={href} end>
-      <div>
-        <Icon />
+    <NavLink
+      to={href}
+      className={({ isActive }) => `
+        flex ${expanded ? 'flex-row items-center gap-4' : 'flex-col items-center gap-1'} 
+        ${expanded ? 'px-4' : 'px-2'} py-3 rounded-lg
+        transition-all duration-200 group
+        ${isActive
+          ? "bg-indigo-800 text-white"
+          : "text-gray-300 hover:bg-indigo-800/50 hover:text-white"
+        }
+      `}
+    >
+      <div className={`
+        flex items-center justify-center
+        ${expanded ? 'min-w-[24px]' : ''}
+      `}>
+        <Icon size={20} />
       </div>
-      <div className="flex flex-col" onClick={() => setHasOpen(!hasOpen)}>
-        <span className="text-lg font-bold leading-5 text-white">{title}</span>
-        <div className="flex flex-row justify-between">
-          <span className="text-sm text-white/50 hidden md:block">
-            {subTitle}
-          </span>
-          {expanded && (
-            <div className="pl-5">
-              {hasOpen ? <IoChevronDown /> : <IoChevronForward />}
-              <div className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                {hasOpen && (
-                  <ul id="dropdown-example" className=" py-2 space-y-2">
-                    {hasOpen &&
-                      units.map((item) => (
-                        <li
-                          className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                          key={item.id}
-                        >
-                          {item.name}
-                        </li>
-                      ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <span className={`
+        ${expanded ? 'text-sm' : 'text-[10px]'} 
+        ${expanded ? '' : 'text-center'} 
+        leading-tight transition-all duration-300
+        ${(!expanded) ? 'opacity-0 h-0' : 'opacity-100 h-auto'}
+      `}>
+        {title}
+      </span>
     </NavLink>
   );
 };
