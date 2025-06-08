@@ -26,7 +26,7 @@ export const SideBar: FC = () => {
             {isMobile && !isOpen && (
                 <button 
                     onClick={() => setIsOpen(true)}
-                    className="fixed top-4 right-4 z-[57] p-2.5 
+                    className="fixed top-2 left-0 z-[57] p-2.5 
                         bg-indigo-600 text-white rounded-lg 
                         hover:bg-indigo-700 transition-colors
                         lg:hidden"
@@ -64,7 +64,7 @@ export const SideBar: FC = () => {
                             transition-all duration-300
                             ${(!isOpen && !isMobile) ? 'opacity-0 w-0' : 'opacity-100 w-auto'}
                         `}>
-                            Gatway <span className="text-blue-600 font-semibold">Corporation</span>
+                            Gatway <span className="text-blue-600 font-semibold">System</span>
                         </h4>
                         
                         {/* Botón cerrar para móvil */}
