@@ -22,3 +22,101 @@ button {
 input:not(.swal2-input)[type=text],input:not(.swal2-input)[type=password], input:not(.swal2-input)[type=email], input:not(.swal2-input)[type=number], input:not(.swal2-input)[type=date], input:not(.swal2-input)[type=time]  {
   @apply w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500;
 }
+
+.pdf-container {
+  width: 100%;
+  height: 100vh;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.pdf-viewer {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: white;
+  overflow: hidden;
+}
+
+.pdf-content {
+  width: 210mm;
+  background: white;
+  padding: 20mm;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+}
+
+.pdf-document {
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Ajustes específicos para móvil */
+@media screen and (max-width: 480px) {
+  .pdf-container {
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .pdf-content {
+    position: relative;
+    margin-top: 1rem;
+  }
+  
+  .pdf-document {
+    margin: 0 !important;
+    padding: 8mm !important;
+    font-size: 14px !important;
+  }
+  
+  /* Ajustar tamaños de texto en móvil */
+  .pdf-document h1 {
+    font-size: 1.5em !important;
+  }
+  
+  .pdf-document input,
+  .pdf-document p {
+    font-size: 0.9em !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .pdf-container {
+    height: calc(100vh - 80px);
+    padding-top: 1rem;
+  }
+}
+
+/* Ajustes para impresión */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .print-container {
+    zoom: 1;
+  }
+
+  .pdf-container {
+    height: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .pdf-content {
+    transform: none !important;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Prevenir scroll horizontal y comportamientos indeseados */
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
