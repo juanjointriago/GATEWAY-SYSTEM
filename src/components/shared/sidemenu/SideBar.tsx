@@ -8,6 +8,7 @@ import { RiMenu4Line } from "react-icons/ri";
 import { useEventStore } from "../../../stores/events/event.store";
 import { useFeesStore } from "../../../stores/fees/fess.store";
 import { useNewsStore } from "../../../stores/news/news.store";
+import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
 
 export const SideBar: FC = () => {
     const [isOpen, setIsOpen] = useState(false); // Cambiado a false por defecto
@@ -22,6 +23,7 @@ export const SideBar: FC = () => {
     const getAllUnits = useUnitStore(state => state.getAndSetUnits);
     const getAllFees = useFeesStore(state => state.getAndSetFees);
     const getAllNews = useNewsStore(state => state.getAndSetNews);
+    const getAllProgressSheet = useProgressSheetStore(state => state.getAndSetProgressSheets);
     
 
     useEffect(() => {
@@ -32,7 +34,8 @@ export const SideBar: FC = () => {
       getAllUnits();
       getAllFees();
       getAllNews();
-    }, [getAllEvents, getAllUsers, getAllLevels, getAllSubLevels, getAllUnits, getAllFees, getAllNews])
+      getAllProgressSheet();
+    }, [getAllEvents, getAllUsers, getAllLevels, getAllSubLevels, getAllUnits, getAllFees, getAllNews, getAllProgressSheet])
     
 
 
