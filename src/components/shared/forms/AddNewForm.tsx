@@ -85,7 +85,7 @@ export const AddNewForm = () => {
 
   return (
     <div>
-      <div className="flex ">
+      <div className="flex">
         <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
           <div className="flex flex-wrap mx-3 mb-6">
             <div className="w-full md:w-1/1 px-3 mb-6 md:mb-2">
@@ -135,7 +135,7 @@ export const AddNewForm = () => {
             <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="supportMaterial"
+                htmlFor="imageUrl"
               >
                 Imagen de Noticia *
               </label>
@@ -195,7 +195,7 @@ export const AddNewForm = () => {
             <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="name"
+                htmlFor="isActive"
               >
                 Visible? *
               </label>
