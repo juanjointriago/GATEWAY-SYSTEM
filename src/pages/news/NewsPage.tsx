@@ -20,7 +20,7 @@ export const NewsPage = () => {
   const [showModalAll, setShowModalAll] = useState(false);
   const news = useNewsStore((state) => state.news);
   const updateNews = useNewsStore((state) => state.updateNews);
-  console.debug("NEWS", news);
+  // console.debug("NEWS", news);
   const columns = useMemo<ColumnDef<INew>[]>(
       
       () => {
