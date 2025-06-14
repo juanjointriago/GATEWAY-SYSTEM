@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "../../Expo/gateway-academic/src/interfaces/news.interface.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

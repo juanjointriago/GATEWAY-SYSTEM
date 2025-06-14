@@ -31,6 +31,22 @@ input:not(.swal2-input)[type=text],input:not(.swal2-input)[type=password], input
   position: relative;
 }
 
+/* Ajustes específicos para iPhone 12 Pro y similares */
+@media screen and (max-width: 390px) {
+  .pdf-container {
+    height: 85vh;
+    padding-top: 0.5rem;
+  }
+}
+
+/* Ajustes para tablets */
+@media screen and (min-width: 391px) and (max-width: 768px) {
+  .pdf-container {
+    height: 90vh;
+    padding-top: 1rem;
+  }
+}
+
 .pdf-viewer {
   width: 100%;
   min-height: 100vh;
@@ -119,4 +135,88 @@ input:not(.swal2-input)[type=text],input:not(.swal2-input)[type=password], input
 body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Prevenir comportamientos indeseados en móvil */
+@media screen and (max-width: 390px) {
+  body {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Asegurar que el PDFViewer sea visible */
+  iframe {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh !important;
+  }
+}
+
+.pdf-viewer-container {
+  width: 100%;
+  min-height: 100vh;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.pdf-viewer-wrapper {
+  width: 100%;
+  height: 100vh;
+  background: white;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilos responsivos usando clamp para valores dinámicos */
+@media screen {
+  .pdf-viewer-wrapper {
+    height: clamp(85vh, 90vh, 100vh);
+    padding-top: clamp(0.5rem, 1vh, 1rem);
+  }
+}
+
+/* Móviles pequeños */
+@media screen and (max-width: 390px) {
+  .pdf-viewer-container {
+    height: 85vh;
+  }
+}
+
+/* Tablets */
+@media screen and (min-width: 391px) and (max-width: 768px) {
+  .pdf-viewer-container {
+    height: 90vh;
+  }
+}
+
+/* Surface Pro 7 y similares */
+@media screen and (min-width: 769px) and (max-width: 912px) {
+  .pdf-viewer-container {
+    height: 90vh;
+  }
+}
+
+/* Controles de overflow por dispositivo */
+@media screen and (max-width: 912px) {
+  body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .pdf-viewer-container {
+    padding-top: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+/* Ajustes para impresión */
+@media print {
+  .pdf-viewer-wrapper {
+    height: 100%;
+    padding: 0;
+  }
 }

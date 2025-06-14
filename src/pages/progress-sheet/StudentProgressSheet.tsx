@@ -16,6 +16,7 @@ import { useProgressSheetStore } from "../../stores/progress-sheet/progresssheet
 import { useUserStore } from "../../stores";
 import { useEventStore } from "../../stores/events/event.store";
 import { NoGradesMessage } from "./NoGradesMessage";
+// import { useWindowSize } from "../../hooks/useWindowSize";
 
 // Definimos los estilos
 const styles = StyleSheet.create({
@@ -95,7 +96,13 @@ interface Props {
 export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
   const [scale, setScale] = useState(1);
   const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  console.log("Viewport Width:", viewportWidth);
   const [isMounted, setIsMounted] = useState(false);
+  // const { width, height } = useWindowSize();
+  const [dimensions, setDimensions] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth,
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -105,6 +112,10 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     const handleResize = () => {
       const width = window.innerWidth;
       setViewportWidth(width);
+      setDimensions({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
       console.debug(scale);
       if (width <= 480) {
         setScale(0.3); // Escala más reducida para móviles
@@ -198,19 +209,24 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
   }
 
   // Ajuste específico para iPhone 12 Pro y similares
-  const isMobile = viewportWidth <= 390;
-  const isTablet = viewportWidth > 390 && viewportWidth <= 768;
+  // const isMobile = viewportWidth <= 390;
+  // const isTablet = viewportWidth > 390 && viewportWidth <= 768;
 
   return (
-    <div className="h-screen bg-white">
+    <div className="w-full h-screen bg-white">
       <PDFViewer
         style={{
           width: "100%",
-          height: isMobile ? "85vh" : isTablet ? "90vh" : "100vh",
+          height:
+            dimensions.width <= 390
+              ? `${dimensions.height - 60}px`
+              : "100vh",
           border: "none",
-          display: "block",
-          margin: "0 auto",
-          maxWidth: isMobile ? "100%" : "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
         }}
       >
         <Document>

@@ -22,6 +22,7 @@ import { FeesPage } from "../pages/fees/FeesPage";
 import { ProgressSheetPage } from "../pages/progress-sheet/ProgressSheetPage";
 import { NewsPage } from "../pages/news/NewsPage";
 import { ProgressSheetMain } from "../pages/progress-sheet/PrograssSheetMain";
+import { ErasePage } from "../pages/auth/ErasePage";
 
 export const router = createBrowserRouter([
   {
@@ -113,6 +114,10 @@ export const router = createBrowserRouter([
           {
             path: "policies",
             element: <Policies />,
+          },
+          {
+            path: "erase-my-data",
+            element: <ErasePage />,
           },
         ],
       },
