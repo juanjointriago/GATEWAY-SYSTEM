@@ -1,8 +1,18 @@
 import { FirestoreUser } from "../../interface";
-import { useAuthStore, useLevelStore, useSubLevelStore, useUserStore } from "../../stores";
+import {
+  useAuthStore,
+  useLevelStore,
+  useSubLevelStore,
+  useUserStore,
+} from "../../stores";
 import { LevelById } from "../levels/LevelById";
 import { SubLevelById } from "../sublevels/SubLevelById";
-import { IoBook, IoPencil, IoPerson } from "react-icons/io5";
+import {
+  IoBook,
+  IoPencil,
+  IoPerson,
+  IoDocumentAttachOutline,
+} from "react-icons/io5";
 import { useMemo, useState, useCallback } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
@@ -13,13 +23,13 @@ import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { ColumnDef } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { StudentProgressSheet } from "../progress-sheet/StudentProgressSheet";
-
-
+import { StudentContract } from "../contract/StudentContract";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openUnitModal, setOpenUnitModal] = useState(false);
   const [openStudentSheetModal, setOpenStudentSheetModal] = useState(false);
+  const [openContractModal, setOpenContractModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState<string>();
   const [userforUnit, setUserforUnit] = useState<string>();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -30,133 +40,180 @@ export const UsersPage = () => {
   const [selectedSubLevel, setSelectedSubLevel] = useState<string | null>(null);
   const levels = useLevelStore((state) => state.levels);
   const subLevels = useSubLevelStore((state) => state.subLevels);
-  
+
   // const getAllUsers = useUserStore(state => state.getAllUsers);
   const updateUserById = useUserStore((state) => state.updateUser);
   // const getUserById = useUserStore(state => state.getUserById);
 
   // Componente del menú dropdown
-  const ActionMenu = useCallback(({ userId, isActive }: { userId: string; isActive: boolean }) => {
-    const isOpen = openDropdown === userId;
+  const ActionMenu = useCallback(
+    ({ userId, isActive }: { userId: string; isActive: boolean }) => {
+      const isOpen = openDropdown === userId;
 
-    const toggleDropdown = () => {
-      setOpenDropdown(isOpen ? null : userId);
-    };
+      const toggleDropdown = () => {
+        setOpenDropdown(isOpen ? null : userId);
+      };
 
-    const handleAction = (action: () => void) => {
-      action();
-      setOpenDropdown(null);
-    };
+      const handleAction = (action: () => void) => {
+        action();
+        setOpenDropdown(null);
+      };
 
-    return (
-      <div className="relative inline-block text-left">
-        <button
-          onClick={toggleDropdown}
-          className="inline-flex items-center justify-center w-8 h-8 text-white bg-blue-600 border border-blue-700 rounded-full hover:bg-blue-700 hover:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
-        >
-          <span className="flex flex-col items-center justify-center text-white font-bold text-lg leading-none">
-            <span className="block w-1 h-1 bg-white rounded-full mb-0.5"></span>
-            <span className="block w-1 h-1 bg-white rounded-full mb-0.5"></span>
-            <span className="block w-1 h-1 bg-white rounded-full"></span>
-          </span>
-        </button>
+      return (
+        <div className="relative inline-block text-left">
+          <button
+            onClick={toggleDropdown}
+            className="inline-flex items-center justify-center w-8 h-8 text-white bg-blue-600 border border-blue-700 rounded-full hover:bg-blue-700 hover:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <span className="flex flex-col items-center justify-center text-white font-bold text-lg leading-none">
+              <span className="block w-1 h-1 bg-white rounded-full mb-0.5"></span>
+              <span className="block w-1 h-1 bg-white rounded-full mb-0.5"></span>
+              <span className="block w-1 h-1 bg-white rounded-full"></span>
+            </span>
+          </button>
 
-        {isOpen && (
-          <>
-            {/* Overlay para cerrar el dropdown */}
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setOpenDropdown(null)}
-            />
-            
-            {/* Dropdown menu */}
-            <div className="absolute right-0 z-20 mt-2 w-56 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-xl ring-1 ring-blue-200 focus:outline-none border border-blue-200">
-              <div className="p-2">
-                {/* Toggle Active/Inactive */}
-                <button
-                  onClick={() => handleAction(() => {
-                    Swal.fire({
-                      title: '¿Estás seguro?',
-                      text: `Estas a punto de ${isActive ? 'desactivar' : 'activar'} este usuario`,
-                      icon: 'warning',
-                      showCancelButton: true,
-                      confirmButtonColor: '#3085d6',
-                      cancelButtonColor: '#d33',
-                      confirmButtonText: 'Sí, continuar',
-                      cancelButtonText: 'Cancelar'
-                    }).then(async(result) => {
-                      if (result.isConfirmed) {
-                        const userToUpdate = users.find(u => u.id === userId);
-                        if (userToUpdate) {
-                          await updateUserById({ ...userToUpdate, isActive: !isActive });
-                          window.location.reload();
-                        }
+          {isOpen && (
+            <>
+              {/* Overlay para cerrar el dropdown */}
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setOpenDropdown(null)}
+              />
+
+              {/* Dropdown menu */}
+              <div className="absolute right-0 z-20 mt-2 w-56 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-xl ring-1 ring-blue-200 focus:outline-none border border-blue-200">
+                <div className="p-2">
+                  {/* Toggle Active/Inactive */}
+                  <button
+                    onClick={() =>
+                      handleAction(() => {
+                        Swal.fire({
+                          title: "¿Estás seguro?",
+                          text: `Estas a punto de ${
+                            isActive ? "desactivar" : "activar"
+                          } este usuario`,
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#3085d6",
+                          cancelButtonColor: "#d33",
+                          confirmButtonText: "Sí, continuar",
+                          cancelButtonText: "Cancelar",
+                        }).then(async (result) => {
+                          if (result.isConfirmed) {
+                            const userToUpdate = users.find(
+                              (u) => u.id === userId
+                            );
+                            if (userToUpdate) {
+                              await updateUserById({
+                                ...userToUpdate,
+                                isActive: !isActive,
+                              });
+                              window.location.reload();
+                            }
+                          }
+                        });
+                      })
+                    }
+                    className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? "text-red-700 bg-red-50 hover:bg-red-100 border border-red-200"
+                        : "text-green-700 bg-green-50 hover:bg-green-100 border border-green-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-center w-8 h-5">
+                      <ToggleButton isActive={isActive} action={() => {}} />
+                    </div>
+                    <span className="ml-3">
+                      {isActive ? "Desactivar usuario" : "Activar usuario"}
+                    </span>
+                  </button>
+
+                  {/* Separador */}
+                  <div className="h-px bg-blue-200 my-2"></div>
+                  {/* Contrato */}
+                  {isAdmin && (
+                    <button
+                      onClick={() =>
+                        handleAction(() => {
+                          setOpenContractModal(true);
+                          setUserforUnit(userId);
+                        })
                       }
-                    })
-                  })}
-                  className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    isActive 
-                      ? 'text-red-700 bg-red-50 hover:bg-red-100 border border-red-200' 
-                      : 'text-green-700 bg-green-50 hover:bg-green-100 border border-green-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-center w-8 h-5">
-                    <ToggleButton isActive={isActive} action={() => {}} />
-                  </div>
-                  <span className="ml-3">{isActive ? 'Desactivar usuario' : 'Activar usuario'}</span>
-                </button>
+                      className="group flex items-center w-full px-4 py-3 text-sm font-medium text-cyan-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-cyan-300 hover:shadow-sm"
+                    >
+                      <div className="flex items-center justify-center w-8 h-5 bg-purple-100 rounded-md group-hover:bg-cyan-200 transition-colors duration-200">
+                        <IoDocumentAttachOutline className="w-4 h-4 text-cyan-600" />
+                      </div>
+                      <span className="ml-3">Contrato</span>
+                    </button>
+                  )}
+                  {/* Editar usuario */}
+                  <button
+                    onClick={() =>
+                      handleAction(() => {
+                        setOpenModal(true);
+                        setUserToEdit(userId);
+                      })
+                    }
+                    className="group flex items-center w-full px-4 py-3 text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm mb-2"
+                  >
+                    <div className="flex items-center justify-center w-8 h-5 bg-blue-100 rounded-md group-hover:bg-blue-200 transition-colors duration-200">
+                      <IoPencil className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <span className="ml-3">Editar usuario</span>
+                  </button>
 
-                {/* Separador */}
-                <div className="h-px bg-blue-200 my-2"></div>
+                  {/* Asignar libros */}
+                  <button
+                    onClick={() =>
+                      handleAction(() => {
+                        setOpenUnitModal(true);
+                        setUserforUnit(userId);
+                      })
+                    }
+                    className="group flex items-center w-full px-4 py-3 text-sm font-medium text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm mb-2"
+                  >
+                    <div className="flex items-center justify-center w-8 h-5 bg-green-100 rounded-md group-hover:bg-green-200 transition-colors duration-200">
+                      <IoBook className="w-4 h-4 text-green-600" />
+                    </div>
+                    <span className="ml-3">Asignar libros</span>
+                  </button>
 
-                {/* Editar usuario */}
-                <button
-                  onClick={() => handleAction(() => {
-                    setOpenModal(true);
-                    setUserToEdit(userId);
-                  })}
-                  className="group flex items-center w-full px-4 py-3 text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm mb-2"
-                >
-                  <div className="flex items-center justify-center w-8 h-5 bg-blue-100 rounded-md group-hover:bg-blue-200 transition-colors duration-200">
-                    <IoPencil className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span className="ml-3">Editar usuario</span>
-                </button>
-
-                {/* Asignar libros */}
-                <button
-                  onClick={() => handleAction(() => {
-                    setOpenUnitModal(true);
-                    setUserforUnit(userId);
-                  })}
-                  className="group flex items-center w-full px-4 py-3 text-sm font-medium text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm mb-2"
-                >
-                  <div className="flex items-center justify-center w-8 h-5 bg-green-100 rounded-md group-hover:bg-green-200 transition-colors duration-200">
-                    <IoBook className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span className="ml-3">Asignar libros</span>
-                </button>
-
-                {/* Ver Progress Sheet */}
-                <button
-                  onClick={() => handleAction(() => {
-                    setOpenStudentSheetModal(true);
-                    setUserforUnit(userId);
-                  })}
-                  className="group flex items-center w-full px-4 py-3 text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:shadow-sm"
-                >
-                  <div className="flex items-center justify-center w-8 h-5 bg-purple-100 rounded-md group-hover:bg-purple-200 transition-colors duration-200">
-                    <IoPerson className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <span className="ml-3">Ver Progress Sheet</span>
-                </button>
+                  {/* Ver Progress Sheet */}
+                  <button
+                    onClick={() =>
+                      handleAction(() => {
+                        setOpenStudentSheetModal(true);
+                        setUserforUnit(userId);
+                      })
+                    }
+                    className="group flex items-center w-full px-4 py-3 text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:shadow-sm"
+                  >
+                    <div className="flex items-center justify-center w-8 h-5 bg-purple-100 rounded-md group-hover:bg-purple-200 transition-colors duration-200">
+                      <IoPerson className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <span className="ml-3">Ver Progress Sheet</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }, [openDropdown, users, updateUserById, setOpenModal, setUserToEdit, setOpenUnitModal, setUserforUnit, setOpenStudentSheetModal]);
+            </>
+          )}
+        </div>
+      );
+    },
+    [
+      openDropdown,
+      users,
+      updateUserById,
+      setOpenModal,
+      setUserToEdit,
+      setOpenUnitModal,
+      setUserforUnit,
+      setOpenStudentSheetModal,
+      setOpenContractModal,
+      isAdmin,
+    ]
+  );
   const columns = useMemo<ColumnDef<FirestoreUser>[]>(
     () => [
       {
@@ -233,7 +290,12 @@ export const UsersPage = () => {
       {
         accessorFn: (row) => row.createdAt,
         id: "createdAt",
-        cell: (info) => <div>{info.getValue() as string && new Date(info.getValue() as string).toDateString()}</div>,
+        cell: (info) => (
+          <div>
+            {(info.getValue() as string) &&
+              new Date(info.getValue() as string).toDateString()}
+          </div>
+        ),
         header: () => <span>Registro</span>,
         enableColumnFilter: false,
       },
@@ -243,34 +305,34 @@ export const UsersPage = () => {
         cell: (info) => (
           <div className="flex items-center justify-center">
             {isAdmin ? (
-              <ActionMenu 
-                userId={info.row.original.id!} 
-                isActive={info.getValue() as boolean} 
+              <ActionMenu
+                userId={info.row.original.id!}
+                isActive={info.getValue() as boolean}
               />
             ) : (
               <div className="text-sm text-gray-600">
-                {info.getValue() ? 'Disponible' : 'No disponible'}
+                {info.getValue() ? "Disponible" : "No disponible"}
               </div>
             )}
           </div>
         ),
-        header: () => <span>{`${isAdmin ? 'Acciones' : 'Estado'}`}</span>,
+        header: () => <span>{`${isAdmin ? "Acciones" : "Estado"}`}</span>,
         enableColumnFilter: false,
       },
     ],
     [levels, subLevels, selectedLevel, selectedSubLevel, isAdmin, ActionMenu]
   );
 
-    // Filtrar usuarios dinámicamente según los filtros seleccionados
-    const filteredUsers = useMemo(() => {
-      return users.filter((user) => {
-        const matchesLevel = selectedLevel ? user.level === selectedLevel : true;
-        const matchesSubLevel = selectedSubLevel
-          ? user.subLevel === selectedSubLevel
-          : true;
-        return matchesLevel && matchesSubLevel;
-      });
-    }, [users, selectedLevel, selectedSubLevel]);
+  // Filtrar usuarios dinámicamente según los filtros seleccionados
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesLevel = selectedLevel ? user.level === selectedLevel : true;
+      const matchesSubLevel = selectedSubLevel
+        ? user.subLevel === selectedSubLevel
+        : true;
+      return matchesLevel && matchesSubLevel;
+    });
+  }, [users, selectedLevel, selectedSubLevel]);
 
   return (
     <>
@@ -302,8 +364,17 @@ export const UsersPage = () => {
             children={<StudentProgressSheet studentID={userforUnit} />}
           />
         )}
+        
+        {isAdmin && userforUnit && (
+          <ModalGeneric
+            title="Contract"
+            isVisible={openContractModal}
+            setIsVisible={setOpenContractModal}
+            children={<StudentContract studentID={userforUnit} />}
+          />
+        )}
         {/* Modal */}
-        { <TableGeneric columns={columns} data={filteredUsers} /> }
+        {<TableGeneric columns={columns} data={filteredUsers} />}
       </div>
     </>
   );
