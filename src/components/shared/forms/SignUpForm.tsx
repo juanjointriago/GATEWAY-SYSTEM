@@ -271,186 +271,239 @@ export const SignUpForm = () => {
   });
 
   return (
-    <>
-      <h1 className="text-2xl font-semibold mb-4">Registro de Nuevo Usuario</h1>
+    <div className="w-full max-w-4xl mx-auto p-3 sm:p-6 bg-white rounded-lg sm:rounded-xl shadow-lg overflow-y-auto max-h-[calc(100vh-2rem)] sm:max-h-none">
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Registro de Nuevo Usuario</h1>
       {!isLoading ? (
-        <form className="w-full max-w-lg" onSubmit={onSubmit}>
+        <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6" onSubmit={onSubmit}>
           {/** Name */}
-          <div className="mb-4">
-            <label className="block text-gray-600">Nombre</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
             <input
               {...register("name", { required: "El nombre es obligatorio 👀" })}
               type="text"
               id="name"
               placeholder="Ej. Juan Pérez"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
             />
             {errors.name && (
-              <p className="text-red-500 text-xs italic">
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
                 {errors.name.message}
               </p>
             )}
           </div>
-          <div className="flex flex-row">
-            {/** CC */}
-            <div className="mb-4 ">
-              <label className="block text-gray-600">CC:</label>
-              <input
-                {...register("cc", {
-                  required: "El nro de cc es obligatorio 👀",
-                  pattern: {
-                    value: /^[0-9]*$/,
-                    message: "Sólo se permiten números entre 0 y 9 ",
-                  },
-                })}
-                type="text"
-                maxLength={13}
-                placeholder="10123000009 o 10123000009001"
-                id="cc"
-              />
-              {errors.cc && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.cc.message}
-                </p>
-              )}
-            </div>
-            {/** Ciudad*/}
-            <div className="mb-4 ml-2">
-              <label htmlFor="sublevel" className="block text-gray-600">
-                Ciudad
-              </label>
-              <select
-                {...register("city", { required: "Ciudad" })}
-                id="sublevel"
-                defaultValue={""}
-                className="appearance-none block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-              >
-                <option value={""}>Seleccione ciudad</option>
-                {cities.map((city, index) => {
-                  return (
-                    <option key={index} value={city}>
-                      {city}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+
+          {/** CC */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Cédula de Ciudadanía</label>
+            <input
+              {...register("cc", {
+                required: "El nro de cc es obligatorio 👀",
+                pattern: {
+                  value: /^[0-9]*$/,
+                  message: "Sólo se permiten números entre 0 y 9 ",
+                },
+              })}
+              type="text"
+              maxLength={13}
+              placeholder="10123000009"
+              id="cc"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+            />
+            {errors.cc && (
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
+                {errors.cc.message}
+              </p>
+            )}
           </div>
+
           {/** Email */}
-          <div className="mb-4">
-            <label className="block text-gray-600">Email</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               {...register("email", { required: "El email es obligatorio 👀" })}
               type="email"
               id="email"
+              placeholder="ejemplo@correo.com"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs italic">
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
                 {errors.email.message}
               </p>
             )}
           </div>
-          <div className="flex flex-row justify-between">
-            {/** Password*/}
-            <div className="mb-4">
-              <label className="block text-gray-600">Contraseña</label>
-              <input
-                {...register("password", {
-                  required: "La contraseña es obligatoria 👀",
-                  minLength: {
-                    value: 6,
-                    message: "La contraseña debe tener al menos 6 caracteres",
-                  },
-                })}
-                type="password"
-                name="password"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-            {/** Password2*/}
-            <div className="mb-4">
-              <label className="block text-gray-600">Repita Contraseña</label>
-              <input
-                {...register("password2", {
-                  required: "Debe repetir la contraseña  👀",
-                  validate: (value) =>
-                    value === getValues("password") ||
-                    "Las contraseñas no coinciden",
-                })}
-                type="password"
-                id="password2"
-              />
-              {errors.password2 && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.password2.message}
-                </p>
-              )}
-            </div>
-          </div>
 
-          {/** Dirección*/}
-          <div className="mb-4">
-            <label className="block text-gray-600">Dirección</label>
-            <input
-              {...register("address", {
-                required: "La dirección es obligatoria 👀",
+          {/** Ciudad*/}
+          <div className="space-y-1">
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+              Ciudad
+            </label>
+            <select
+              {...register("city", { required: "Ciudad" })}
+              id="city"
+              defaultValue={""}
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base"
+            >
+              <option value={""}>Seleccione ciudad</option>
+              {cities.map((city, index) => {
+                return (
+                  <option key={index} value={city}>
+                    {city}
+                  </option>
+                );
               })}
-              type="text"
-              id="address"
-            />
-            {errors.address && (
-              <p className="text-red-500 text-xs italic">
-                {errors.address.message}
+            </select>
+            {errors.city && (
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
+                La ciudad es obligatoria
               </p>
             )}
           </div>
+
+          {/** Password*/}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input
+              {...register("password", {
+                required: "La contraseña es obligatoria 👀",
+                minLength: {
+                  value: 6,
+                  message: "La contraseña debe tener al menos 6 caracteres",
+                },
+              })}
+              type="password"
+              name="password"
+              placeholder="Mínimo 6 caracteres"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {/** Password2*/}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+            <input
+              {...register("password2", {
+                required: "Debe repetir la contraseña  👀",
+                validate: (value) =>
+                  value === getValues("password") ||
+                  "Las contraseñas no coinciden",
+              })}
+              type="password"
+              id="password2"
+              placeholder="Confirme su contraseña"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+            />
+            {errors.password2 && (
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
+                {errors.password2.message}
+              </p>
+            )}
+          </div>
+
           {/** Telefono*/}
-          <div className="mb-4">
-            <label className="block text-gray-600">Teléfono de contacto</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Teléfono</label>
             <input
               {...register("phone", {
                 required: "El teléfono es obligatorio 👀",
               })}
               type="tel"
               id="phone"
+              placeholder="Ej. 0987654321"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
             />
             {errors.phone && (
-              <p className="text-red-500 text-xs italic">
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
                 {errors.phone.message}
               </p>
             )}
           </div>
 
-          {/** BornDate*/}
-          <div className="mb-4 text-blue-500">
-            <p className="hover:underline">Fecha de cumpleaños 🎂</p>
-            <input type="date" name="bornDate" />
+          {/** Dirección*/}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Dirección</label>
+            <input
+              {...register("address", {
+                required: "La dirección es obligatoria 👀",
+              })}
+              type="text"
+              id="address"
+              placeholder="Ej. Av. Principal 123"
+              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+            />
+            {errors.address && (
+              <p className="text-red-500 text-xs italic flex items-center gap-1">
+                <span>⚠️</span>
+                {errors.address.message}
+              </p>
+            )}
           </div>
 
-          {/** Button*/}
-          <button
-            type="submit"
-            className="text-white w-full  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2"
-          >
-            Registrarme 🤘🏻
-          </button>
-          <button className="mt-5   text-white w-full  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2">
-            <a href="/auth/signin" className="hover:underline">
-              Ya eres estudiante? Continúa por aquí ✅
-            </a>
-          </button>
+          {/** BornDate*/}
+          <div className="space-y-1 lg:col-span-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <span>Fecha de cumpleaños</span>
+              <span>🎂</span>
+            </label>
+            <input 
+              {...register("bornDate")}
+              type="date" 
+              name="bornDate" 
+              className="w-full sm:w-1/2 lg:w-1/3 px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+            />
+          </div>
+
+          {/** Buttons*/}
+          <div className="lg:col-span-2 space-y-3 pt-2 sm:pt-4">
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 sm:py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-base"
+            >
+              <span>Registrarme</span>
+              <span>🤘🏻</span>
+            </button>
+            <div className="text-center">
+              <a 
+                href="/auth/signin" 
+                className="inline-flex items-center justify-center w-full py-3 sm:py-2.5 px-6 border-2 border-blue-500 text-blue-600 font-medium rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out gap-2 text-sm sm:text-base"
+              >
+                <span className="hidden sm:inline">¿Ya eres estudiante? Continúa por aquí</span>
+                <span className="sm:hidden">¿Ya tienes cuenta? Inicia sesión</span>
+                <span>✅</span>
+              </a>
+            </div>
+          </div>
         </form>
       ) : (
-        <div className="bg-red-400 mx-auto flex flex-col">
-          <Loading />
-            <h1 className=" heading text-2xl font-semibold mb-4 text-center">
-              Procesando registro...
-            </h1>
+        <div className="flex flex-col items-center justify-center min-h-[250px] sm:min-h-[300px] bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
+          <div className="bg-white rounded-full p-3 sm:p-4 mb-3 sm:mb-4 shadow-lg">
+            <Loading />
+          </div>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-800 text-center mb-2">
+            Procesando registro...
+          </h1>
+          <p className="text-gray-600 text-center text-sm">
+            Por favor espera mientras creamos tu cuenta
+          </p>
+          <div className="mt-3 flex space-x-1">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 };

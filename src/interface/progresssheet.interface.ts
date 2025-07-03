@@ -24,6 +24,12 @@ export interface progressSheetInterface {
     myPreferredName: string
     otherContacts: string
     progressClasses: progressClassesInterface[];
+    totalFee?: number;//total adeudado
+    totalPaid?: number;// total pagado
+    totalDue?: number;// total pendiente
+    totalDiscount?: number;// total descuento
+    totalBalance?: number;// total saldo
+    quotesQty?: number;// cantidad de cuotas
     studentId: string;
     createdAt?: number
     updatedAt?: number
