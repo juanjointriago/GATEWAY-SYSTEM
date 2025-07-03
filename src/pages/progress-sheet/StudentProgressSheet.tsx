@@ -94,41 +94,10 @@ interface Props {
 }
 
 export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
-  const [scale, setScale] = useState(1);
-  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
-  console.log("Viewport Width:", viewportWidth);
   const [isMounted, setIsMounted] = useState(false);
-  // const { width, height } = useWindowSize();
-  const [dimensions, setDimensions] = useState({
-    height: window.innerHeight,
-    width: window.innerWidth,
-  });
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setViewportWidth(width);
-      setDimensions({
-        height: window.innerHeight,
-        width: window.innerWidth,
-      });
-      console.debug(scale);
-      if (width <= 480) {
-        setScale(0.3); // Escala más reducida para móviles
-      } else if (width <= 768) {
-        setScale(0.55); // Tablets
-      } else {
-        setScale(1); // Desktop
-      }
-    };
-
-    handleResize(); // Ejecutar al montar
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const getUserById = useUserStore((state) => state.getUserById);
@@ -141,18 +110,22 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     Swal.fire(" Error", "No se encontró un estudiante con ese UID", "error");
     return <NoGradesMessage />;
   }
-  const progressClasses = getProgressSheetByStudentId(studentID);
-  if (progressClasses?.progressClasses.length === 0 || !progressClasses) {
+  const progressSheet = getProgressSheetByStudentId(studentID);
+  console.log("STUDENT SCREEN Progress Classes:", progressSheet);
+  if (!progressSheet) {
     Swal.fire(
-      " Error",
+      " Warning",
       "No se encontró un ProgressSheet con ese Estudiante",
-      "error"
+      "info"
     );
+    return <NoGradesMessage message="A este estudiante no se le ha asignado un progressSheet debes actualizar su contrato" />;
+  }
+  if ( progressSheet.progressClasses.length === 0 ) {
     return <NoGradesMessage />;
   }
   const age =
     new Date().getFullYear() - new Date(student.bornDate).getFullYear();
-  const progressEntries: ProgressEntry[] = progressClasses.progressClasses.map(
+  const progressEntries: ProgressEntry[] = progressSheet.progressClasses.map(
     (record) => {
       const event = getEventById(record.eventInfo.value);
       if (!event) return {} as ProgressEntry;
@@ -208,25 +181,14 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     return null;
   }
 
-  // Ajuste específico para iPhone 12 Pro y similares
-  // const isMobile = viewportWidth <= 390;
-  // const isTablet = viewportWidth > 390 && viewportWidth <= 768;
-
+  // Ajuste específico para móviles
   return (
-    <div className="w-full h-screen bg-white">
+    <div className="w-full h-full bg-white">
       <PDFViewer
         style={{
           width: "100%",
-          height:
-            dimensions.width <= 390
-              ? `${dimensions.height - 60}px`
-              : "100vh",
+          height: "100%",
           border: "none",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
         }}
       >
         <Document>

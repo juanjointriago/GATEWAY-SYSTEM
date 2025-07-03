@@ -311,61 +311,88 @@ export const EditUserform: FC<Props> = ({ userId }) => {
 
     console.debug('👀', watch('role'));
     return (
-        <div>
-            {/* <h1 className="text-2xl font-semibold mb-4">{`${user.name}` }</h1> */}
-            <form className="w-full max-w-lg" onSubmit={onSubmit}>
+        <div className="w-full max-w-none">
+            <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6" onSubmit={onSubmit}>
                 {/** Name */}
-                <div className="mb-4">
-                    <label className="block text-gray-600">Nombre</label>
+                <div className="lg:col-span-2 space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
                     <input
                         {...register("name", { required: "El nombre es obligatorio 👀", })}
                         type="text"
                         id="name"
                         placeholder='Ej. Juan Pérez'
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
                     />
-                    {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
+                    {errors.name && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.name.message}
+                    </p>}
                 </div>
-                <div className='flex flex-row'>
-                    {/** CC */}
-                    <div className="mb-4 ">
-                        <label className="block text-gray-600">CC:</label>
-                        <input
-                            {...register("cc", { required: "El nro de cc es obligatorio 👀", pattern: { value: /^[0-9]*$/, message: 'Sólo se permiten números entre 0 y 9 ' } })}
-                            type="text"
-                            maxLength={13}
-                            placeholder='10123000009 o 10123000009001'
-                            id="cc"
-                        />
-                        {errors.cc && <p className="text-red-500 text-xs italic">{errors.cc.message}</p>}
-                    </div>
 
-                    {/** Ciudad*/}
-                    <div className="mb-4 ml-2">
-                        <label htmlFor="sublevel" className="block text-gray-600">Ciudad</label>
-                        <select
-                            {...register("city", { required: "La ciudad es Obligatoria 👀" })}
-                            id="sublevel"
-                            defaultValue={''}
-                            className="appearance-none block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
-                            <option value={''}>Seleccione ciudad</option>
-                            {
-                                cities.map((city, index) => {
-                                    return <option key={index} value={city}>{city}</option>
-                                })
-                            }
-                        </select>
-                        {errors.city && <p className="text-red-500 text-xs italic">{errors.city.message}</p>}
-                    </div>
+                {/** CC */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Cédula de Ciudadanía</label>
+                    <input
+                        {...register("cc", { required: "El nro de cc es obligatorio 👀", pattern: { value: /^[0-9]*$/, message: 'Sólo se permiten números entre 0 y 9 ' } })}
+                        type="text"
+                        maxLength={13}
+                        placeholder='10123000009'
+                        id="cc"
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+                    />
+                    {errors.cc && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.cc.message}
+                    </p>}
                 </div>
-                {/*Role*/}
-                <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                    <label className="block text-gray-600">Rol:</label>
 
+                {/** Ciudad*/}
+                <div className="space-y-2">
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ciudad</label>
                     <select
-                        {...register("role", { required: "Debe Seleciconar un rol 👀" })}
-                        id="sublevel"
+                        {...register("city", { required: "La ciudad es Obligatoria 👀" })}
+                        id="city"
+                        defaultValue={''}
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base"
+                    >
+                        <option value={''}>Seleccione ciudad</option>
+                        {
+                            cities.map((city, index) => {
+                                return <option key={index} value={city}>{city}</option>
+                            })
+                        }
+                    </select>
+                    {errors.city && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.city.message}
+                    </p>}
+                </div>
+
+                {/** Email */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                        {...register("email", { required: "El email es obligatorio 👀" })}
+                        type="email"
+                        id="email"
+                        placeholder="ejemplo@correo.com"
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+                    />
+                    {errors.email && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.email.message}
+                    </p>}
+                </div>
+
+                {/*Role*/}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Rol</label>
+                    <select
+                        {...register("role", { required: "Debe Seleccionar un rol 👀" })}
+                        id="role"
                         defaultValue={user.role}
-                        className="appearance-none block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white">
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base"
+                    >
                         <option value={''}>Seleccione Rol</option>
                         {
                             roles.map((role, index) => {
@@ -373,101 +400,151 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                             })
                         }
                     </select>
+                    {errors.role && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.role.message}
+                    </p>}
                 </div>
-                {/*Level*/}
-                {watch('role') === 'student' && <>
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                        <Select
-                            components={animatedComponents}
-                            placeholder="Modalidad"
-                            defaultInputValue={levels.find(level => level.id === user.level)?.name}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            options={levels.map(level => ({ value: level.id, label: level.name })) as any}
-                            // {...register("teacher", { required: "El minimo de estudiantes es obligatorio👀" })}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            onChange={(e: any) => {
-                                console.debug('LEVELID', e.value);
-                                if (!e.value) return
-                                setLevelStudent(e.value);
-                            }}
-                            required={false}
-                        />
-                    </div>
-                    {/*SubLevels*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-                        <div className="bg-indigo-300 w-[auto] rounded-sm ">
-                        </div>
-                        <Select
-                            id="sublevels"
-                            components={animatedComponents}
-                            defaultInputValue={sublevels.find(sublevel => sublevel.id === user.subLevel)?.name}
 
-                            placeholder="Unidad "
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            onChange={(e: any) => {
-                                console.debug('SUB-LEVELID', { e });
-                                setSelectedSublevels(e);
-                            }}
-                        />
-                    </div>
-                </>}
-                {/** Email */}
-                <div className="mb-4">
-                    <label className="block text-gray-600">Email</label>
-                    <input
-                        {...register("email", { required: "El email es obligatorio 👀" })}
-                        type="email"
-                        id="email"
-                    />
-                    {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
-                </div>
-                {watch('role') === 'teacher' && <div className='flex flex-row justify-between'>
-                    {/** TeacherLink*/}
-                    <div className="mb-4 w-full">
-                        <label className="block text-gray-600">Teacher Link</label>
+                {/*Level and SubLevel for Students*/}
+                {watch('role') === 'student' && (
+                    <>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Modalidad</label>
+                            <div className="relative">
+                                <Select
+                                    components={animatedComponents}
+                                    placeholder="Seleccione modalidad"
+                                    defaultInputValue={levels.find(level => level.id === user.level)?.name}
+                                    options={levels.filter(level => level.id).map(level => ({ value: level.id!, label: level.name }))}
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    onChange={(selectedOption: any) => {
+                                        console.debug('LEVELID', selectedOption?.value);
+                                        if (!selectedOption?.value) return
+                                        setLevelStudent(selectedOption.value);
+                                    }}
+                                    className="text-base"
+                                    styles={{
+                                        control: (base) => ({
+                                            ...base,
+                                            minHeight: '42px',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '6px',
+                                            '&:hover': {
+                                                borderColor: '#9ca3af'
+                                            },
+                                            '&:focus-within': {
+                                                borderColor: '#3b82f6',
+                                                boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.5)'
+                                            }
+                                        })
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Curso</label>
+                            <div className="relative">
+                                <Select
+                                    id="sublevels"
+                                    components={animatedComponents}
+                                    defaultInputValue={sublevels.find(sublevel => sublevel.id === user.subLevel)?.name}
+                                    placeholder="Seleccione curso"
+                                    options={sublevels.filter(sublevel => sublevel.id).map(sublevel => ({ value: sublevel.id!, label: sublevel.name }))}
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    onChange={(selectedOption: any) => {
+                                        console.debug('SUB-LEVELID', { selectedOption });
+                                        setSelectedSublevels(selectedOption);
+                                    }}
+                                    className="text-base"
+                                    styles={{
+                                        control: (base) => ({
+                                            ...base,
+                                            minHeight: '42px',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '6px',
+                                            '&:hover': {
+                                                borderColor: '#9ca3af'
+                                            },
+                                            '&:focus-within': {
+                                                borderColor: '#3b82f6',
+                                                boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.5)'
+                                            }
+                                        })
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/** Teacher Link for Teachers */}
+                {watch('role') === 'teacher' && (
+                    <div className="lg:col-span-2 space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Teacher Link</label>
                         <input
                             {...register("teacherLink")}
                             type="text"
                             id="teacherLink"
+                            placeholder="https://teacher-link.com"
+                            className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
                         />
-                        {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                     </div>
-                </div>}
+                )}
+
                 {/** Dirección*/}
-                <div className="mb-4">
-                    <label className="block text-gray-600">Dirección</label>
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Dirección</label>
                     <input
                         {...register("address", { required: "La dirección es obligatoria 👀" })}
                         type="text"
                         id="address"
+                        placeholder="Ej. Av. Principal 123"
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
                     />
-                    {errors.address && <p className="text-red-500 text-xs italic">{errors.address.message}</p>}
+                    {errors.address && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.address.message}
+                    </p>}
                 </div>
+
                 {/** Telefono*/}
-                <div className="mb-4">
-                    <label className="block text-gray-600">Teléfono de contacto</label>
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Teléfono de contacto</label>
                     <input
                         {...register("phone", { required: "El teléfono es obligatorio 👀" })}
-                        type="text"
+                        type="tel"
                         id="phone"
+                        placeholder="Ej. 0987654321"
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
                     />
-                    {errors.phone && <p className="text-red-500 text-xs italic">{errors.phone.message}</p>}
+                    {errors.phone && <p className="text-red-500 text-xs italic flex items-center gap-1">
+                        <span>⚠️</span>
+                        {errors.phone.message}
+                    </p>}
                 </div>
 
-                {/** Button*/}
-
-                <button type="submit" className="text-white w-full  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2">Guardar Cambios 🤘🏻</button>
-                <div className="flex mt-5 underline justify-end text-blue-500">
+                {/** Buttons */}
+                <div className="lg:col-span-2 space-y-3 pt-4 border-t border-gray-200">
+                    <button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-base"
+                    >
+                        <span>Guardar Cambios</span>
+                        <span>🤘🏻</span>
+                    </button>
+                    
+                    <button
+                        type="button"
+                        className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-sm"
+                        onClick={() => resetPasswordByEmail(user.email)}
+                    >
+                        <span>Enviar correo para reinicio de contraseña</span>
+                        <span>🔑</span>
+                    </button>
                 </div>
             </form>
-            <button
-                type="button"
-                className="text-white w-[70%]  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2"
-                onClick={() => resetPasswordByEmail(user.email)}>
-                Enviar correo para reinicio de contraseña 🔑
-            </button>
         </div>
     )
 }

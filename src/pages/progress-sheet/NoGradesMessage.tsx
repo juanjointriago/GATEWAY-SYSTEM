@@ -1,7 +1,10 @@
 import { FC } from 'react';
 import { FaChalkboardTeacher } from 'react-icons/fa';
 
-export const NoGradesMessage: FC = () => {
+interface NoGradesMessageProps {
+  message?: string
+}
+export const NoGradesMessage: FC<NoGradesMessageProps> = ({ message ="Puedes solicitar a tu docente que califique tus asistencias para acceder a tu progress sheet." }) => {
   return (
     <div className="min-h-[400px] flex items-center justify-center p-8">
       <div className="text-center space-y-6 max-w-2xl mx-auto">
@@ -24,7 +27,7 @@ export const NoGradesMessage: FC = () => {
         {/* Sugerencia */}
         <div className="bg-indigo-50 rounded-lg p-6 mt-8">
           <p className="text-lg text-indigo-700">
-            Puedes solicitar a tu docente que califique tus asistencias para acceder a tu progress sheet.
+            {message}
           </p>
         </div>
 

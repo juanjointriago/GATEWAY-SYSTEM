@@ -30,7 +30,15 @@ const storeAPI: StateCreator<ProgressSheetStore,
     getAllProgressSheets:  () =>   get().progressSheets ,
 
     getProgressSheetById: (id: string) => get().progressSheets.find(progressSheet => progressSheet.id === id),
-    getProgressSheetByStudentId: (id: string) => get().progressSheets.find(progressSheet => progressSheet.studentId === id),
+    getProgressSheetByStudentId: (id: string) => {
+        const progressSheet = get().progressSheets.filter(ps => ps.studentId === id);
+        console.debug('STORE ProgressSheet for student ID:', id, progressSheet);
+        if (progressSheet.length === 0) {
+            console.warn(`No progress sheet found for student ID: ${id}`);
+            return undefined;
+        }
+        return progressSheet[0];
+    },
     createProgressSheet: async (progressSheet: progressSheetInterface) => {
         await ProgressSheetService.createProgressSheet(progressSheet);
         set({ progressSheets: [...get().progressSheets, progressSheet] })

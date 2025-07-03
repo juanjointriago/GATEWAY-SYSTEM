@@ -9,6 +9,7 @@ import { menuItemsByRole } from './menu';
 import { useEventStore } from '../../../stores/events/event.store';
 import { useFeesStore } from '../../../stores/fees/fess.store';
 import { useNewsStore } from '../../../stores/news/news.store';
+import { useProgressSheetStore } from '../../../stores/progress-sheet/progresssheet.store';
 // import { useNavigate } from "react-router-dom";
 
 
@@ -29,6 +30,7 @@ export const SideMenu = () => {
   const authStatus = useAuthStore(state => state.status);
   const logoutUser = useAuthStore(state => state.logoutUser);
   const getAndSetNews = useNewsStore((state) => state.getAndSetNews);
+  const getAndSetProgressSheet = useProgressSheetStore((state) => state.getAllProgressSheets);
   
   // const navigate = useNavigate()
   useEffect(() => {
@@ -39,7 +41,8 @@ export const SideMenu = () => {
     getAllUnits();
     getAllFees();
     getAndSetNews();
-  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits, getAllFees, getAndSetNews]);
+    getAndSetProgressSheet();
+  }, [ getAllUsers, getAllLevels, getAllSubLevels, getAllEvents, getAllUnits, getAllFees, getAndSetNews, getAndSetProgressSheet]);
 
 
   if (authStatus === 'unauthorized') {
