@@ -367,7 +367,7 @@ export const UsersPage = () => {
         
         {isAdmin && userforUnit && (
           <ModalGeneric
-            title="Contract"
+            title="Contrato del Estudiante"
             isVisible={openContractModal}
             setIsVisible={setOpenContractModal}
             children={<StudentContract studentID={userforUnit} />}

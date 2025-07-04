@@ -19,6 +19,7 @@ export interface progressClassesInterface {
 
 export interface progressSheetInterface {
     id?: string
+    uid?: string
     inscriptionDate: string
     expirationDate: string
     myPreferredName: string
