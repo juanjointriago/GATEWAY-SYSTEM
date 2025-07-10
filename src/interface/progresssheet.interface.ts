@@ -20,6 +20,8 @@ export interface progressClassesInterface {
 export interface progressSheetInterface {
     id?: string
     uid?: string
+    contractNumber?: string
+    headquarters?: string
     inscriptionDate: string
     expirationDate: string
     myPreferredName: string
@@ -29,8 +31,11 @@ export interface progressSheetInterface {
     totalPaid?: number;// total pagado
     totalDue?: number;// total pendiente
     totalDiscount?: number;// total descuento
-    totalBalance?: number;// total saldo
+    observation?: string;// observacion
     quotesQty?: number;// cantidad de cuotas
+    quoteValue?: number;// valor de la cuota
+    dueDate?: string;// fecha de vencimiento
+    program?: string;// programa
     studentId: string;
     createdAt?: number
     updatedAt?: number

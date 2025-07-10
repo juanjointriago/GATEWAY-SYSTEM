@@ -18,77 +18,6 @@ import { useEventStore } from "../../stores/events/event.store";
 import { NoGradesMessage } from "./NoGradesMessage";
 // import { useWindowSize } from "../../hooks/useWindowSize";
 
-// Definimos los estilos
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    backgroundColor: "#ffffff",
-    padding: 30,
-  },
-  landscapePage: {
-    flexDirection: "column",
-    backgroundColor: "#ffffff",
-    padding: 30,
-    size: "landscape",
-  },
-  header: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexGrow: 1,
-  },
-  row: {
-    flexDirection: "row",
-    marginVertical: 5,
-  },
-  label: {
-    width: 120,
-    fontWeight: "bold",
-  },
-  value: {
-    flex: 1,
-    borderBottom: 1,
-    marginLeft: 10,
-  },
-  table: {
-    flexDirection: "column",
-    width: "100%",
-    marginTop: 20,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    minHeight: 25,
-  },
-  tableHeader: {
-    backgroundColor: "#f0f0f0",
-    fontWeight: "bold",
-  },
-  tableCell: {
-    padding: 5,
-    borderRightWidth: 1,
-    borderRightColor: "#000",
-    fontSize: 8,
-    flexWrap: "wrap",
-    minWidth: 60,
-  },
-  tableTitle: {
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: 10,
-    fontWeight: "bold",
-  },
-});
-
 interface Props {
   studentID: string;
 }
@@ -141,14 +70,14 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
   const studentInfo: StudentInfo = {
     ...student,
     headline: "",
-    preferredName: student.name,
+    preferredName: progressSheet.myPreferredName || student.name,
     age: age.toString(),
     birthday: student.bornDate,
     occupation: "student",
     fullName: student.name,
     gender: "undefined",
     observation: "none",
-    otherContacts: student.phone,
+    otherContacts: progressSheet.otherContacts || student.phone,
     phone: student.phone,
     idNumber: student.cc,
     regNumber: student.cc,
@@ -278,3 +207,76 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     </div>
   );
 };
+
+
+
+// Definimos los estilos
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#ffffff",
+    padding: 30,
+  },
+  landscapePage: {
+    flexDirection: "column",
+    backgroundColor: "#ffffff",
+    padding: 30,
+    size: "landscape",
+  },
+  header: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+    fontWeight: "bold",
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+  },
+  row: {
+    flexDirection: "row",
+    marginVertical: 5,
+  },
+  label: {
+    width: 120,
+    fontWeight: "bold",
+  },
+  value: {
+    flex: 1,
+    borderBottom: 1,
+    marginLeft: 10,
+  },
+  table: {
+    flexDirection: "column",
+    width: "100%",
+    marginTop: 20,
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  tableRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    minHeight: 25,
+  },
+  tableHeader: {
+    backgroundColor: "#f0f0f0",
+    fontWeight: "bold",
+  },
+  tableCell: {
+    padding: 5,
+    borderRightWidth: 1,
+    borderRightColor: "#000",
+    fontSize: 8,
+    flexWrap: "wrap",
+    minWidth: 60,
+  },
+  tableTitle: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+});
