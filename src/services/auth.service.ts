@@ -147,7 +147,6 @@ export class AuthService {
           totalPaid: 0,
           totalDue: 0,
           totalDiscount: 0,
-          totalBalance: 0,
           quotesQty: 0,
           progressClasses: [], // Inicialmente vacío
           createdAt: Date.now(),
