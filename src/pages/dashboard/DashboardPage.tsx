@@ -9,9 +9,6 @@ export const DashboardPage = () => {
   
   return (
     <>
-      <h1>Dashboard</h1>
-      <p>Información colectiva de todas las entidades de Gateway</p>
-      <hr />
       {user && <DashboardForUser user={user} />}
     </>
   )
