@@ -41,15 +41,36 @@ export const ProgressSheetPage = () => {
     } else {
       // Si no existe, crear uno nuevo
       try {
+        const duuid = uuid();
         const newProgressSheet: progressSheetInterface = {
-          id: uuid(),
+          id: duuid,
+          uid: duuid,
           studentId: uid!,
+          contractNumber: "000",
+          headquarters: "",
+          inscriptionDate: new Date().toISOString().split('T')[0],
+          expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
           myPreferredName: student?.name || "",
+          contractDate: new Date().toISOString().split('T')[0],
+          work: "",
+          enterpriseName: "",
+          preferredCI: "",
+          conventionalPhone: "",
+          familiarPhone: "",
+          preferredEmail: student?.email || "",
           otherContacts: student?.phone || "",
-          inscriptionDate: Date.now().toString() || "",
-          expirationDate:  "",
+          program: "",
+          observation: "",
+          totalFee: 0,
+          totalPaid: 0,
+          totalDue: 0,
+          totalDiscount: 0,
+          quotesQty: 0,
+          quoteValue: 0,
+          dueDate: "",
           progressClasses: [], // Inicialmente vacío
           createdAt: Date.now(),
+          updatedAt: Date.now(),
         };
 
        await createProgressSheet(newProgressSheet);
@@ -57,7 +78,13 @@ export const ProgressSheetPage = () => {
         setShowModal(true); // Abrir el modal
       } catch (error) {
         console.error("Error al crear el Progress Sheet:", error);
-        Swal.fire("Error", "No se pudo crear el Progress Sheet", "error");
+        Swal.fire({
+          title: "Error",
+          text: "No se pudo crear el Progress Sheet",
+          icon: "error",
+          confirmButtonColor: "#d33",
+          confirmButtonText: "Aceptar"
+        });
       }
     }
   };
@@ -67,7 +94,11 @@ export const ProgressSheetPage = () => {
       {
         accessorFn: (row) => row.createdAt,
         id: "createdAt",
-        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
+        cell: (info) => {
+          const timestamp = info.getValue() as number;
+          const date = new Date(timestamp);
+          return <p className="text-start text-nowrap text-xs">{date.toLocaleDateString()}</p>;
+        },
         header: () => <span>Date</span>,
       },
       {
@@ -83,10 +114,14 @@ export const ProgressSheetPage = () => {
         header: () => <span>Book</span>,
       },
       {
-        accessorFn: (row) => row.eventInfo.label,
+        accessorFn: (row) => row.eventInfo?.label || row.eventInfo?.value || "",
         id: "eventId",
-        cell: (info) => <p className="text-start text-xs">{getEventById(info.getValue() as string)?.name}</p>,
-        header: () => <span>Reservacion</span>,
+        cell: (info) => {
+          const eventValue = info.getValue() as string;
+          const event = getEventById(eventValue);
+          return <p className="text-start text-xs">{event?.name || eventValue || "Sin evento"}</p>;
+        },
+        header: () => <span>Reservación</span>,
       },
       {
         accessorFn: (row) => row.lesson,
