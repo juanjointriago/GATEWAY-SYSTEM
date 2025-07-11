@@ -103,6 +103,7 @@ export class AuthService {
       address,
       bornDate,
       cc,
+      phone,
       city,
       country,
     } = signUpUser;
@@ -122,7 +123,7 @@ export class AuthService {
           email,
           role,
           photoUrl: photoURL,
-          phone: "",
+          phone,
           address,
           bornDate,
           cc,
@@ -138,18 +139,33 @@ export class AuthService {
         //Add preffered info and Total fee for user
         const contractInfo: progressSheetInterface = {
           id: uuid(),
+          uid: uuid(),
           studentId: uid,
-          myPreferredName: "",
+          contractNumber: "000",
+          headquarters: "",
+          inscriptionDate: new Date().toISOString().split('T')[0],
+          expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+          myPreferredName: name || "",
+          contractDate: new Date().toISOString().split('T')[0],
+          work: "",
+          enterpriseName: "",
+          preferredCI: "",
+          conventionalPhone: "",
+          familiarPhone: "",
+          preferredEmail: email || "",
           otherContacts: "",
-          inscriptionDate: Date.now().toString() || "",
-          expirationDate: "",
+          program: "",
+          observation: "",
           totalFee: 0,
           totalPaid: 0,
           totalDue: 0,
           totalDiscount: 0,
           quotesQty: 0,
+          quoteValue: 0,
+          dueDate: "",
           progressClasses: [], // Inicialmente vacío
           createdAt: Date.now(),
+          updatedAt: Date.now(),
         };
         await setItem( import.meta.env.VITE_COLLECTION_PROGRESS_SHEET, contractInfo);
         Swal.fire({
