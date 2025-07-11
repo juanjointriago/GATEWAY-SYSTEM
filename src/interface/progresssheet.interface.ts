@@ -25,6 +25,15 @@ export interface progressSheetInterface {
     inscriptionDate: string
     expirationDate: string
     myPreferredName: string
+    
+    contractDate?: string
+    work: string
+    enterpriseName: string
+    preferredCI?: string
+    conventionalPhone?: string
+    familiarPhone?: string
+    preferredEmail?: string
+
     otherContacts: string
     progressClasses: progressClassesInterface[];
     totalFee?: number;//total adeudado

@@ -9,6 +9,7 @@ import { useEventStore } from "../../../stores/events/event.store";
 import { useFeesStore } from "../../../stores/fees/fess.store";
 import { useNewsStore } from "../../../stores/news/news.store";
 import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
+import { useEnterpriseInfoStore } from "../../../stores/enterpriseinfo/enterpriseinfo.store";
 
 export const SideBar: FC = () => {
     const [isOpen, setIsOpen] = useState(false); // Cambiado a false por defecto
@@ -24,6 +25,7 @@ export const SideBar: FC = () => {
     const getAllFees = useFeesStore(state => state.getAndSetFees);
     const getAllNews = useNewsStore(state => state.getAndSetNews);
     const getAllProgressSheet = useProgressSheetStore(state => state.getAndSetProgressSheets);
+    const getEnterpriseInfo = useEnterpriseInfoStore(state => state.getEnterpriseInfo);
     
 
     useEffect(() => {
@@ -35,7 +37,8 @@ export const SideBar: FC = () => {
       getAllFees();
       getAllNews();
       getAllProgressSheet();
-    }, [getAllEvents, getAllUsers, getAllLevels, getAllSubLevels, getAllUnits, getAllFees, getAllNews, getAllProgressSheet])
+      getEnterpriseInfo();
+    }, [getAllEvents, getAllUsers, getAllLevels, getAllSubLevels, getAllUnits, getAllFees, getAllNews, getAllProgressSheet, getEnterpriseInfo])
     
 
 

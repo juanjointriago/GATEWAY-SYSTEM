@@ -10,13 +10,20 @@ interface Props {
     studentID: string;
 }
 
-type FormData = {
+type FormData ={
   contractNumber: string;
   headquarters: string;
   inscriptionDate: string;
   expirationDate: string;
   dueDate: string;
   myPreferredName: string;
+  contractDate: string;
+  work: string;
+  enterpriseName: string;
+  preferredCI: string;
+  conventionalPhone: string;
+  familiarPhone: string;
+  preferredEmail: string;
   otherContacts: string;
   program: string[]; // Array para múltiples selecciones
   observation: string;
@@ -51,6 +58,13 @@ export const StudentContract = ({ studentID }: Props) => {
       expirationDate: '',
       dueDate: '',
       myPreferredName: '',
+      contractDate: '',
+      work: '',
+      enterpriseName: '',
+      preferredCI: '',
+      conventionalPhone: '',
+      familiarPhone: '',
+      preferredEmail: '',
       otherContacts: '',
       program: [],
       observation: '',
@@ -100,6 +114,13 @@ export const StudentContract = ({ studentID }: Props) => {
             inscriptionDate: new Date().toISOString().split('T')[0],
             expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
             myPreferredName: student.name || "",
+            contractDate: new Date().toISOString().split('T')[0],
+            work: "",
+            enterpriseName: "",
+            preferredCI: "",
+            conventionalPhone: "",
+            familiarPhone: "",
+            preferredEmail: "",
             dueDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
             otherContacts: "",
             progressClasses: [],
@@ -125,6 +146,13 @@ export const StudentContract = ({ studentID }: Props) => {
             expirationDate: newProgressSheet.expirationDate,
             dueDate: newProgressSheet.dueDate || '',
             myPreferredName: newProgressSheet.myPreferredName,
+            contractDate: newProgressSheet.contractDate || '',
+            work: newProgressSheet.work || '',
+            enterpriseName: newProgressSheet.enterpriseName || '',
+            preferredCI: newProgressSheet.preferredCI || '',
+            conventionalPhone: newProgressSheet.conventionalPhone || '',
+            familiarPhone: newProgressSheet.familiarPhone || '',
+            preferredEmail: newProgressSheet.preferredEmail || '',
             otherContacts: newProgressSheet.otherContacts,
             program: newProgressSheet.program ? newProgressSheet.program.split(',').map(p => p.trim()) : [],
             observation: newProgressSheet.observation || '',
@@ -144,6 +172,13 @@ export const StudentContract = ({ studentID }: Props) => {
             expirationDate: progressSheet.expirationDate ? progressSheet.expirationDate.split('T')[0] : '',
             dueDate: progressSheet.dueDate ? progressSheet.dueDate.split('T')[0] : '',
             myPreferredName: progressSheet.myPreferredName || '',
+            contractDate: progressSheet.contractDate ? progressSheet.contractDate.split('T')[0] : '',
+            work: progressSheet.work || '',
+            enterpriseName: progressSheet.enterpriseName || '',
+            preferredCI: progressSheet.preferredCI || '',
+            conventionalPhone: progressSheet.conventionalPhone || '',
+            familiarPhone: progressSheet.familiarPhone || '',
+            preferredEmail: progressSheet.preferredEmail || '',
             otherContacts: progressSheet.otherContacts || '',
             program: progressSheet.program ? progressSheet.program.split(',').map(p => p.trim()) : [],
             observation: progressSheet.observation || '',
@@ -180,7 +215,8 @@ export const StudentContract = ({ studentID }: Props) => {
         updatedAt: Date.now(),
         inscriptionDate: data.inscriptionDate + 'T00:00:00.000Z',
         expirationDate: data.expirationDate + 'T23:59:59.999Z',
-        dueDate: data.dueDate + 'T23:59:59.999Z',
+        dueDate: data.dueDate ? data.dueDate + 'T23:59:59.999Z' : undefined,
+        contractDate: data.contractDate ? data.contractDate + 'T00:00:00.000Z' : undefined,
         progressClasses: progressSheet?.progressClasses || [],
       };
 
@@ -218,6 +254,13 @@ export const StudentContract = ({ studentID }: Props) => {
       expirationDate: '',
       dueDate: '',
       myPreferredName: '',
+      contractDate: '',
+      work: '',
+      enterpriseName: '',
+      preferredCI: '',
+      conventionalPhone: '',
+      familiarPhone: '',
+      preferredEmail: '',
       otherContacts: '',
       program: [],
       observation: '',
@@ -363,7 +406,7 @@ export const StudentContract = ({ studentID }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             {/* Fecha de Inscripción */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -388,6 +431,24 @@ export const StudentContract = ({ studentID }: Props) => {
               {errors.inscriptionDate && (
                 <p className="mt-1 text-sm text-red-600">{errors.inscriptionDate.message}</p>
               )}
+            </div>
+
+            {/* Fecha de Contrato */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha de Contrato
+              </label>
+              <Controller
+                name="contractDate"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="date"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                )}
+              />
             </div>
 
             {/* Fecha de Expiración */}
@@ -428,7 +489,7 @@ export const StudentContract = ({ studentID }: Props) => {
               )}
             </div>
 
-            {/* Fecha de Vencimiento */}
+            {/* Fecha de Pago Mensual */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha de Pago Mensual
@@ -444,6 +505,190 @@ export const StudentContract = ({ studentID }: Props) => {
                   />
                 )}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Información Personal Adicional */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            Información Personal Adicional
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Trabajo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Trabajo *
+              </label>
+              <Controller
+                name="work"
+                control={control}
+                rules={{
+                  required: "El trabajo es requerido"
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                      errors.work ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="Ingrese el trabajo"
+                  />
+                )}
+              />
+              {errors.work && (
+                <p className="mt-1 text-sm text-red-600">{errors.work.message}</p>
+              )}
+            </div>
+
+            {/* Nombre de Empresa */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nombre de Empresa *
+              </label>
+              <Controller
+                name="enterpriseName"
+                control={control}
+                rules={{
+                  required: "El nombre de la empresa es requerido"
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                      errors.enterpriseName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="Ingrese el nombre de la empresa"
+                  />
+                )}
+              />
+              {errors.enterpriseName && (
+                <p className="mt-1 text-sm text-red-600">{errors.enterpriseName.message}</p>
+              )}
+            </div>
+
+            {/* Cédula Preferida */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Cédula Preferida
+              </label>
+              <Controller
+                name="preferredCI"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^[0-9]{10}$/,
+                    message: "La cédula debe tener 10 dígitos"
+                  }
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    maxLength={10}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                      errors.preferredCI ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="Ingrese la cédula"
+                  />
+                )}
+              />
+              {errors.preferredCI && (
+                <p className="mt-1 text-sm text-red-600">{errors.preferredCI.message}</p>
+              )}
+            </div>
+
+            {/* Email Preferido */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Preferido
+              </label>
+              <Controller
+                name="preferredEmail"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "El email no es válido"
+                  }
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="email"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                      errors.preferredEmail ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="ejemplo@correo.com"
+                  />
+                )}
+              />
+              {errors.preferredEmail && (
+                <p className="mt-1 text-sm text-red-600">{errors.preferredEmail.message}</p>
+              )}
+            </div>
+
+            {/* Teléfono Convencional */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Teléfono Convencional
+              </label>
+              <Controller
+                name="conventionalPhone"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^[0-9\-+() ]+$/,
+                    message: "El teléfono solo puede contener números, guiones, paréntesis y espacios"
+                  }
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="tel"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                      errors.conventionalPhone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="02-123-4567"
+                  />
+                )}
+              />
+              {errors.conventionalPhone && (
+                <p className="mt-1 text-sm text-red-600">{errors.conventionalPhone.message}</p>
+              )}
+            </div>
+
+            {/* Teléfono Familiar */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Teléfono Familiar
+              </label>
+              <Controller
+                name="familiarPhone"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^[0-9\-+() ]+$/,
+                    message: "El teléfono solo puede contener números, guiones, paréntesis y espacios"
+                  }
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="tel"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                      errors.familiarPhone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="09-123-4567"
+                  />
+                )}
+              />
+              {errors.familiarPhone && (
+                <p className="mt-1 text-sm text-red-600">{errors.familiarPhone.message}</p>
+              )}
             </div>
           </div>
         </div>
@@ -547,7 +792,11 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? 0 : parseFloat(value) || 0);
+                    }}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.totalFee ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
@@ -580,7 +829,11 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? 0 : parseFloat(value) || 0);
+                    }}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.totalPaid ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
@@ -613,7 +866,11 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? 0 : parseFloat(value) || 0);
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="0.00"
                   />
@@ -663,7 +920,11 @@ export const StudentContract = ({ studentID }: Props) => {
                     {...field}
                     type="number"
                     min="1"
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? 0 : parseInt(value) || 0);
+                    }}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.quotesQty ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
