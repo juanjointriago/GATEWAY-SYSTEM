@@ -15,12 +15,17 @@ import { EnterPriseInfoService } from "../../services/enterprise.service";
 
 
 const storeAPI: StateCreator<IenterpriseInfoStore, 
-[["zustand/devtools", never], ["zustand/immer", never]], [], IenterpriseInfoStore>=(set)=>({
+[["zustand/devtools", never], ["zustand/immer", never]], [], IenterpriseInfoStore>=(set, get)=>({
     enterpriseInfo: null,
     loading: false,
     error: null,
     getEnterpriseInfo: async () => {
         set({ loading: true, error: null });
+            if (get().enterpriseInfo) {
+            console.debug("Enterprise Info already loaded:", get().enterpriseInfo);
+            set({ error: null, loading: false });
+            return get().enterpriseInfo as IenterpriseInfo;
+        }
         try {
             // Implement your logic to fetch enterprise info
             const info = await EnterPriseInfoService.getEnterPriseInfo();
