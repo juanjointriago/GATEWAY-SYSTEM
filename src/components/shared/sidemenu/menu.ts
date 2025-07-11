@@ -1,4 +1,4 @@
-import { IoBarChart, IoBook, IoCalendar, IoCash, IoLocate, IoPerson, IoPieChart, IoSpeedometerOutline, IoFootstepsOutline, IoNewspaper } from "react-icons/io5";
+import { IoBarChart, IoBook, IoCalendar, IoSettings, IoCash, IoNotifications, IoPerson, IoPieChart, IoSpeedometerOutline, IoFootstepsOutline, IoNewspaper } from "react-icons/io5";
 import { IconType } from "react-icons";
 import { role } from "../../../interface";
 
@@ -22,7 +22,9 @@ const admin: MenuItem[] = [
   { title: 'Unidades', subTitle: 'Gestión de unidades', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true},
   { title: 'Reservaciones', subTitle: 'Gestión de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
   { title: 'Cobranza', subTitle: 'Gestión de cobranza', href: '/dashboard/fees', Icon: IoCash, active: true },
-  { title: 'Localidades', subTitle: 'Gestión de Lugares', href: '/dashboard/locations', Icon: IoLocate, active: true },
+  { title: 'Notificaciones', subTitle: 'Gestión de Notificaciones', href: '/dashboard/notifications', Icon: IoNotifications, active: true },
+  { title: 'Configuraciones', subTitle: 'Gestión de Configuraciones', href: '/dashboard/settings', Icon: IoSettings, active: true },
+  // { title: 'Localidades', subTitle: 'Gestión de Lugares', href: '/dashboard/locations', Icon: IoLocate, active: true },
 ]
 
 const student: MenuItem[] = [

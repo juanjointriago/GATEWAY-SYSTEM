@@ -23,6 +23,8 @@ import { ProgressSheetPage } from "../pages/progress-sheet/ProgressSheetPage";
 import { NewsPage } from "../pages/news/NewsPage";
 import { ProgressSheetMain } from "../pages/progress-sheet/PrograssSheetMain";
 import DeleteUserData from "../pages/auth/ErasePage";
+import { NotificationPage } from "../pages/notification/NotificationPage";
+import { SettingsPage } from "../pages/settings/SettingsPage";
 
 export const router = createBrowserRouter([
   {
@@ -82,6 +84,14 @@ export const router = createBrowserRouter([
           {
             path: "locations",
             element: <LocationsPage />,
+          },
+          {
+            path: "notifications",
+            element: <NotificationPage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
           },
           {
             path: "progress-sheet/:uid", // Nueva ruta para ProgressSheetPage
