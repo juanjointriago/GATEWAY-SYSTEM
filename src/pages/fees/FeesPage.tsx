@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fee } from "../../interface/fees.interface";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { useFeesStore } from "../../stores/fees/fess.store";
@@ -7,6 +7,7 @@ import { useAuthStore, useUserStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { AddFeeForm } from "../../components/shared/forms/AddFeeForm";
 import PDFPreview from "../../components/shared/pdf/PDFPreview";
+import { MdPictureAsPdf } from "react-icons/md";
 
 export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
@@ -18,6 +19,17 @@ export const FeesPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<fee | null>(null); // Estado para la fila seleccionada
   const [showPreview, setShowPreview] = useState(false); // Estado para
+
+  const handleGeneratePDF = useCallback((row: fee) => {
+    setSelectedRow(row); // Guardar la fila seleccionada
+    setShowPreview(true); // Mostrar la vista previa
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setSelectedRow(null); // Limpiar la fila seleccionada
+    setShowPreview(false); // Ocultar la vista previa
+  }, []);
+
   const columns = useMemo<ColumnDef<fee>[]>(
     () => [
       {
@@ -92,9 +104,27 @@ export const FeesPage = () => {
         enableColumnFilter: false,
         header: () => <span>Evidencia</span>,
       },
+      {
+        id: "actions",
+        header: () => <span>Acciones</span>,
+        enableSorting: false,
+        enableColumnFilter: false,
+        cell: ({ row }) => (
+          <div className="flex gap-2">
+            <button
+              className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 text-xs sm:text-sm font-medium whitespace-nowrap"
+              onClick={() => handleGeneratePDF(row.original)}
+              title="Imprimir recibo"
+            >
+              <MdPictureAsPdf className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Imprimir</span>
+            </button>
+          </div>
+        ),
+      },
       // { accessorFn: row =>row.studentUid, id: "studentUid", cell: (info) => info.getValue(), header:(item)=><span>{getStudentByUid(item.column)}</span> },
     ],
-    []
+    [handleGeneratePDF]
   );
   const studentColumns = useMemo<ColumnDef<fee>[]>(
     () => [
@@ -156,74 +186,88 @@ export const FeesPage = () => {
           </>
         ),
         enableColumnFilter: false,
-        header: () => <span>Imagen</span>,
+        header: () => <span>Evidencia</span>,
+      },
+      {
+        id: "actions",
+        header: () => <span>Acciones</span>,
+        enableSorting: false,
+        enableColumnFilter: false,
+        cell: ({ row }) => (
+          <div className="flex gap-2">
+            <button
+              className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 text-xs sm:text-sm font-medium whitespace-nowrap"
+              onClick={() => handleGeneratePDF(row.original)}
+              title="Imprimir recibo"
+            >
+              <MdPictureAsPdf className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Imprimir</span>
+            </button>
+          </div>
+        ),
       },
       // { accessorFn: row =>row.studentUid, id: "studentUid", cell: (info) => info.getValue(), header:(item)=><span>{getStudentByUid(item.column)}</span> },
     ],
-    []
+    [handleGeneratePDF]
   );
   useEffect(() => {
     getAndSetFees();
   }, [getAndSetFees]);
 
-  const handleGeneratePDF = (row: fee) => {
-    setSelectedRow(row); // Guardar la fila seleccionada
-    setShowPreview(true); // Mostrar la vista previa
-  };
-
-  const handleClosePreview = () => {
-    setSelectedRow(null); // Limpiar la fila seleccionada
-    setShowPreview(false); // Ocultar la vista previa
-  };
-
   return (
-    <div className="pt-5">
-      <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-6x">
-        {isAdmin?'Pagos recibidos':'Mis pagos'}
-      </h1>
-      <div className="flex flex-row">
+    <>
+      <div className="pt-5">
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+          {isAdmin ? 'Pagos recibidos' : 'Mis pagos'}
+        </h1>
+        
+        {/* Modal para registrar pago */}
+        <ModalGeneric
+          key={"frm"}
+          isVisible={showModal}
+          setIsVisible={setShowModal}
+          title={"Registro de pago"}
+          children={<AddFeeForm />}
+        />
+        
+        {/* Botón para registrar pago */}
         {user && !isTeacher && (
-          <button
-            className="mr-1 ml-q bg-blue-500 mb-5 text-white px-4 py-2 rounded"
-            type="button"
-            onClick={() => setShowModal(true)}
-          >
-            Registrar Pago 💸
-          </button>
-        )}
-        {/* {user && user.role === 'admin' && <button className="mr-1 ml-q bg-green-800 mb-5 text-white px-4 py-2 rounded hover:bg-green-700" type="button"
-                        onClick={handleDownloadExcel}><IoBarChart /> </button>} */}
-        {/* {user && user.role === 'admin' && <button className="bg-red-800 mb-5 text-white px-4 py-2 rounded hover:bg-red-700" type="button"
-                        onClick={handleDownloadPDF}><MdPictureAsPdf /> </button>} */}
-      </div>
-      {/**Table comp */}
-      <ModalGeneric
-        key={"frm"}
-        isVisible={showModal}
-        setIsVisible={setShowModal}
-        title={"Registro de pago"}
-        children={<AddFeeForm />}
-      />
-      <TableGeneric
-        hasActions
-        // onGeneratePDF={async(row: fee) => await generatePDF(row)}
-        onGeneratePDF={handleGeneratePDF}
-        columns={isAdmin?columns: studentColumns}
-        data={isAdmin?fees:fees.filter(f=>f.studentUid===user?.uid)}
-      />
-      {showPreview && selectedRow && (
-        <div className="modal">
-          <div className="modal-content">
-            <button
-              onClick={handleClosePreview}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={() => setShowModal(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
-              Cerrar Vista Previa
+              + Registrar Pago 💸
             </button>
-            <PDFPreview row={selectedRow} studentName={getUserById(selectedRow!.studentUid!)!.name}/>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        
+        {/* Tabla con TableGeneric */}
+        <TableGeneric
+          columns={isAdmin ? columns : studentColumns}
+          data={isAdmin ? fees : fees.filter(f => f.studentUid === user?.uid)}
+        />
+        
+        {/* Modal para vista previa PDF */}
+        {showPreview && selectedRow && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
+              <div className="flex justify-between items-center p-4 border-b">
+                <h2 className="text-xl font-bold text-gray-800">Vista Previa - Recibo de Pago</h2>
+                <button
+                  onClick={handleClosePreview}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-md transition-colors duration-200 font-medium"
+                >
+                  Cerrar
+                </button>
+              </div>
+              <div className="p-4">
+                <PDFPreview row={selectedRow} studentName={getUserById(selectedRow!.studentUid!)!.name}/>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
