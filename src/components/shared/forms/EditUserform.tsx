@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC, useState, useEffect } from "react"
 import { FirestoreUser } from "../../../interface"
 import { useForm } from "react-hook-form";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
@@ -20,11 +20,44 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const animatedComponents = makeAnimated();
     const levels = useLevelStore(state => state.levels);
     const sublevels = useSubLevelStore(state => state.subLevels);
-    const [levelStudent, setLevelStudent] = useState<string>();
-    // console.debug(levelStudent)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [selectedSublevels, setSelectedSublevels] = useState<any>();
+    
+    // Inicializar estados con valores actuales del usuario
+    const [levelStudent, setLevelStudent] = useState<string>(user.level || '');
+    const [selectedSublevels, setSelectedSublevels] = useState<{value: string, label: string} | null>(null);
+    
+    // Efecto para inicializar sublevels cuando estén disponibles
+    useEffect(() => {
+        if (user.subLevel && sublevels.length > 0) {
+            const sublevel = sublevels.find(s => s.id === user.subLevel);
+            if (sublevel) {
+                setSelectedSublevels({ value: user.subLevel, label: sublevel.name });
+            }
+        }
+    }, [user.subLevel, sublevels]);
+
+    // Función para validar cédula ecuatoriana
+    const validateEcuadorianID = (cc: string): boolean => {
+        if (cc.length !== 10) return false;
+        
+        const digits = cc.split('').map(Number);
+        const province = parseInt(cc.substring(0, 2));
+        
+        // Validar provincia (01-24, excepto 00)
+        if (province < 1 || province > 24) return false;
+        
+        // Algoritmo de validación
+        const coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+        let sum = 0;
+        
+        for (let i = 0; i < 9; i++) {
+            let result = digits[i] * coefficients[i];
+            if (result > 9) result -= 9;
+            sum += result;
+        }
+        
+        const verification = sum % 10 === 0 ? 0 : 10 - (sum % 10);
+        return verification === digits[9];
+    };
 
 
 
@@ -33,7 +66,7 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         'Quito',
         'Cuenca',
         'Santo Domingo',
-        'Machala,',
+        'Machala',
         'Durán',
         'Manta',
         'Portoviejo',
@@ -258,41 +291,67 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         { value: 'admin', label: 'Administrator Be carefull' }
     ]
     console.debug('EditUserForm Found User by id', { user });
-    const defaultValues: FirestoreUser = {
-        ...user,
-        updatedAt: Date.now()
-    };
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<FirestoreUser>({ defaultValues });
+    
+    // Inicializar formulario con valores por defecto
+    const { register, handleSubmit, watch, formState: { errors } } = useForm<FirestoreUser>({ 
+        defaultValues: {
+            ...user,
+            updatedAt: Date.now()
+        }
+    });
+    
     const onSubmit = handleSubmit((async (data) => {
-        if (!levelStudent && watch('role') === 'student') {
+        // Validar que si es estudiante, debe tener modalidad
+        if (data.role === 'student' && !levelStudent) {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
-                text: 'Debe seleccionar una modalidad',
-            })
+                title: 'Error de validación',
+                text: 'Debe seleccionar una modalidad para el estudiante',
+            });
             return;
         }
-        data.level = levelStudent ?? "";
-        if ((sublevels.length === 0) && (selectedSublevels)) {
+
+        // Validar que si es estudiante, debe tener sublevel
+        if (data.role === 'student' && !selectedSublevels) {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
-                text: 'Debe seleccionar una unidad',
+                title: 'Error de validación', 
+                text: 'Debe seleccionar un curso para el estudiante',
             });
-            return
+            return;
         }
-        if (watch('role') === 'student') {
-            data.subLevel = selectedSublevels.value;
+
+        // Validar cédula ecuatoriana
+        if (data.cc && !validateEcuadorianID(data.cc)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cédula inválida',
+                text: 'La cédula ingresada no es válida según el algoritmo ecuatoriano',
+            });
+            return;
         }
+
+        // Asignar valores específicos para estudiantes
+        if (data.role === 'student') {
+            data.level = levelStudent;
+            data.subLevel = selectedSublevels?.value || '';
+        } else {
+            // Limpiar campos de estudiante si no es estudiante
+            data.level = '';
+            data.subLevel = '';
+        }
+
         const updatedUser = {
-            ...defaultValues,
-            ...data
-        }
-        console.debug('👀====>', { updatedUser });
-        // return
+            ...user,
+            ...data,
+            updatedAt: Date.now()
+        };
+
+        console.debug('Usuario actualizado:', { updatedUser });
+
         Swal.fire({
             title: '¿Estás seguro?',
-            text: `Estas a punto de actualizar los datos de ${user.name}`,
+            text: `Estás a punto de actualizar los datos de ${user.name}`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -301,13 +360,26 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             cancelButtonText: 'Cancelar'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await updateUser(updatedUser);
-                window.location.reload();
+                try {
+                    await updateUser(updatedUser);
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Actualizado!',
+                        text: 'Los datos del usuario han sido actualizados correctamente.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } catch (error) {
+                    console.error('Error actualizando usuario:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un problema al actualizar los datos. Inténtalo de nuevo.',
+                    });
+                }
             }
-        })
-        // await updateUser(updatedUser);
-        // reset(defaultValues);
-    }))
+        });
+    }));
 
     console.debug('👀', watch('role'));
     return (
@@ -333,10 +405,22 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Cédula de Ciudadanía</label>
                     <input
-                        {...register("cc", { required: "El nro de cc es obligatorio 👀", pattern: { value: /^[0-9]*$/, message: 'Sólo se permiten números entre 0 y 9 ' } })}
+                        {...register("cc", { 
+                            required: "La cédula es obligatoria", 
+                            pattern: { 
+                                value: /^[0-9]{10}$/, 
+                                message: 'La cédula debe tener exactamente 10 dígitos' 
+                            },
+                            validate: (value) => {
+                                if (value && !validateEcuadorianID(value)) {
+                                    return 'La cédula no es válida según el algoritmo ecuatoriano';
+                                }
+                                return true;
+                            }
+                        })}
                         type="text"
-                        maxLength={13}
-                        placeholder='10123000009'
+                        maxLength={10}
+                        placeholder='1234567890'
                         id="cc"
                         className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
                     />
@@ -350,12 +434,11 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 <div className="space-y-2">
                     <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ciudad</label>
                     <select
-                        {...register("city", { required: "La ciudad es Obligatoria 👀" })}
+                        {...register("city", { required: "La ciudad es obligatoria" })}
                         id="city"
-                        defaultValue={''}
                         className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base"
                     >
-                        <option value={''}>Seleccione ciudad</option>
+                        <option value=''>Seleccione ciudad</option>
                         {
                             cities.map((city, index) => {
                                 return <option key={index} value={city}>{city}</option>
@@ -372,7 +455,13 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Email</label>
                     <input
-                        {...register("email", { required: "El email es obligatorio 👀" })}
+                        {...register("email", { 
+                            required: "El email es obligatorio",
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                message: "El formato del email no es válido"
+                            }
+                        })}
                         type="email"
                         id="email"
                         placeholder="ejemplo@correo.com"
@@ -388,12 +477,11 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Rol</label>
                     <select
-                        {...register("role", { required: "Debe Seleccionar un rol 👀" })}
+                        {...register("role", { required: "Debe seleccionar un rol" })}
                         id="role"
-                        defaultValue={user.role}
                         className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base"
                     >
-                        <option value={''}>Seleccione Rol</option>
+                        <option value=''>Seleccione Rol</option>
                         {
                             roles.map((role, index) => {
                                 return <option key={index} value={role.value}>{role.label}</option>
@@ -415,14 +503,16 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                                 <Select
                                     components={animatedComponents}
                                     placeholder="Seleccione modalidad"
-                                    defaultInputValue={levels.find(level => level.id === user.level)?.name}
+                                    value={levelStudent ? { value: levelStudent, label: levels.find(level => level.id === levelStudent)?.name || '' } : null}
                                     options={levels.filter(level => level.id).map(level => ({ value: level.id!, label: level.name }))}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onChange={(selectedOption: any) => {
-                                        console.debug('LEVELID', selectedOption?.value);
-                                        if (!selectedOption?.value) return
-                                        setLevelStudent(selectedOption.value);
+                                    onChange={(selectedOption) => {
+                                        console.debug('LEVELID', selectedOption);
+                                        const option = selectedOption as {value: string, label: string} | null;
+                                        setLevelStudent(option?.value || '');
+                                        // Limpiar sublevel cuando cambie el level
+                                        setSelectedSublevels(null);
                                     }}
+                                    isClearable
                                     className="text-base"
                                     styles={{
                                         control: (base) => ({
@@ -449,14 +539,15 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                                 <Select
                                     id="sublevels"
                                     components={animatedComponents}
-                                    defaultInputValue={sublevels.find(sublevel => sublevel.id === user.subLevel)?.name}
+                                    value={selectedSublevels}
                                     placeholder="Seleccione curso"
                                     options={sublevels.filter(sublevel => sublevel.id).map(sublevel => ({ value: sublevel.id!, label: sublevel.name }))}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onChange={(selectedOption: any) => {
+                                    onChange={(selectedOption) => {
                                         console.debug('SUB-LEVELID', { selectedOption });
-                                        setSelectedSublevels(selectedOption);
+                                        const option = selectedOption as {value: string, label: string} | null;
+                                        setSelectedSublevels(option);
                                     }}
+                                    isClearable
                                     className="text-base"
                                     styles={{
                                         control: (base) => ({
@@ -513,9 +604,16 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Teléfono de contacto</label>
                     <input
-                        {...register("phone", { required: "El teléfono es obligatorio 👀" })}
+                        {...register("phone", { 
+                            required: "El teléfono es obligatorio",
+                            pattern: {
+                                value: /^[0-9]{10}$/,
+                                message: "El teléfono debe tener exactamente 10 dígitos"
+                            }
+                        })}
                         type="tel"
                         id="phone"
+                        maxLength={10}
                         placeholder="Ej. 0987654321"
                         className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
                     />
