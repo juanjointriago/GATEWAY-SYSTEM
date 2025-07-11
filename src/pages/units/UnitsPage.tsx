@@ -235,7 +235,6 @@ export const UnitsPage = () => {
         <TableGeneric
           columns={columns}
           data={filteredData}
-          hasActions={isAdmin}
         />
       </div>
     </>

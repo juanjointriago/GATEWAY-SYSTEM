@@ -22,19 +22,21 @@ export const UrlIframe: FC<Props> = ({ title, src, errorMsg = 'Este producto no 
 
     return (
         <>
-            {/* Botón responsive */}
+            {/* Botón responsive y compacto */}
             <button 
-                className="w-full sm:w-auto bg-transparent hover:bg-blue-500 
-                text-blue-700 font-semibold hover:text-white 
-                py-2 px-4 border border-blue-500 
+                className="w-full max-w-full bg-transparent hover:bg-blue-500 
+                text-blue-700 font-medium hover:text-white 
+                py-1.5 px-2 sm:px-3 border border-blue-500 
                 hover:border-transparent rounded
                 transition-all duration-300 ease-in-out
-                flex items-center justify-center gap-2
-                text-sm sm:text-base"
+                flex items-center justify-center gap-1.5
+                text-xs sm:text-sm
+                min-w-0 truncate"
                 onClick={() => setIsVisible(true)}
+                title="Ver material de apoyo"
             >
-                <span className="text-lg">🔍</span>
-                <span>Support Material</span>
+                <span className="text-sm sm:text-base">🔍</span>
+                <span className="truncate">Support Material</span>
             </button>
 
             {/* Modal con contenido responsive */}
