@@ -86,7 +86,7 @@ export const UsersPage = () => {
 
               {/* Dropdown menu - responsivo */}
               <div 
-                className="fixed right-0 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200"
+                className="fixed right-10 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200"
                 style={{ zIndex: 999999 }}
               >
                 <div className="p-1 sm:p-2">
