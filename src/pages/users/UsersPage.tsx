@@ -33,6 +33,7 @@ export const UsersPage = () => {
   const [userToEdit, setUserToEdit] = useState<string>();
   const [userforUnit, setUserforUnit] = useState<string>();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  
   const user = useAuthStore((state) => state.user);
   const isAdmin = user && user.role === "admin";
   const users = useUserStore((state) => state.users);
@@ -50,7 +51,9 @@ export const UsersPage = () => {
     ({ userId, isActive }: { userId: string; isActive: boolean }) => {
       const isOpen = openDropdown === userId;
 
-      const toggleDropdown = () => {
+      const toggleDropdown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
         setOpenDropdown(isOpen ? null : userId);
       };
 
@@ -76,13 +79,17 @@ export const UsersPage = () => {
             <>
               {/* Overlay para cerrar el dropdown */}
               <div
-                className="fixed inset-0 z-10"
+                className="fixed inset-0"
+                style={{ zIndex: 999998 }}
                 onClick={() => setOpenDropdown(null)}
               />
 
-              {/* Dropdown menu */}
-              <div className="absolute right-0 z-20 mt-2 w-56 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-xl ring-1 ring-blue-200 focus:outline-none border border-blue-200">
-                <div className="p-2">
+              {/* Dropdown menu - responsivo */}
+              <div 
+                className="fixed right-0 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200"
+                style={{ zIndex: 999999 }}
+              >
+                <div className="p-1 sm:p-2">
                   {/* Toggle Active/Inactive */}
                   <button
                     onClick={() =>
@@ -114,22 +121,22 @@ export const UsersPage = () => {
                         });
                       })
                     }
-                    className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
                       isActive
                         ? "text-red-700 bg-red-50 hover:bg-red-100 border border-red-200"
                         : "text-green-700 bg-green-50 hover:bg-green-100 border border-green-200"
                     }`}
                   >
-                    <div className="flex items-center justify-center w-8 h-5">
+                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
                       <ToggleButton isActive={isActive} action={() => {}} />
                     </div>
-                    <span className="ml-3">
+                    <span className="ml-2 sm:ml-3">
                       {isActive ? "Desactivar usuario" : "Activar usuario"}
                     </span>
                   </button>
 
                   {/* Separador */}
-                  <div className="h-px bg-blue-200 my-2"></div>
+                  <div className="h-px bg-blue-200 my-1 sm:my-2"></div>
                   {/* Contrato */}
                   {isAdmin && (
                     <button
@@ -139,12 +146,12 @@ export const UsersPage = () => {
                           setUserforUnit(userId);
                         })
                       }
-                      className="group flex items-center w-full px-4 py-3 text-sm font-medium text-cyan-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-cyan-300 hover:shadow-sm"
+                      className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-cyan-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-cyan-300 hover:shadow-sm"
                     >
-                      <div className="flex items-center justify-center w-8 h-5 bg-purple-100 rounded-md group-hover:bg-cyan-200 transition-colors duration-200">
-                        <IoDocumentAttachOutline className="w-4 h-4 text-cyan-600" />
+                      <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-purple-100 rounded-md group-hover:bg-cyan-200 transition-colors duration-200">
+                        <IoDocumentAttachOutline className="w-3 sm:w-4 h-3 sm:h-4 text-cyan-600" />
                       </div>
-                      <span className="ml-3">Contrato</span>
+                      <span className="ml-2 sm:ml-3">Contrato</span>
                     </button>
                   )}
                   {/* Editar usuario */}
@@ -155,12 +162,12 @@ export const UsersPage = () => {
                         setUserToEdit(userId);
                       })
                     }
-                    className="group flex items-center w-full px-4 py-3 text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm mb-2"
+                    className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm mb-1 sm:mb-2"
                   >
-                    <div className="flex items-center justify-center w-8 h-5 bg-blue-100 rounded-md group-hover:bg-blue-200 transition-colors duration-200">
-                      <IoPencil className="w-4 h-4 text-blue-600" />
+                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-blue-100 rounded-md group-hover:bg-blue-200 transition-colors duration-200">
+                      <IoPencil className="w-3 sm:w-4 h-3 sm:h-4 text-blue-600" />
                     </div>
-                    <span className="ml-3">Editar usuario</span>
+                    <span className="ml-2 sm:ml-3">Editar usuario</span>
                   </button>
 
                   {/* Asignar libros */}
@@ -171,12 +178,12 @@ export const UsersPage = () => {
                         setUserforUnit(userId);
                       })
                     }
-                    className="group flex items-center w-full px-4 py-3 text-sm font-medium text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm mb-2"
+                    className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm mb-1 sm:mb-2"
                   >
-                    <div className="flex items-center justify-center w-8 h-5 bg-green-100 rounded-md group-hover:bg-green-200 transition-colors duration-200">
-                      <IoBook className="w-4 h-4 text-green-600" />
+                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-green-100 rounded-md group-hover:bg-green-200 transition-colors duration-200">
+                      <IoBook className="w-3 sm:w-4 h-3 sm:h-4 text-green-600" />
                     </div>
-                    <span className="ml-3">Asignar libros</span>
+                    <span className="ml-2 sm:ml-3">Asignar libros</span>
                   </button>
 
                   {/* Ver Progress Sheet */}
@@ -187,12 +194,12 @@ export const UsersPage = () => {
                         setUserforUnit(userId);
                       })
                     }
-                    className="group flex items-center w-full px-4 py-3 text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:shadow-sm"
+                    className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:shadow-sm"
                   >
-                    <div className="flex items-center justify-center w-8 h-5 bg-purple-100 rounded-md group-hover:bg-purple-200 transition-colors duration-200">
-                      <IoPerson className="w-4 h-4 text-purple-600" />
+                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-purple-100 rounded-md group-hover:bg-purple-200 transition-colors duration-200">
+                      <IoPerson className="w-3 sm:w-4 h-3 sm:h-4 text-purple-600" />
                     </div>
-                    <span className="ml-3">Ver Progress Sheet</span>
+                    <span className="ml-2 sm:ml-3">Ver Progress Sheet</span>
                   </button>
                 </div>
               </div>
@@ -303,21 +310,29 @@ export const UsersPage = () => {
         accessorFn: (row) => row.isActive,
         id: "isActive",
         cell: (info) => (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center relative">
             {isAdmin ? (
-              <ActionMenu
-                userId={info.row.original.id!}
-                isActive={info.getValue() as boolean}
-              />
-            ) : (
-              <div className="text-sm text-gray-600">
-                {info.getValue() ? "Disponible" : "No disponible"}
+              <div className="relative">
+                <ActionMenu
+                  userId={info.row.original.id!}
+                  isActive={info.getValue() as boolean}
+                />
               </div>
+            ) : (
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                info.getValue() 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-red-100 text-red-800'
+              }`}>
+                {info.getValue() ? "Activo" : "Inactivo"}
+              </span>
             )}
           </div>
         ),
         header: () => <span>{`${isAdmin ? "Acciones" : "Estado"}`}</span>,
         enableColumnFilter: false,
+        enableSorting: false,
+        size: isAdmin ? 150 : 100,
       },
     ],
     [levels, subLevels, selectedLevel, selectedSubLevel, isAdmin, ActionMenu]

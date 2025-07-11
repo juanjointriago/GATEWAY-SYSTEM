@@ -1,16 +1,15 @@
-// import { useEffect } from "react";
-import { TableContainer } from "../../components/shared/tables/TableContainer"
+import { useMemo, useState } from "react";
 import { level } from "../../interface"
-import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useAuthStore, useLevelStore } from "../../stores";
 import { FormLevel } from "../../components/shared/forms";
 import Swal from "sweetalert2";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { useState } from "react";
 import { IoPencil, IoTrash } from "react-icons/io5";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditLevelControl } from "../../components/shared/forms/EditLevelControl";
+import { TableGeneric } from "../../components/shared/tables/TableGeneric";
+import { ColumnDef } from "@tanstack/react-table";
 
 
 export const LevelsPage = () => {
@@ -20,69 +19,151 @@ export const LevelsPage = () => {
   const updateLevel = useLevelStore(state => state.updateLevel);
   const deleteLevel = useLevelStore(state => state.deleteLevel);
   const [openModal, setOpenModal] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
   const [levelToEdit, setLevelToEdit] = useState<string>();
 
-
-  // console.debug("LEVELS", levels);
-  const levelsCols: Array<ColumnProps<level>> = [
-    // { key: 'id', title: 'Código' },
-    { key: 'name', title: 'Nombre' },
-    { key: 'description', title: 'Descripción' },
+  const columns = useMemo<ColumnDef<level>[]>(() => [
     {
-      key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => (
-        //TODO component for generic actions on all tables
-        <>
-          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
-            Swal.fire({
-              title: '¿Estás seguro?',
-              text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} esta modalidad`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, continuar',
-              cancelButtonText: 'Cancelar'
-            }).then(async(result) => {
-              if (result.isConfirmed) {
-                await updateLevel({ ...record, isActive: !record.isActive })
-                window.location.reload();
-              }
-            })
-          }} /> : <div>{record.isActive ? 'Público' : 'Privado'}</div>}
-          {isAdmin && <FabButton isActive tootTipText={''} action={() => {
-            setOpenModal(true);
-            setLevelToEdit(record.id)
-          }} Icon={IoPencil} />}
-          {isAdmin && <FabButton isActive
-            Icon={IoTrash}
-            action={() => {
-              Swal.fire({
-                title: '¿Estás seguro?',
-                text: `Estas a punto de eliminar esta modalidad`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, continuar',
-                cancelButtonText: 'Cancelar'
-              }).then(async(result) => {
-                if (result.isConfirmed) {
-                  await deleteLevel(record.id!);
-                }
-              })
-            }} />}
-        </>
-      )
+      accessorKey: 'name',
+      header: 'Nombre',
+      cell: ({ row }) => (
+        <div className="font-medium text-gray-900">
+          {row.getValue('name')}
+        </div>
+      ),
     },
-  ]
+    {
+      accessorKey: 'description',
+      header: 'Descripción',
+      cell: ({ row }) => (
+        <div className="max-w-xs">
+          <p className="text-sm text-gray-600 truncate">
+            {row.getValue('description') || 'Sin descripción'}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'isActive',
+      header: isAdmin ? 'Acciones' : 'Estado',
+      cell: ({ row }) => {
+        const level = row.original;
+        
+        if (!isAdmin) {
+          return (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              level.isActive 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-gray-100 text-gray-800'
+            }`}>
+              {level.isActive ? 'Público' : 'Privado'}
+            </span>
+          );
+        }
 
-  // console.debug({getAllLevels})
+        return (
+          <div className="flex items-center gap-2">
+            <ToggleButton
+              isActive={level.isActive}
+              action={() => {
+                Swal.fire({
+                  title: '¿Estás seguro?',
+                  text: `Estás a punto de ${level.isActive ? 'ocultar' : 'mostrar'} esta modalidad`,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Sí, continuar',
+                  cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    await updateLevel({ ...level, isActive: !level.isActive });
+                    window.location.reload();
+                  }
+                });
+              }}
+            />
+            <FabButton 
+              isActive 
+              tootTipText="Editar modalidad" 
+              action={() => {
+                setOpenModal(true);
+                setLevelToEdit(level.id);
+              }} 
+              Icon={IoPencil} 
+            />
+            <FabButton 
+              isActive
+              tootTipText="Eliminar modalidad"
+              Icon={IoTrash}
+              action={() => {
+                Swal.fire({
+                  title: '¿Estás seguro?',
+                  text: 'Estás a punto de eliminar esta modalidad',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Sí, continuar',
+                  cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    await deleteLevel(level.id!);
+                  }
+                });
+              }} 
+            />
+          </div>
+        );
+      },
+    },
+  ], [updateLevel, deleteLevel, isAdmin]);
+
   return (
     <>
       <div className="pt-5">
-        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Modalidades</h1>
-      {levelToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditLevelControl levelId={levelToEdit} />} />}
-        <TableContainer columns={levelsCols} data={levels} modalChildren={<FormLevel />} modalTitle="Crear Modalidades" />
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+          Modalidades
+        </h1>
+        
+        {/* Modal para editar nivel */}
+        {levelToEdit && (
+          <ModalGeneric 
+            title="Actualizar datos" 
+            isVisible={openModal} 
+            setIsVisible={setOpenModal} 
+            children={<EditLevelControl levelId={levelToEdit} />} 
+          />
+        )}
+        
+        {/* Modal para agregar nueva modalidad */}
+        {isAdmin && (
+          <ModalGeneric 
+            title="Crear Nueva Modalidad" 
+            isVisible={openAddModal} 
+            setIsVisible={setOpenAddModal} 
+            children={<FormLevel />}
+          />
+        )}
+        
+        {/* Botón para agregar nueva modalidad */}
+        {isAdmin && (
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={() => setOpenAddModal(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              + Agregar Modalidad
+            </button>
+          </div>
+        )}
+        
+        {/* Tabla con TableGeneric */}
+        <TableGeneric
+          columns={columns}
+          data={levels}
+          // hasActions={isAdmin}
+        />
       </div>
     </>
   )

@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { unit } from "../../interface"
-import { ColumnProps } from "../../interface/ui/tables.interface"
 import { useAuthStore, useUnitStore } from "../../stores";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
 import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
@@ -10,9 +9,10 @@ import { FabButton } from "../../components/shared/buttons/FabButton";
 import { IoPencil, IoTrash } from "react-icons/io5";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
-import { TableContainerBooks } from "../../components/shared/tables/TableContainerBooks";
 import Swal from "sweetalert2";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
+import { TableGeneric } from "../../components/shared/tables/TableGeneric";
+import { ColumnDef } from "@tanstack/react-table";
 
 
 
@@ -20,94 +20,223 @@ export const UnitsPage = () => {
   const updateUnit = useUnitStore(state => state.updateUnit);
   const deleteUnit = useUnitStore(state => state.deleteUnit);
   const user = useAuthStore(state => state.user);
-  // console.debug('👀 ==== > USER ', { user })
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const books = useUnitStore(state => state.units);
   const [openModal, setOpenModal] = useState(false);
-  const [unitToEdit, setUnitToEdit] = useState<unit>()
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [unitToEdit, setUnitToEdit] = useState<unit>();
 
 
   useEffect(() => {
     getAllUnits();
   }, [getAllUnits]);
-  // console.debug('UNIDADES', units);
-  const unitsCols: Array<ColumnProps<unit>> = [
-    { key: 'orderNumber', title: 'Nro', render: (_, record) => <>{record.orderNumber}</> },
-    { key: 'sublevel', title: 'Unidad', render: (_, record) => <SubLevelById subLevelId={record.sublevel} /> },
-    { key: 'name', title: 'Nombre' },
-    { key: 'supportMaterial', title: 'Mat. de Apoyo', render: (_, record) => <UrlIframe title={record.name} src={record.supportMaterial!} errorMsg="Error al cargar el archivo" /> },
+  
+  console.debug('UNIDADES', books);
+
+  const columns = useMemo<ColumnDef<unit>[]>(() => [
     {
-      key: 'workSheetUrl', title: 'Work Sheet', render: (_, record) =>
-        <div className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-          <NavLink to={record.workSheetUrl} target="_blank" end rel="noreferrer noopener" > <span className="text-sm uppercase text-white-500 hidden md:block">🔍 WorkSheet</span></NavLink> </div>
+      accessorKey: 'orderNumber',
+      header: 'Nro.',
+      cell: ({ row }) => (
+        <span className="font-medium text-gray-900">
+          {row.getValue('orderNumber')}
+        </span>
+      ),
     },
     {
-      key: 'isActive', title: `${isAdmin ? 'Acciones' : 'Estado'}`, render: (_, record) => (<>
-        {isAdmin ? <div>
-          {isAdmin ? <ToggleButton isActive={record.isActive} action={() => {
-
-            console.debug(record)
-            Swal.fire({
-              title: '¿Estás seguro?',
-              text: `Estas a punto de ${record.isActive ? 'ocultar' : 'mostrar'} este Libro`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, continuar',
-              cancelButtonText: 'Cancelar'
-            }).then(async(result) => {
-              if (result.isConfirmed) {
-                // console.debug('data for update', { ...record, isActive: record.isActive ? false : true });
-                // return
-                await updateUnit({ ...record, isActive: record.isActive? false : true });
-                window.location.reload();
-              }
-            })
-          }} /> : <div>{record.isActive ? 'Disponible' : 'No disponible'}</div>}
-          {isAdmin && <FabButton isActive tootTipText={''} action={() => { setOpenModal(true); setUnitToEdit(record) }} Icon={IoPencil} />}
-          {isAdmin && <FabButton isActive
-            Icon={IoTrash}
-            action={() => {
-              Swal.fire({
-                title: '¿Estás seguro?',
-                text: `Estas a punto de eliminar este Libro `,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, continuar',
-                cancelButtonText: 'Cancelar'
-              }).then(async(result) => {
-                if (result.isConfirmed) {
-                  await deleteUnit(record.id!);
-                }
-              })
-            }} />}
-        </div> : <p>--------</p>}
-      </>
-      )
+      accessorKey: 'sublevel',
+      header: 'Unidad',
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <SubLevelById subLevelId={row.getValue('sublevel')} />
+        </div>
+      ),
     },
-  ]
+    {
+      accessorKey: 'name',
+      header: 'Nombre',
+      cell: ({ row }) => (
+        <div className="max-w-xs">
+          <p className="text-sm font-medium text-gray-900 truncate">
+            {row.getValue('name')}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'author',
+      header: 'Autor',
+      cell: ({ row }) => (
+        <span className="text-sm text-gray-600">
+          {row.getValue('author') || 'Sin autor'}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'supportMaterial',
+      header: 'Material de Apoyo',
+      cell: ({ row }) => (
+        <div className="w-full">
+          <UrlIframe 
+            title={row.getValue('name')} 
+            src={row.getValue('supportMaterial')} 
+            errorMsg="Error al cargar el archivo" 
+          />
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'workSheetUrl',
+      header: 'Work Sheet',
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <NavLink 
+            to={row.getValue('workSheetUrl')} 
+            target="_blank" 
+            rel="noreferrer noopener"
+            className="inline-flex items-center px-3 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 hover:border-blue-400 transition-colors duration-200"
+          >
+            <span className="hidden sm:inline">🔍 WorkSheet</span>
+            <span className="sm:hidden">🔍</span>
+          </NavLink>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'isActive',
+      header: isAdmin ? 'Acciones' : 'Estado',
+      cell: ({ row }) => {
+        const unit = row.original;
+        
+        if (!isAdmin) {
+          return (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              unit.isActive 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {unit.isActive ? 'Disponible' : 'No disponible'}
+            </span>
+          );
+        }
 
-  // const sortedUnits = units.sort((a, b) => a.orderNumber > b.orderNumber ? 1 : -1).filter(unit => unit.isActive);
-  // user && console.debug('USUARIO ACTUAL =>',user.uid,' UNIDADES ASIGNADAS =>',  user.unitsForBooks)
-  const activeUnits = books
-  // books && user && console.debug('✅ LIBROS DE ',books.filter((unit) => unit.sublevel === user.unitsForBooks[0]))
+        return (
+          <div className="flex items-center gap-2">
+            <ToggleButton
+              isActive={unit.isActive}
+              action={() => {
+                Swal.fire({
+                  title: '¿Estás seguro?',
+                  text: `Estás a punto de ${unit.isActive ? 'ocultar' : 'mostrar'} este Libro`,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Sí, continuar',
+                  cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    await updateUnit({ ...unit, isActive: !unit.isActive });
+                    window.location.reload();
+                  }
+                });
+              }}
+            />
+            <FabButton 
+              isActive 
+              tootTipText="Editar unidad" 
+              action={() => { 
+                setOpenModal(true); 
+                setUnitToEdit(unit) 
+              }} 
+              Icon={IoPencil} 
+            />
+            <FabButton 
+              isActive
+              tootTipText="Eliminar unidad"
+              Icon={IoTrash}
+              action={() => {
+                Swal.fire({
+                  title: '¿Estás seguro?',
+                  text: 'Estás a punto de eliminar este Libro',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Sí, continuar',
+                  cancelButtonText: 'Cancelar'
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    await deleteUnit(unit.id!);
+                  }
+                });
+              }} 
+            />
+          </div>
+        );
+      },
+    },
+  ], [updateUnit, deleteUnit, isAdmin]);
+
+  // Filtrar datos según el rol del usuario
+  const filteredData = useMemo(() => {
+    if (!user) return [];
+    
+    if (user.role === 'admin') {
+      return books;
+    } else {
+      return user.unitsForBooks ? 
+        books.filter((unit) => user.unitsForBooks.includes(unit.sublevel)) : 
+        [];
+    }
+  }, [user, books]);
 
   return (
     <>
       <div className="pt-5">
-        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">Libros</h1>
-        {/**Table comp */}
-        {isAdmin && unitToEdit && <ModalGeneric title="Actualizar datos" isVisible={openModal} setIsVisible={setOpenModal} children={<EditUnitForm unit={unitToEdit} />} />}
-        <TableContainerBooks
-          hasAddBtn={isAdmin}
-          columns={unitsCols}
-          data={user && ((user.role === 'admin') ? books : user.unitsForBooks ? activeUnits.filter((unit) => user.unitsForBooks.includes(unit.sublevel)) : [])}
-          modalChildren={<FormUnit />}
-          modalTitle="Crear Unidades" />
+        <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+          Libros
+        </h1>
+        
+        {/* Modal para editar unidad */}
+        {isAdmin && unitToEdit && (
+          <ModalGeneric 
+            title="Actualizar datos" 
+            isVisible={openModal} 
+            setIsVisible={setOpenModal} 
+            children={<EditUnitForm unit={unitToEdit} />} 
+          />
+        )}
+        
+        {/* Modal para agregar nueva unidad */}
+        {isAdmin && (
+          <ModalGeneric 
+            title="Crear Nueva Unidad" 
+            isVisible={openAddModal} 
+            setIsVisible={setOpenAddModal} 
+            children={<FormUnit />}
+          />
+        )}
+        
+        {/* Botón para agregar nueva unidad */}
+        {isAdmin && (
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={() => setOpenAddModal(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              + Agregar Libro
+            </button>
+          </div>
+        )}
+        
+        {/* Tabla con TableGeneric */}
+        <TableGeneric
+          columns={columns}
+          data={filteredData}
+          hasActions={isAdmin}
+        />
       </div>
     </>
   )
