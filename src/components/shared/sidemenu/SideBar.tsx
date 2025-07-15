@@ -87,7 +87,7 @@ export const SideBar: FC = () => {
                 `}
             >
                 {/* Header del menú */}
-                <div className="sticky top-0 bg-[#1e1b4b] border-b border-indigo-800">
+                <div className="sticky top-0 bg-[#1e1b4b] border-b border-indigo-800 z-10">
                     <div className="flex items-center justify-between h-16 px-4">
                         <h4 className={`
                             text-lg font-medium text-white
@@ -123,9 +123,9 @@ export const SideBar: FC = () => {
                 </div>
 
                 {/* Contenedor principal con scroll si es necesario */}
-                <div className="flex-1 flex flex-col overflow-y-auto">
+                <div className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
                     {/* Área scrolleable */}
-                    <nav className="flex-1 mt-6 px-3 space-y-1">
+                    <nav className="flex-1 mt-6 px-3 space-y-1 pb-4">
                         {user && menuItemsByRole(user.role).map((item) => (
                             <SideMenuItem 
                                 key={item.title}
@@ -137,7 +137,7 @@ export const SideBar: FC = () => {
                 </div>
 
                 {/* Footer fijo */}
-                <div className="sticky bottom-0 bg-[#1e1b4b] border-t border-indigo-800 mt-auto">
+                <div className="sticky bottom-0 bg-[#1e1b4b] border-t border-indigo-800 mt-auto z-10">
                     <div className="p-4">
                         <button
                             onClick={logout}
