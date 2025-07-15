@@ -265,12 +265,24 @@ export const SettingsPage = () => {
       </div>
 
       {/* Modal para editar configuración */}
-      <ModalGeneric
-        isVisible={showModal}
-        setIsVisible={setShowModal}
-        title="Editar Configuración de la Empresa"
-        children={<EditSettingsForm />}
-      />
+      {enterpriseInfo && (
+        <ModalGeneric
+          isVisible={showModal}
+          setIsVisible={setShowModal}
+          title="Editar Configuración de la Empresa"
+          children={
+            <EditSettingsForm
+              initialData={enterpriseInfo}
+              onSave={() => {
+                setShowModal(false);
+                // Refrescar la información
+                getEnterpriseInfo();
+              }}
+              onCancel={() => setShowModal(false)}
+            />
+          }
+        />
+      )}
     </>
   );
 };
