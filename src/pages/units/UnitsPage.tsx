@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { unit } from "../../interface"
 import { useAuthStore, useUnitStore } from "../../stores";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
@@ -7,12 +7,14 @@ import { NavLink } from "react-router-dom";
 import { SubLevelById } from "../sublevels/SubLevelById";
 import { FabButton } from "../../components/shared/buttons/FabButton";
 import { IoPencil, IoTrash } from "react-icons/io5";
+import { MdFileDownload } from "react-icons/md";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
 import Swal from "sweetalert2";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { ColumnDef } from "@tanstack/react-table";
+import { exportUnitsToExcel } from "../../helpers/excel.helper";
 
 
 
@@ -26,6 +28,26 @@ export const UnitsPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [unitToEdit, setUnitToEdit] = useState<unit>();
+
+  const handleExportToExcel = useCallback(async () => {
+    try {
+      const success = await exportUnitsToExcel(books);
+      
+      if (success) {
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "El archivo Excel ha sido descargado exitosamente",
+          icon: "success",
+          confirmButtonText: "Continuar"
+        });
+      } else {
+        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+      }
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+    }
+  }, [books]);
 
 
   useEffect(() => {
@@ -221,12 +243,34 @@ export const UnitsPage = () => {
         
         {/* Botón para agregar nueva unidad */}
         {isAdmin && (
-          <div className="mb-6 flex justify-end">
+          <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={handleExportToExcel}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+              >
+                <MdFileDownload className="w-5 h-5" />
+                Exportar Excel
+              </button>
+            </div>
             <button 
               onClick={() => setOpenAddModal(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
               + Agregar Libro
+            </button>
+          </div>
+        )}
+
+        {/* Solo botón de exportación para no admin */}
+        {!isAdmin && (
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              <MdFileDownload className="w-5 h-5" />
+              Exportar Excel
             </button>
           </div>
         )}

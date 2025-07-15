@@ -13,6 +13,7 @@ import {
   IoPerson,
   IoDocumentAttachOutline,
 } from "react-icons/io5";
+import { MdFileDownload } from "react-icons/md";
 import { useMemo, useState, useCallback } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
@@ -24,6 +25,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { StudentProgressSheet } from "../progress-sheet/StudentProgressSheet";
 import { StudentContract } from "../contract/StudentContract";
+import { exportUsersToExcel } from "../../helpers/excel.helper";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -349,6 +351,26 @@ export const UsersPage = () => {
     });
   }, [users, selectedLevel, selectedSubLevel]);
 
+  const handleExportToExcel = useCallback(async () => {
+    try {
+      const success = await exportUsersToExcel(filteredUsers);
+      
+      if (success) {
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "El archivo Excel ha sido descargado exitosamente",
+          icon: "success",
+          confirmButtonText: "Continuar"
+        });
+      } else {
+        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+      }
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+    }
+  }, [filteredUsers]);
+
   return (
     <>
       <div className="pt-5">
@@ -388,6 +410,20 @@ export const UsersPage = () => {
             children={<StudentContract studentID={userforUnit} />}
           />
         )}
+        
+        {/* Botón para exportar usuarios */}
+        {isAdmin && (
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              <MdFileDownload className="w-5 h-5" />
+              Exportar Excel
+            </button>
+          </div>
+        )}
+        
         {/* Modal */}
         {<TableGeneric columns={columns} data={filteredUsers} />}
       </div>

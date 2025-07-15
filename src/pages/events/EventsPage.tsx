@@ -15,11 +15,11 @@ import {
   IoPencil,
   IoTrash,
 } from "react-icons/io5";
-import { MdPerson } from "react-icons/md";
+import { MdPerson, MdFileDownload } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 // import { TableContainer } from "../../components/shared/tables/TableContainer";
 import { FabButton } from "../../components/shared/buttons/FabButton";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import Swal from "sweetalert2";
 // import { getInitials } from "../users/helper";
@@ -31,10 +31,12 @@ import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { IconType } from "react-icons";
 import { FormEventControl } from "../../components/shared/forms";
+import { exportEventsToExcel } from "../../helpers/excel.helper";
 
 export const EventsPage = () => {
   const [showModal, setShowModal] = useState(false);
   
+  const events = useEventStore((state) => state.events);
   const users = useUserStore((state) => state.users);
   const user = useAuthStore((state) => state.user);
   const sublevels = useSubLevelStore((state) => state.subLevels);
@@ -45,6 +47,26 @@ export const EventsPage = () => {
   const isTeacher = user && user.role === "teacher";
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>();
+
+  const handleExportToExcel = useCallback(async () => {
+    try {
+      const success = await exportEventsToExcel(events);
+      
+      if (success) {
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "El archivo Excel ha sido descargado exitosamente",
+          icon: "success",
+          confirmButtonText: "Continuar"
+        });
+      } else {
+        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+      }
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+    }
+  }, [events]);
 
   const iconEdit:IconType = isAdmin?IoPencil:MdPerson
 
@@ -329,9 +351,6 @@ export const EventsPage = () => {
     [ isAdmin, levels, sublevels, users, updateEvent, deleteEvent, setEventToEdit, isTeacher, user, iconEdit]
   );
 
-
-
-  const events = useEventStore((state) => state.events);
   const sortedEvents = events.filter(event => event.isActive).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -371,12 +390,34 @@ export const EventsPage = () => {
         
         {/* Botón para agregar nueva reservación */}
         {isAdmin && (
-          <div className="mb-6 flex justify-end">
+          <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={handleExportToExcel}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+              >
+                <MdFileDownload className="w-5 h-5" />
+                Exportar Excel
+              </button>
+            </div>
             <button 
               onClick={() => setShowModal(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
               + Agregar Reservación
+            </button>
+          </div>
+        )}
+
+        {/* Solo botón de exportación para teachers */}
+        {isTeacher && (
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              <MdFileDownload className="w-5 h-5" />
+              Exportar Excel
             </button>
           </div>
         )}

@@ -12,10 +12,8 @@ import {
 import { useReducer, useRef, useState } from "react";
 import { Filter } from "./Filter";
 import { environment } from "../../../environment";
-import { WorkBook, utils, writeFileXLSX } from 'xlsx';
-import { IoBarChart } from "react-icons/io5";
 import { MdPictureAsPdf } from "react-icons/md";
-import { useAuthStore } from "../../../stores";
+// import { useAuthStore } from "../../../stores";
 
 
 
@@ -44,14 +42,15 @@ export const TableGeneric = <T,>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const rerender = useReducer(() => ({}), {})[1];
     const tableRef = useRef<HTMLTableElement | null>(null);
-    const user = useAuthStore(state => state.user);
+    // const user = useAuthStore(state => state.user);
 
   
 
-   const handleDownloadExcel = () => {
-      const wb: WorkBook = utils.table_to_book(tableRef.current);
-      writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
-    }
+  //  const handleDownloadExcel = () => {
+  //     // Esta funcionalidad se ha movido a las páginas específicas
+  //     // usando ExcelJS por motivos de seguridad
+  //     console.log('Funcionalidad de Excel movida a helpers específicos');
+  //   }
 
   // Agregar columna de acciones dinámicamente
   const columnsWithActions = hasActions?[
@@ -121,28 +120,8 @@ export const TableGeneric = <T,>({
             {table.getPrePaginationRowModel().rows.length} registro(s)
           </span>
         </div>
-        
-        {user && user.role === 'admin' && (
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            <button 
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 sm:px-4 py-2 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 text-sm"
-              type="button"
-              onClick={handleDownloadExcel}
-            >
-              <IoBarChart className="w-4 h-4" />
-              <span className="font-medium">Exportar Excel</span>
-            </button>
-            <button 
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 sm:px-4 py-2 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 text-sm"
-              type="button"
-              onClick={() => {}}
-            >
-              <MdPictureAsPdf className="w-4 h-4" />
-              <span className="font-medium">Exportar PDF</span>
-            </button>
-          </div>
-        )}
       </div>
+      
       {/* Tabla con diseño moderno y responsivo */}
       <div className="overflow-x-auto overflow-y-visible rounded-lg border border-gray-200 shadow-sm relative">
         <table ref={tableRef} className="min-w-full divide-y divide-gray-200 relative z-0">

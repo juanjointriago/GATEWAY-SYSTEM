@@ -1,27 +1,60 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useFormContext } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateInvoiceNumber } from "../../../helpers/invoice.helper";
 import { fee } from "../../../interface/fees.interface";
 import { useUserStore } from "../../../stores";
 import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
 import { useFeesStore } from "../../../stores/fees/fess.store";
+import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
+import { useAuthStore } from "../../../stores/auth/auth.store";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Swal from "sweetalert2";
 import { v6 as uuid } from "uuid";
+import { sendCustomEmail } from "../../../store/firebase/helper";
+import QRCode from "qrcode";
 
 export const AddFeeForm = () => {
   const getUserByRole = useUserStore((state) => state.getUserByRole);
   const createFee = useFeesStore((state) => state.createFee);
+  const { user } = useAuthStore();
+  const { getProgressSheetByStudentId, updateProgressSheet } = useProgressSheetStore();
   const [isLoading] = useState(false);
   const [error] = useState<string | null>(null);
   const students = getUserByRole("student").filter(
     (student) => student.isActive
   )!;
+  //fPJoZWFmWRgjB3LBToRo7wwhLuH3
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const getUserById = useUserStore((state) => state.getUserById);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Definir las opciones de pago según el rol del usuario
+  const getPaymentOptions = () => {
+    if (user?.role === 'student') {
+      return [
+        { value: 'deposit', label: 'Depósito' },
+        { value: 'transference', label: 'Transferencia' },
+        { value: 'voucher_tc', label: 'Voucher TC' }
+      ];
+    } else {
+      return [
+        { value: 'cash', label: 'Efectivo' },
+        { value: 'transference', label: 'Transferencia' },
+        { value: 'tc', label: 'Tarjeta de crédito' },
+        { value: 'deposit', label: 'Depósito' }
+      ];
+    }
+  };
+
+  // Función para determinar si se requiere selección de estudiante
+  const isStudentSelectionRequired = () => {
+    if (!user) return true;
+    return user.role === 'admin' || user.role === 'teacher';
+  };
+
+  const paymentOptions = getPaymentOptions();
 
   const today = Date.now();
   const {
@@ -30,18 +63,19 @@ export const AddFeeForm = () => {
     register,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<fee>({
     defaultValues: {
-      studentUid: "",
+      studentUid: user?.role === 'student' ? user.id : "",
       qty: 0,
       createdAt: today,
       updatedAt: today,
       code: generateInvoiceNumber(),
       isActive: true,
-      isSigned: true,
+      isSigned: false,
       reason: "",
-      paymentMethod: "cash",
+      paymentMethod: user?.role === 'student' ? "deposit" : "cash",
       place: "",
       docNumber: "",
       customerName: "",
@@ -50,6 +84,29 @@ export const AddFeeForm = () => {
   });
 
   const paymentMethod = watch("paymentMethod");
+  const selectedStudentUid = watch("studentUid");
+
+  // Effect para autocompletar el nombre del representante
+  useEffect(() => {
+    const studentUid = user?.role === 'student' ? user.id : selectedStudentUid;
+    
+    if (studentUid) {
+      const progressSheet = getProgressSheetByStudentId(studentUid);
+      if (progressSheet && progressSheet.myPreferredName) {
+        setValue('customerName', progressSheet.myPreferredName);
+      }
+    }
+  }, [selectedStudentUid, user, getProgressSheetByStudentId, setValue]);
+
+  // Effect inicial para estudiantes autenticados
+  useEffect(() => {
+    if (user?.role === 'student' && user.id) {
+      const progressSheet = getProgressSheetByStudentId(user.id);
+      if (progressSheet && progressSheet.myPreferredName) {
+        setValue('customerName', progressSheet.myPreferredName);
+      }
+    }
+  }, [user, getProgressSheetByStudentId, setValue]);
 
   const customStyles = {
     control: (provided: any) => ({
@@ -71,63 +128,98 @@ export const AddFeeForm = () => {
 
   const onSubmit = async (fee: fee) => {
     try {
-      if (!fee.studentUid) {
+      const studentUid = user?.role === 'student' ? user.id : fee.studentUid;
+      
+      if (!studentUid) {
         Swal.fire("Error", "Por favor seleccione un estudiante", "error");
         return;
       }
 
-      const student = getUserById(fee.studentUid);
+      const student = getUserById(studentUid);
       if (!student) {
         Swal.fire("Error", "No se encontró un estudiante con ese UID", "error");
         return;
       }
 
+      // Validar imagen solo si no es efectivo
       if (paymentMethod !== "cash" && !selectedFile) {
-        Swal.fire("Error", "Por favor ssssseleccione una imagen", "error");
+        Swal.fire("Error", "Por favor seleccione una imagen del comprobante", "error");
         return;
       }
 
-      // if (!selectedFile) {
-      //   Swal.fire("Error", "Por favor seleccione una imagen", "error");
-      //   return;
-      // }
-
       setIsUploading(true);
 
-      // Subir la imagen a Firebase Storage
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const fileName = `${timestamp}-${student.cc}`;
-      const storage = getStorage();
-      const storageRef = ref(storage, `fees/${fileName}`);
-      if (selectedFile) {
-        await uploadBytes(storageRef, selectedFile);
+      // Buscar el progress sheet del estudiante
+      const progressSheet = getProgressSheetByStudentId(studentUid);
+      if (!progressSheet) {
+        Swal.fire("Error", "No se encontró un contrato para este estudiante", "error");
+        setIsUploading(false);
+        return;
       }
-      const imageUrl = !selectedFile
-        ? undefined
-        : await getDownloadURL(storageRef);
+
+      // Subir la imagen a Firebase Storage o usar logo para efectivo
+      let imageUrl: string | undefined;
+      if (paymentMethod === "cash") {
+        // Para pagos en efectivo, usar el logo de Gateway
+        imageUrl = import.meta.env.VITE_REACT_APP_LOGO_URL || 'https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd';
+      } else if (selectedFile) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const fileName = `${timestamp}-${student.cc}`;
+        const storage = getStorage();
+        const storageRef = ref(storage, `fees/${fileName}`);
+        await uploadBytes(storageRef, selectedFile);
+        imageUrl = await getDownloadURL(storageRef);
+      }
 
       // Crear el objeto fee
       const feeToSave: fee = {
         ...fee,
-        id: uuid(),
-        cc: student.cc,
-      };
-
-      const feeToSaveImgUrl = {
-        ...feeToSave,
+        studentUid,
         id: uuid(),
         cc: student.cc,
         imageUrl,
       };
 
-      // Guardar el fee en Firebase
-      await createFee(imageUrl ? feeToSaveImgUrl : feeToSave);
+      // Actualizar los valores del progress sheet
+      const paymentAmount = Number(fee.qty); // Asegurar que sea número
+      
+      // Validar que el monto sea válido
+      if (isNaN(paymentAmount) || paymentAmount <= 0) {
+        Swal.fire("Error", "El monto del pago debe ser un número válido mayor a 0", "error");
+        setIsUploading(false);
+        return;
+      }
+      
+      const currentTotalPaid = Number(progressSheet.totalPaid || 0);
+      const currentTotalDue = Number(progressSheet.totalDue || 0);
+      
+      const updatedProgressSheet = {
+        ...progressSheet,
+        totalPaid: currentTotalPaid + paymentAmount,
+        totalDue: Math.max(0, currentTotalDue - paymentAmount), // Asegurar que no sea negativo
+        updatedAt: Date.now(),
+      };
+
+      // Guardar el fee y actualizar el progress sheet
+      await Promise.all([
+        createFee(feeToSave),
+        updateProgressSheet(updatedProgressSheet)
+      ]);
+
+      // Enviar email de notificación
+      await sendPaymentNotificationEmail(feeToSave, student, progressSheet);
 
       // Mostrar mensaje de éxito
-      Swal.fire("Éxito", "El registro se ha guardado correctamente", "success");
+      Swal.fire({
+        title: "¡Éxito!",
+        text: "El pago se ha registrado correctamente y se ha actualizado el contrato",
+        icon: "success",
+        confirmButtonText: "Continuar"
+      });
 
       // Limpiar el formulario
       reset();
+      setSelectedFile(null);
 
       setIsUploading(false);
     } catch (error) {
@@ -137,270 +229,407 @@ export const AddFeeForm = () => {
     }
   };
 
+  // Función para enviar email de notificación
+  const sendPaymentNotificationEmail = async (fee: fee, student: any, progressSheet: any) => {
+    try {
+      // Crear QR code con información del pago
+      const qrData = `Pago: ${fee.code}\nEstudiante: ${student.name}\nMonto: $${fee.qty}\nFecha: ${new Date(fee.createdAt).toLocaleDateString()}`;
+      const qrCodeUrl = await QRCode.toDataURL(qrData);
+
+      // Plantilla HTML para el email
+      const htmlTemplate = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <img src="${import.meta.env.VITE_REACT_APP_LOGO_URL || 'https://firebasestorage.googleapis.com/v0/b/gateway-english-iba.appspot.com/o/gateway-assets%2Flogo.png?alt=media&token=1402510d-7ad8-4831-a20e-727191800fcd'}" 
+                 alt="Gateway English" style="max-width: 200px; height: auto;">
+          </div>
+          
+          <h2 style="color: #2563eb; text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">
+            Comprobante de Pago
+          </h2>
+          
+          <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #1e40af; margin-top: 0;">Detalles del Pago</h3>
+            <p><strong>Número de Recibo:</strong> ${fee.code}</p>
+            <p><strong>Estudiante:</strong> ${student.name}</p>
+            <p><strong>Monto:</strong> $${fee.qty}</p>
+            <p><strong>Fecha:</strong> ${new Date(fee.createdAt).toLocaleDateString()}</p>
+            <p><strong>Forma de Pago:</strong> ${fee.paymentMethod === 'cash' ? 'Efectivo' : 
+              fee.paymentMethod === 'transference' ? 'Transferencia' : 
+              fee.paymentMethod === 'deposit' ? 'Depósito' : 
+              fee.paymentMethod === 'tc' ? 'Tarjeta de Crédito' : 'Voucher TC'}</p>
+            <p><strong>Motivo:</strong> ${fee.reason}</p>
+            ${fee.paymentMethod !== 'cash' && fee.docNumber ? `<p><strong>Número de Comprobante:</strong> ${fee.docNumber}</p>` : ''}
+          </div>
+
+          ${fee.paymentMethod !== 'cash' && fee.imageUrl ? `
+          <div style="text-align: center; margin: 20px 0;">
+            <h4 style="color: #1e40af;">Comprobante de Pago</h4>
+            <img src="${fee.imageUrl}" alt="Comprobante" style="max-width: 400px; height: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          </div>
+          ` : ''}
+
+          <div style="text-align: center; margin: 30px 0;">
+            <h4 style="color: #1e40af;">Código QR del Pago</h4>
+            <img src="${qrCodeUrl}" alt="QR Code" style="max-width: 200px; height: auto;">
+          </div>
+
+          <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; color: #0369a1; font-size: 14px; text-align: center;">
+              <strong>Gracias por su pago. Este comprobante es válido como evidencia de su transacción.</strong>
+            </p>
+          </div>
+        </div>
+      `;
+
+      // Determinar destinatarios
+      const recipients = [student.email];
+      if (progressSheet.preferredEmail && progressSheet.preferredEmail !== student.email) {
+        recipients.push(progressSheet.preferredEmail);
+      }
+
+      // Enviar email
+      await sendCustomEmail({
+        to: recipients,
+        message: {
+          subject: `Comprobante nro ${fee.code}`,
+          text: `Comprobante de pago ${fee.code} por $${fee.qty}`,
+          html: htmlTemplate
+        }
+      });
+
+      console.log('Email de notificación enviado exitosamente');
+    } catch (error) {
+      console.error('Error enviando email de notificación:', error);
+      // No mostrar error al usuario ya que el pago fue registrado exitosamente
+    }
+  };
+
   return (
-    <div className="max-w-md mx-auto p-2">
+    <div className="max-w-4xl mx-auto p-4 md:p-6">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full"
+        className="w-full space-y-4"
         noValidate={true}
       >
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Nro de recibo:
-          </label>
-          <input type="text" value={generateInvoiceNumber()} readOnly />
-        </div>
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Escoja estudiante
-          </label>
-          <Controller
-            name="studentUid"
-            control={control}
-            rules={{ required: "Por favor escoja un estudiante" }}
-            render={({ field: { onChange, onBlur, ref, name } }) => (
-              <Select
-                name={name}
-                id={name}
-                ref={ref}
-                onBlur={onBlur}
-                options={
-                  students &&
-                  students.map(
-                    (student) =>
-                      ({
-                        value: student.id,
-                        label: student.name,
-                      } as any)
-                  )
-                }
-                isLoading={isLoading}
-                styles={customStyles}
-                isClearable
-                isSearchable
-                placeholder="Buscar Estudiante..."
-                noOptionsMessage={() =>
-                  error ? error : "No existen estudiantes con ese nombre."
-                }
-                onChange={(selectedOption) => {
-                  // Extrae solo el value (uid) del estudiante seleccionado
-                  onChange(selectedOption ? selectedOption?.value : "");
-                }}
-              />
-            )}
-          />
-          {errors.studentUid && (
-            <p className="text-red-500 text-xs italic">
-              {errors.studentUid.message}
-            </p>
-          )}
-        </div>
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Valor
-          </label>
-          <Controller
-            name="qty"
-            rules={{ required: "Por favor ingrese un valor" }}
-            control={control}
-            render={({ field: { onChange, onBlur, ref, name } }) => (
-              <input
-                id={name}
-                ref={ref}
-                onBlur={onBlur}
-                type="number"
-                step="0.01"
-                onChange={onChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
-            )}
-          />
-          {errors.qty && (
-            <p className="text-red-500 text-xs italic">{errors.qty.message}</p>
-          )}
-        </div>
-        {/* Place NameInput */}
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Lugar
-          </label>
-          <input
-            type="text"
-            {...register("place", { required: "El lugar es requerido" })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-          {errors.place && (
-            <p className="text-red-500 text-xs italic">
-              {errors.place.message}
-            </p>
-          )}
-        </div>
-        {/* Date Input */}
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Fecha
-          </label>
-          <input
-            type="date"
-            {...register("createdAt", {
-              required: "Necesita seleccionar una fecha",
-            })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-          {errors.createdAt && (
-            <p className="text-red-500 text-xs italic">
-              {errors.createdAt.message}
-            </p>
-          )}
-        </div>
-        {/* Customer NameInput */}
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Cliente / Representante
-          </label>
-          <input
-            type="text"
-            {...register("customerName", {
-              required: "Nombre del cliente es requerido",
-            })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-          {errors.customerName && (
-            <p className="text-red-500 text-xs italic">
-              {errors.customerName.message}
-            </p>
-          )}
-        </div>
-{/* Select para el motivo del pago */}
-<div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Motivo del pago
-          </label>
-          <Controller
-            name="reason"
-            control={control}
-            rules={{ required: "Por favor seleccione un motivo de pago" }}
-            render={({ field: { onChange, value, name, ref } }) => (
-              <select
-                id={name}
-                ref={ref}
-                value={value}
-                onChange={onChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              >
-                <option value="">Seleccione un motivo</option>
-                <option value="Abono mensualidad">Abono mensualidad</option>
-                <option value="Pago mensualidad">Pago mensualidad</option>
-                <option value="Pago total programa de inglés">
-                  Pago total programa de inglés
-                </option>
-              </select>
-            )}
-          />
-          {errors.reason && (
-            <p className="text-red-500 text-xs italic">
-              {errors.reason.message}
-            </p>
-          )}
-        </div>
-        {/*de pago */}
-        <div className="mb-1">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Forma de pago
-          </label>
-          <Controller
-            name="paymentMethod"
-            control={control}
-            rules={{ required: "Por favor seleccione una forma de pago" }}
-            render={({ field: { onChange, value, name, ref } }) => (
-              <select
-                id={name}
-                ref={ref}
-                value={value}
-                onChange={onChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              >
-                <option value="cash">Efectivo</option>
-                <option value="transference">Transferencia</option>
-                <option value="tc">Tarjeta de crédito</option>
-                <option value="deposit">Depósito</option>
-              </select>
-            )}
-          />
-          {errors.paymentMethod && (
-            <p className="text-red-500 text-xs italic">
-              {errors.paymentMethod.message}
-            </p>
-          )}
-        </div>
-        {/* Document Number Input */}
-        {(paymentMethod === "transference" ||
-          paymentMethod === "deposit" ||
-          paymentMethod === "tc") && (
-          <div className="mb-1">
+        {/* Grid responsive para organizar los campos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Número de recibo */}
+          <div className="md:col-span-2">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Nro de Comprobante
+              Nro de recibo:
+            </label>
+            <input 
+              type="text" 
+              value={generateInvoiceNumber()} 
+              readOnly 
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 focus:outline-none"
+            />
+          </div>
+
+          {/* Selector de estudiante - Solo visible si no es estudiante */}
+          {user?.role !== 'student' && (
+            <div className="md:col-span-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Escoja estudiante
+              </label>
+              <Controller
+                name="studentUid"
+                control={control}
+                rules={{ required: isStudentSelectionRequired() ? "Por favor escoja un estudiante" : undefined }}
+                render={({ field: { onChange, onBlur, ref, name } }) => (
+                  <Select
+                    name={name}
+                    id={name}
+                    ref={ref}
+                    onBlur={onBlur}
+                    options={
+                      students &&
+                      students.map(
+                        (student) =>
+                          ({
+                            value: student.id,
+                            label: `${student.name} - ${student.email}`,
+                          } as any)
+                      )
+                    }
+                    isLoading={isLoading}
+                    styles={customStyles}
+                    isClearable
+                    isSearchable
+                    placeholder="Buscar Estudiante..."
+                    noOptionsMessage={() =>
+                      error ? error : "No existen estudiantes con ese nombre."
+                    }
+                    onChange={(selectedOption) => {
+                      onChange(selectedOption ? selectedOption?.value : "");
+                    }}
+                  />
+                )}
+              />
+              {errors.studentUid && (
+                <p className="text-red-500 text-xs italic mt-1">
+                  {errors.studentUid.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Información del estudiante para estudiantes logueados */}
+          {user?.role === 'student' && (
+            <div className="md:col-span-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Estudiante
+              </label>
+              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+                {user.name} ({user.email})
+              </div>
+            </div>
+          )}
+
+          {/* Valor */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Valor
+            </label>
+            <Controller
+              name="qty"
+              rules={{ 
+                required: "Por favor ingrese un valor",
+                min: {
+                  value: 0.01,
+                  message: "El valor debe ser mayor a 0"
+                }
+              }}
+              control={control}
+              render={({ field: { onChange, onBlur, ref, name } }) => (
+                <input
+                  id={name}
+                  ref={ref}
+                  onBlur={onBlur}
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                />
+              )}
+            />
+            {errors.qty && (
+              <p className="text-red-500 text-xs italic mt-1">{errors.qty.message}</p>
+            )}
+          </div>
+
+          {/* Lugar */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Lugar
             </label>
             <input
               type="text"
-              {...register("docNumber", {
-                required: "Escribir el Nro de comprobante",
-              })}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              {...register("place", { required: "El lugar es requerido" })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Ingrese el lugar"
             />
-            {errors.docNumber && (
-              <p className="text-red-500 text-xs italic">
-                {errors.docNumber.message}
+            {errors.place && (
+              <p className="text-red-500 text-xs italic mt-1">
+                {errors.place.message}
               </p>
             )}
           </div>
-        )}
-        {/* Input para subir imagen (solo para transferencia o depósito) */}
-        {(paymentMethod === "transference" ||
-          paymentMethod === "deposit" ||
-          paymentMethod === "tc") && (
-          <div className="mb-2">
-            <label className="block text-gray-700 text-sm font-bold mt-2">
-              Suba la imagen de su deposito/tranferencia o voucher
+
+          {/* Fecha */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Fecha
             </label>
             <input
-              type="file"
-              accept="image/*"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  if (!file.type.startsWith("image/")) {
-                    Swal.fire(
-                      "Error",
-                      "El archivo debe ser una imagen",
-                      "error"
-                    );
-                    return;
-                  }
-                  if (file.size > 5 * 1024 * 1024) {
-                    Swal.fire(
-                      "Error",
-                      "El archivo no debe exceder los 5 MB",
-                      "error"
-                    );
-                    return;
-                  }
-                  setSelectedFile(file);
-                }
-              }}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="date"
+              {...register("createdAt", {
+                required: "Necesita seleccionar una fecha",
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+            {errors.createdAt && (
+              <p className="text-red-500 text-xs italic mt-1">
+                {errors.createdAt.message}
+              </p>
+            )}
           </div>
-        )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full transition duration-300 ease-in-out"
-          disabled={isLoading || isUploading}
-        >
-          {isLoading || isUploading ? "Guardando..." : "Registrar pago"}
-        </button>
+          {/* Cliente / Representante */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Cliente / Representante
+            </label>
+            <input
+              type="text"
+              {...register("customerName", {
+                required: "Nombre del cliente es requerido",
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Ingrese el nombre del cliente"
+            />
+            {errors.customerName && (
+              <p className="text-red-500 text-xs italic mt-1">
+                {errors.customerName.message}
+              </p>
+            )}
+          </div>
+
+          {/* Motivo del pago */}
+          <div className="md:col-span-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Motivo del pago
+            </label>
+            <Controller
+              name="reason"
+              control={control}
+              rules={{ required: "Por favor seleccione un motivo de pago" }}
+              render={({ field: { onChange, value, name, ref } }) => (
+                <select
+                  id={name}
+                  ref={ref}
+                  value={value}
+                  onChange={onChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Seleccione un motivo</option>
+                  <option value="Abono mensualidad">Abono mensualidad</option>
+                  <option value="Pago mensualidad">Pago mensualidad</option>
+                  <option value="Pago total programa de inglés">
+                    Pago total programa de inglés
+                  </option>
+                </select>
+              )}
+            />
+            {errors.reason && (
+              <p className="text-red-500 text-xs italic mt-1">
+                {errors.reason.message}
+              </p>
+            )}
+          </div>
+
+          {/* Forma de pago */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Forma de pago
+            </label>
+            <Controller
+              name="paymentMethod"
+              control={control}
+              rules={{ required: "Por favor seleccione una forma de pago" }}
+              render={({ field: { onChange, value, name, ref } }) => (
+                <select
+                  id={name}
+                  ref={ref}
+                  value={value}
+                  onChange={onChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {paymentOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+            {errors.paymentMethod && (
+              <p className="text-red-500 text-xs italic mt-1">
+                {errors.paymentMethod.message}
+              </p>
+            )}
+          </div>
+
+          {/* Número de comprobante */}
+          {(paymentMethod === "transference" ||
+            paymentMethod === "deposit" ||
+            paymentMethod === "tc" ||
+            paymentMethod === "voucher_tc") && (
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Nro de Comprobante
+              </label>
+              <input
+                type="text"
+                {...register("docNumber", {
+                  required: "Escribir el Nro de comprobante",
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Ingrese el número de comprobante"
+              />
+              {errors.docNumber && (
+                <p className="text-red-500 text-xs italic mt-1">
+                  {errors.docNumber.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Subir imagen */}
+          {(paymentMethod === "transference" ||
+            paymentMethod === "deposit" ||
+            paymentMethod === "tc" ||
+            paymentMethod === "voucher_tc") && (
+            <div className="md:col-span-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Suba la imagen de su depósito/transferencia o voucher
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (!file.type.startsWith("image/")) {
+                      Swal.fire(
+                        "Error",
+                        "El archivo debe ser una imagen",
+                        "error"
+                      );
+                      return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                      Swal.fire(
+                        "Error",
+                        "El archivo no debe exceder los 5 MB",
+                        "error"
+                      );
+                      return;
+                    }
+                    setSelectedFile(file);
+                  }
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {selectedFile && (
+                <p className="text-sm text-green-600 mt-2">
+                  Archivo seleccionado: {selectedFile.name}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Botón de envío */}
+        <div className="pt-4">
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading || isUploading}
+          >
+            {isLoading || isUploading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Guardando...
+              </div>
+            ) : (
+              "Registrar pago"
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

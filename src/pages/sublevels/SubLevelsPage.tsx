@@ -1,16 +1,18 @@
 import { IoPencil, IoTrash } from "react-icons/io5"
+import { MdFileDownload } from "react-icons/md"
 import { FabButton } from "../../components/shared/buttons/FabButton"
 import { SublevelForm } from "../../components/shared/forms/SublevelForm"
 import { TableGeneric } from "../../components/shared/tables/TableGeneric"
 import { subLevel } from "../../interface"
 import { useAuthStore, useSubLevelStore } from "../../stores"
 // import { LevelById } from "../levels/LevelById"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useCallback } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
 import { EditSubLEvelForm } from "../../components/shared/forms/EditSubLEvelForm"
 import Swal from "sweetalert2"
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton"
 import { ColumnDef } from "@tanstack/react-table"
+import { exportSublevelsToExcel } from "../../helpers/excel.helper"
 
 export const SubLevelsPage = () => {
   const user = useAuthStore(state => state.user);
@@ -21,6 +23,26 @@ export const SubLevelsPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [subLevelToEdit, setSsubLevelToEdit] = useState<string>();
+
+  const handleExportToExcel = useCallback(async () => {
+    try {
+      const success = await exportSublevelsToExcel(subLevels);
+      
+      if (success) {
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "El archivo Excel ha sido descargado exitosamente",
+          icon: "success",
+          confirmButtonText: "Continuar"
+        });
+      } else {
+        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+      }
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+    }
+  }, [subLevels]);
 
   const columns = useMemo<ColumnDef<subLevel>[]>(() => [
     {
@@ -152,12 +174,34 @@ export const SubLevelsPage = () => {
         
         {/* Botón para agregar nueva unidad */}
         {isAdmin && (
-          <div className="mb-6 flex justify-end">
+          <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={handleExportToExcel}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+              >
+                <MdFileDownload className="w-5 h-5" />
+                Exportar Excel
+              </button>
+            </div>
             <button 
               onClick={() => setOpenAddModal(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
               + Agregar Unidad
+            </button>
+          </div>
+        )}
+
+        {/* Solo botón de exportación para no admin */}
+        {!isAdmin && (
+          <div className="mb-6 flex justify-end">
+            <button 
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              <MdFileDownload className="w-5 h-5" />
+              Exportar Excel
             </button>
           </div>
         )}

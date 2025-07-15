@@ -32,11 +32,11 @@ const storeAPI: StateCreator<FeesStore,
     },
     updateFee: async (fee: fee) => {
         await FeesService.updateFee(fee);
-        set({ fees: get().fees.map(f => f.uid === fee.uid ? fee : f) })
+        set({ fees: get().fees.map(f => f.id === fee.id ? fee : f) })
     },
-    deleteFee: async (uid: string) => {
-        await FeesService.deleteFee(uid);
-        set({ fees: get().fees.filter(f => f.uid !== uid) })
+    deleteFee: async (id: string) => {
+        await FeesService.deleteFee(id);
+        set({ fees: get().fees.filter(f => f.id !== id) })
     }
 })
 

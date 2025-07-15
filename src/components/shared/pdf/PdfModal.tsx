@@ -1,9 +1,5 @@
-import { FC, useEffect, useState } from 'react'
-import { Viewer, Worker } from '@react-pdf-viewer/core';
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import { FC } from 'react'
 import { ModalGeneric } from '../ui/ModalGeneric';
-import { Loading } from '../ui/Loading';
-
 
 interface Props {
     title: string;
@@ -14,35 +10,27 @@ interface Props {
 }
 
 export const PdfModal: FC<Props> = ({ title, src, isVisible, setIsVisible, errorMsg = 'Este Libro no tiene un archivo valido' }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [pdfFileUrl, setPdfFileUrl] = useState('');
-    const defaultLayoutPluginInstance = defaultLayoutPlugin({
-
-    });
-
-    useEffect(() => {
-        setIsLoading(true);
-        setPdfFileUrl(src);
-        setIsLoading(false);
-
-    }, [src, isVisible, errorMsg])
-
-
     return (
-        <>
-            <ModalGeneric title={title} isVisible={isVisible} setIsVisible={setIsVisible} children={
-                <>
-                    {
-                        isLoading
-                            ? <Loading />
-                            : <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                                <Viewer
-                                    fileUrl={pdfFileUrl}
-                                    plugins={[defaultLayoutPluginInstance]}
-                                    theme={'dark'}
-                                />
-                            </Worker>}
-                </>} />
-        </>
+        <ModalGeneric 
+            title={title} 
+            isVisible={isVisible} 
+            setIsVisible={setIsVisible}
+            children={
+                <div className="flex flex-col items-center justify-center p-8">
+                    <p className="text-gray-600 mb-4">Funcionalidad de visualización de PDF temporalmente deshabilitada</p>
+                    <p className="text-sm text-gray-500">{errorMsg}</p>
+                    {src && (
+                        <a 
+                            href={src} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                        >
+                            Abrir PDF en nueva ventana
+                        </a>
+                    )}
+                </div>
+            } 
+        />
     )
 }

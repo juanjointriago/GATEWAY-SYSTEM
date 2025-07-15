@@ -1,8 +1,7 @@
-type paymentMethod = 'cash' | 'transference' | 'tc' | 'deposit';
+type paymentMethod = 'cash' | 'transference' | 'tc' | 'deposit' | 'voucher_tc';
 
 export interface fee{
     id?: string;
-    uid: string;
     place?: string;
     customerName: string;
     studentUid?: string;

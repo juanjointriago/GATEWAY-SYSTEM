@@ -1,7 +1,6 @@
 import { ReactElement, useMemo, useRef, useState } from "react";
 import { ColumnProps } from "../../../interface/ui/tables.interface";
 import { ModalGeneric } from "../ui/ModalGeneric";
-import { WorkBook, utils, writeFileXLSX } from 'xlsx';
 import { IoBarChart, IoTrash } from "react-icons/io5";
 import { MdPictureAsPdf } from "react-icons/md";
 import { useAuthStore } from "../../../stores";
@@ -29,8 +28,13 @@ export const TableContainer = <T,>({ data, columns, hasAddBtn = true, modalChild
 
   const user = useAuthStore(state => state.user);
   const handleDownloadExcel = () => {
-    const wb: WorkBook = utils.table_to_book(tableRef.current);
-    writeFileXLSX(wb, `${crypto.randomUUID()}.xlsx`);
+    Swal.fire({
+      title: 'Excel',
+      text: 'Función de exportación temporalmente deshabilitada. Use los botones de exportación de la página principal.',
+      icon: 'info',
+      confirmButtonText: 'Ok',
+      confirmButtonColor: '#2563EB'
+    })
   }
   const handleDownloadPDF = () => {
     Swal.fire({
