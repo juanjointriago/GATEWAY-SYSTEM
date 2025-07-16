@@ -3,8 +3,9 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import { fee } from "../../../interface/fees.interface";
 import { useFeesStore } from "../../../stores/fees/fess.store";
 import { useUserStore } from "../../../stores";
+import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
 import { sendCustomEmail, footerMail } from "../../../store/firebase/helper";
-import Swal from "sweetalert2";
+import { showSuccessAlert, showErrorAlert, showWarningAlert } from "../../../helpers/swal.helper";
 
 interface ApprovalFeeFormProps {
   selectedFeeForApproval: fee;
@@ -18,6 +19,7 @@ export const ApprovalFeeForm: FC<ApprovalFeeFormProps> = ({
   const updateFee = useFeesStore((state) => state.updateFee);
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
   const getUserById = useUserStore((state) => state.getUserById);
+  const { getProgressSheetByStudentId, updateProgressSheet } = useProgressSheetStore();
 
   const sendNotificationEmail = useCallback(async (approve: boolean, studentData: { email?: string } | null) => {
     if (!studentData?.email) return;
@@ -120,27 +122,60 @@ export const ApprovalFeeForm: FC<ApprovalFeeFormProps> = ({
 
       await updateFee(updatedFee);
       
+      // Si se aprueba el pago, actualizar el progressSheet
+      if (approve) {
+        try {
+          const progressSheet = await getProgressSheetByStudentId(selectedFeeForApproval.studentUid!);
+          
+          if (progressSheet) {
+            const paymentAmount = Number(selectedFeeForApproval.qty);
+            
+            // Validar que el monto sea válido
+            if (!isNaN(paymentAmount) && paymentAmount > 0) {
+              const currentTotalPaid = Number(progressSheet.totalPaid || 0);
+              const currentTotalDue = Number(progressSheet.totalDue || 0);
+              
+              const updatedProgressSheet = {
+                ...progressSheet,
+                totalPaid: currentTotalPaid + paymentAmount,
+                totalDue: Math.max(0, currentTotalDue - paymentAmount),
+                updatedAt: Date.now(),
+              };
+              
+              await updateProgressSheet(updatedProgressSheet);
+              console.log("ProgressSheet actualizado exitosamente tras aprobación del pago");
+            }
+          }
+        } catch (progressError) {
+          console.error("Error actualizando progressSheet:", progressError);
+          // No interrumpir el flujo principal si hay error con progressSheet
+        }
+      }
+      
       // Obtener datos del estudiante para enviar el email
       const studentData = getUserById(selectedFeeForApproval.studentUid!) || null;
       
       // Enviar email de notificación
       await sendNotificationEmail(approve, studentData);
       
-      Swal.fire({
-        title: approve ? "¡Pago Aprobado!" : "¡Pago Rechazado!",
-        text: approve ? "El pago ha sido aprobado exitosamente y se ha enviado una notificación al estudiante" : "El pago ha sido rechazado y se ha enviado una notificación al estudiante",
-        icon: approve ? "success" : "warning",
-        confirmButtonText: "Continuar"
-      });
+      const successText = approve 
+        ? "El pago ha sido aprobado exitosamente, se ha actualizado el contrato y se ha enviado una notificación al estudiante"
+        : "El pago ha sido rechazado y se ha enviado una notificación al estudiante";
+      
+      if (approve) {
+        showSuccessAlert("¡Pago Aprobado!", successText, "Continuar");
+      } else {
+        showWarningAlert("¡Pago Rechazado!", successText, "Continuar");
+      }
 
       // Recargar datos
       await getAndSetFees();
       onClose();
     } catch (error) {
       console.error("Error updating fee:", error);
-      Swal.fire("Error", "Ocurrió un error al actualizar el pago", "error");
+      showErrorAlert("Error", "Ocurrió un error al actualizar el pago");
     }
-  }, [selectedFeeForApproval, updateFee, getAndSetFees, getUserById, sendNotificationEmail, onClose]);
+  }, [selectedFeeForApproval, updateFee, getAndSetFees, getUserById, sendNotificationEmail, onClose, getProgressSheetByStudentId, updateProgressSheet]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

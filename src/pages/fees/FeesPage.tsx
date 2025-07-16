@@ -11,8 +11,8 @@ import PDFPreview from "../../components/shared/pdf/PDFPreview";
 import { MdPictureAsPdf } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
-import Swal from "sweetalert2";
 import { exportFeesToExcel, exportPaymentSummary } from "../../helpers/excel.helper";
+import { showSuccessAlert, showErrorAlert } from "../../helpers/swal.helper";
 
 export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
@@ -53,18 +53,13 @@ export const FeesPage = () => {
       const success = await exportFeesToExcel(dataToExport);
       
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El archivo Excel ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
-        });
+        showSuccessAlert("¡Éxito!", "El archivo Excel ha sido descargado exitosamente", "Continuar");
       } else {
-        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+        showErrorAlert("Error", "No se pudo exportar el archivo Excel");
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+      showErrorAlert("Error", "Ocurrió un error al exportar el archivo");
     }
   }, [fees, isAdmin, user?.uid]);
 
@@ -74,18 +69,13 @@ export const FeesPage = () => {
       const success = await exportPaymentSummary(dataToExport);
       
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El resumen de pagos ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
-        });
+        showSuccessAlert("¡Éxito!", "El resumen de pagos ha sido descargado exitosamente", "Continuar");
       } else {
-        Swal.fire("Error", "No se pudo exportar el resumen", "error");
+        showErrorAlert("Error", "No se pudo exportar el resumen");
       }
     } catch (error) {
       console.error("Error exporting summary:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el resumen", "error");
+      showErrorAlert("Error", "Ocurrió un error al exportar el resumen");
     }
   }, [fees, isAdmin, user?.uid]);
 

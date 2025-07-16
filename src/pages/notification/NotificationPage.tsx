@@ -20,7 +20,6 @@ import { useSubLevelStore } from '../../stores/level/sublevel.store';
 import { useEnterpriseInfoStore } from '../../stores/enterpriseinfo/enterpriseinfo.store';
 import { FirestoreUser, level, subLevel } from '../../interface';
 import { toast } from 'sonner';
-import Swal from 'sweetalert2';
 
 // Esquema de validación
 const notificationSchema = z.object({
@@ -283,17 +282,23 @@ export const NotificationPage = () => {
   const onSubmit = async (data: NotificationFormData) => {
     // Validación previa
     if (!data.recipients || data.recipients.length === 0) {
-      toast.error('Debe seleccionar al menos un destinatario');
+      toast.error('Debe seleccionar al menos un destinatario', {
+        description: 'Selecciona usuarios de la lista para enviar la notificación'
+      });
       return;
     }
 
     if (!data.subject || data.subject.trim() === '') {
-      toast.error('El asunto es requerido');
+      toast.error('El asunto es requerido', {
+        description: 'Ingresa un asunto para la notificación'
+      });
       return;
     }
 
     if (!data.message || data.message.trim() === '') {
-      toast.error('El mensaje es requerido');
+      toast.error('El mensaje es requerido', {
+        description: 'Escribe el contenido del mensaje'
+      });
       return;
     }
 
@@ -304,7 +309,10 @@ export const NotificationPage = () => {
     timeoutRef.current = setTimeout(() => {
       console.warn('Timeout alcanzado - reseteando estado sending');
       resetSendingState();
-      toast.error('Timeout: La operación tardó demasiado tiempo');
+      toast.error('Timeout: La operación tardó demasiado tiempo', {
+        description: 'La notificación puede haberse enviado. Verifique manualmente.',
+        duration: 8000
+      });
     }, 30000); // 30 segundos
     
     try {
@@ -332,18 +340,8 @@ export const NotificationPage = () => {
       // Completar progreso
       setSendingProgress(100);
 
-      // Mostrar mensaje de éxito
-      await Swal.fire({
-        title: '¡Éxito!',
-        text: `Se ha enviado la notificación a ${data.recipients.length} destinatario(s)`,
-        icon: 'success',
-        confirmButtonColor: '#007bff',
-        confirmButtonText: 'Continuar',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        timer: 5000,
-        timerProgressBar: true
-      });
+      // Pequeña pausa para mostrar el progreso completo
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       // Limpiar formulario solo si el envío fue exitoso
       reset({
@@ -354,23 +352,37 @@ export const NotificationPage = () => {
       });
       setSelectedUsers([]);
       
-      toast.success('Notificación enviada exitosamente');
+      // Toast de éxito más detallado
+      toast.success(
+        `✅ Notificación enviada exitosamente a ${data.recipients.length} destinatario${data.recipients.length > 1 ? 's' : ''}`,
+        {
+          duration: 5000,
+          description: `Asunto: "${data.subject}"`,
+          action: {
+            label: 'Cerrar',
+            onClick: () => {}
+          }
+        }
+      );
       
     } catch (error) {
       console.error('Error sending notification:', error);
       
-      // Mostrar error específico
-      await Swal.fire({
-        title: 'Error',
-        text: 'Hubo un problema al enviar la notificación. Por favor, intente nuevamente.',
-        icon: 'error',
-        confirmButtonColor: '#dc3545',
-        confirmButtonText: 'Entendido',
-        allowOutsideClick: false,
-        allowEscapeKey: false
-      });
-      
-      toast.error('Error al enviar la notificación');
+      // Toast de error más informativo
+      toast.error(
+        'Error al enviar la notificación',
+        {
+          duration: 6000,
+          description: 'Hubo un problema al enviar la notificación. Por favor, intente nuevamente.',
+          action: {
+            label: 'Reintentar',
+            onClick: () => {
+              // Reintentar el envío
+              handleSubmit(onSubmit)();
+            }
+          }
+        }
+      );
     } finally {
       // Asegurar que siempre se resetee el estado
       resetSendingState();
@@ -714,7 +726,9 @@ export const NotificationPage = () => {
               <button
                 onClick={() => {
                   resetSendingState();
-                  toast.info('Operación cancelada por el usuario');
+                  toast.info('Operación cancelada por el usuario', {
+                    description: 'El envío de la notificación fue interrumpido'
+                  });
                 }}
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
               >

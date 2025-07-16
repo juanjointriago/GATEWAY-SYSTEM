@@ -10,7 +10,7 @@ import { useFeesStore } from "../../../stores/fees/fess.store";
 import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
 import { useAuthStore } from "../../../stores/auth/auth.store";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import Swal from "sweetalert2";
+import { showSuccessAlert, showErrorAlert } from "../../../helpers/swal.helper";
 import { v6 as uuid } from "uuid";
 import { sendCustomEmail } from "../../../store/firebase/helper";
 import QRCode from "qrcode";
@@ -131,19 +131,19 @@ export const AddFeeForm = () => {
       const studentUid = user?.role === 'student' ? user.id : fee.studentUid;
       
       if (!studentUid) {
-        Swal.fire("Error", "Por favor seleccione un estudiante", "error");
+        showErrorAlert("Error", "Por favor seleccione un estudiante");
         return;
       }
 
       const student = getUserById(studentUid);
       if (!student) {
-        Swal.fire("Error", "No se encontró un estudiante con ese UID", "error");
+        showErrorAlert("Error", "No se encontró un estudiante con ese UID");
         return;
       }
 
       // Validar imagen solo si no es efectivo
       if (paymentMethod !== "cash" && !selectedFile) {
-        Swal.fire("Error", "Por favor seleccione una imagen del comprobante", "error");
+        showErrorAlert("Error", "Por favor seleccione una imagen del comprobante");
         return;
       }
 
@@ -152,7 +152,7 @@ export const AddFeeForm = () => {
       // Buscar el progress sheet del estudiante
       const progressSheet = getProgressSheetByStudentId(studentUid);
       if (!progressSheet) {
-        Swal.fire("Error", "No se encontró un contrato para este estudiante", "error");
+        showErrorAlert("Error", "No se encontró un contrato para este estudiante");
         setIsUploading(false);
         return;
       }
@@ -180,42 +180,48 @@ export const AddFeeForm = () => {
         imageUrl,
       };
 
-      // Actualizar los valores del progress sheet
-      const paymentAmount = Number(fee.qty); // Asegurar que sea número
-      
-      // Validar que el monto sea válido
-      if (isNaN(paymentAmount) || paymentAmount <= 0) {
-        Swal.fire("Error", "El monto del pago debe ser un número válido mayor a 0", "error");
-        setIsUploading(false);
-        return;
-      }
-      
-      const currentTotalPaid = Number(progressSheet.totalPaid || 0);
-      const currentTotalDue = Number(progressSheet.totalDue || 0);
-      
-      const updatedProgressSheet = {
-        ...progressSheet,
-        totalPaid: currentTotalPaid + paymentAmount,
-        totalDue: Math.max(0, currentTotalDue - paymentAmount), // Asegurar que no sea negativo
-        updatedAt: Date.now(),
-      };
+      // Solo actualizar el progress sheet si el usuario es admin/teacher
+      // Los estudiantes deben esperar a que se apruebe el pago
+      if (user?.role === 'admin' || user?.role === 'teacher') {
+        // Actualizar los valores del progress sheet
+        const paymentAmount = Number(fee.qty); // Asegurar que sea número
+        
+        // Validar que el monto sea válido
+        if (isNaN(paymentAmount) || paymentAmount <= 0) {
+          showErrorAlert("Error", "El monto del pago debe ser un número válido mayor a 0");
+          setIsUploading(false);
+          return;
+        }
+        
+        const currentTotalPaid = Number(progressSheet.totalPaid || 0);
+        const currentTotalDue = Number(progressSheet.totalDue || 0);
+        
+        const updatedProgressSheet = {
+          ...progressSheet,
+          totalPaid: currentTotalPaid + paymentAmount,
+          totalDue: Math.max(0, currentTotalDue - paymentAmount), // Asegurar que no sea negativo
+          updatedAt: Date.now(),
+        };
 
-      // Guardar el fee y actualizar el progress sheet
-      await Promise.all([
-        createFee(feeToSave),
-        updateProgressSheet(updatedProgressSheet)
-      ]);
+        // Guardar el fee y actualizar el progress sheet
+        await Promise.all([
+          createFee(feeToSave),
+          updateProgressSheet(updatedProgressSheet)
+        ]);
+      } else {
+        // Si es estudiante, solo guardar el fee (sin actualizar progressSheet)
+        await createFee(feeToSave);
+      }
 
       // Enviar email de notificación
       await sendPaymentNotificationEmail(feeToSave, student, progressSheet);
 
       // Mostrar mensaje de éxito
-      Swal.fire({
-        title: "¡Éxito!",
-        text: "El pago se ha registrado correctamente y se ha actualizado el contrato",
-        icon: "success",
-        confirmButtonText: "Continuar"
-      });
+      const successMessage = user?.role === 'student' 
+        ? "El pago se ha registrado correctamente y está pendiente de aprobación"
+        : "El pago se ha registrado correctamente y se ha actualizado el contrato";
+        
+      showSuccessAlert("¡Éxito!", successMessage, "Continuar");
 
       // Limpiar el formulario
       reset();
@@ -224,7 +230,7 @@ export const AddFeeForm = () => {
       setIsUploading(false);
     } catch (error) {
       console.error("Error submitting form:", error);
-      Swal.fire("Error", "Ocurrió un error al guardar el registro", "error");
+      showErrorAlert("Error", "Ocurrió un error al guardar el registro");
       setIsUploading(false);
     }
   };
@@ -584,19 +590,11 @@ export const AddFeeForm = () => {
                   const file = e.target.files?.[0];
                   if (file) {
                     if (!file.type.startsWith("image/")) {
-                      Swal.fire(
-                        "Error",
-                        "El archivo debe ser una imagen",
-                        "error"
-                      );
+                      showErrorAlert("Error", "El archivo debe ser una imagen");
                       return;
                     }
                     if (file.size > 5 * 1024 * 1024) {
-                      Swal.fire(
-                        "Error",
-                        "El archivo no debe exceder los 5 MB",
-                        "error"
-                      );
+                      showErrorAlert("Error", "El archivo no debe exceder los 5 MB");
                       return;
                     }
                     setSelectedFile(file);
