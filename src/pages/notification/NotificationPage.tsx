@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -55,7 +55,41 @@ export const NotificationPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendingProgress, setSendingProgress] = useState(0);
   const [usersLoading, setUsersLoading] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const progressRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Función para resetear el estado de envío de forma segura
+  const resetSendingState = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (progressRef.current) {
+      clearTimeout(progressRef.current);
+      progressRef.current = null;
+    }
+    setSending(false);
+    setSendingProgress(0);
+    console.log('Estado sending reseteado de forma segura');
+  };
+
+  // Función para simular progreso de envío
+  const startProgressSimulation = () => {
+    setSendingProgress(0);
+    const interval = setInterval(() => {
+      setSendingProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return 90; // Mantener en 90% hasta que termine realmente
+        }
+        return prev + Math.random() * 10;
+      });
+    }, 500);
+    
+    progressRef.current = interval;
+  };
 
   const {
     control,
@@ -97,6 +131,18 @@ export const NotificationPage = () => {
     };
     loadData();
   }, [getAllUsers, getAndSetLevels, getAndSetSubLevels, getEnterpriseInfo]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (progressRef.current) {
+        clearTimeout(progressRef.current);
+      }
+    };
+  }, []);
 
   // Función utilidad para eliminar duplicados
   const removeDuplicateUsers = (users: FirestoreUser[]) => {
@@ -235,12 +281,42 @@ export const NotificationPage = () => {
   };
 
   const onSubmit = async (data: NotificationFormData) => {
+    // Validación previa
+    if (!data.recipients || data.recipients.length === 0) {
+      toast.error('Debe seleccionar al menos un destinatario');
+      return;
+    }
+
+    if (!data.subject || data.subject.trim() === '') {
+      toast.error('El asunto es requerido');
+      return;
+    }
+
+    if (!data.message || data.message.trim() === '') {
+      toast.error('El mensaje es requerido');
+      return;
+    }
+
+    setSending(true);
+    startProgressSimulation();
+    
+    // Timeout de seguridad para evitar que se quede bloqueado
+    timeoutRef.current = setTimeout(() => {
+      console.warn('Timeout alcanzado - reseteando estado sending');
+      resetSendingState();
+      toast.error('Timeout: La operación tardó demasiado tiempo');
+    }, 30000); // 30 segundos
+    
     try {
-      setSending(true);
-      
       const htmlContent = data.isHtml ? 
         generateHtmlTemplate(data.message, data.subject) : 
         data.message;
+
+      console.log('Enviando email con datos:', {
+        recipients: data.recipients.length,
+        subject: data.subject,
+        hasHtml: data.isHtml
+      });
 
       await sendCustomEmail({
         to: data.recipients,
@@ -251,23 +327,54 @@ export const NotificationPage = () => {
         }
       });
 
+      console.log('Email enviado exitosamente');
+      
+      // Completar progreso
+      setSendingProgress(100);
+
+      // Mostrar mensaje de éxito
       await Swal.fire({
         title: '¡Éxito!',
         text: `Se ha enviado la notificación a ${data.recipients.length} destinatario(s)`,
         icon: 'success',
         confirmButtonColor: '#007bff',
-        confirmButtonText: 'Continuar'
+        confirmButtonText: 'Continuar',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        timer: 5000,
+        timerProgressBar: true
       });
 
-      // Limpiar formulario
-      reset();
+      // Limpiar formulario solo si el envío fue exitoso
+      reset({
+        recipients: [],
+        subject: '',
+        message: '',
+        isHtml: true
+      });
       setSelectedUsers([]);
+      
+      toast.success('Notificación enviada exitosamente');
       
     } catch (error) {
       console.error('Error sending notification:', error);
+      
+      // Mostrar error específico
+      await Swal.fire({
+        title: 'Error',
+        text: 'Hubo un problema al enviar la notificación. Por favor, intente nuevamente.',
+        icon: 'error',
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Entendido',
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+      
       toast.error('Error al enviar la notificación');
     } finally {
-      setSending(false);
+      // Asegurar que siempre se resetee el estado
+      resetSendingState();
+      console.log('Estado sending reseteado');
     }
   };
 
@@ -589,9 +696,30 @@ export const NotificationPage = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Enviando Notificación
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-4">
                 Por favor espere mientras se envía la notificación a {watchedRecipients.length} destinatario(s)
               </p>
+              
+              {/* Barra de progreso */}
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${sendingProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">
+                {Math.round(sendingProgress)}% completado
+              </p>
+              
+              <button
+                onClick={() => {
+                  resetSendingState();
+                  toast.info('Operación cancelada por el usuario');
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>

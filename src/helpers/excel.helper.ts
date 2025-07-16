@@ -319,3 +319,24 @@ export const exportUnitsToExcel = async (units: unit[], fileName: string = 'libr
 
   return exportGenericToExcel(units, columns, fileName, 'Libros');
 };
+
+// Función específica para exportar progress classes
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const exportProgressClassesToExcel = async (progressClasses: any[], fileName: string = 'progress_classes') => {
+  const columns = [
+    { header: 'Fecha', key: 'createdAt', width: 15, format: (value: unknown) => new Date(value as number).toLocaleDateString() },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { header: 'Evento', key: 'eventInfo', width: 25, format: (value: unknown) => (value as any)?.label || 'N/A' },
+    { header: 'Libro', key: 'book', width: 20 },
+    { header: 'Lección', key: 'lesson', width: 15 },
+    { header: 'Parte', key: 'part', width: 15 },
+    { header: 'A', key: 'a', width: 10 },
+    { header: 'NA', key: 'na', width: 10 },
+    { header: 'RW', key: 'rw', width: 10 },
+    { header: 'Progreso', key: 'progress', width: 15 },
+    { header: 'Test', key: 'test', width: 15 },
+    { header: 'Observación', key: 'observation', width: 30 }
+  ];
+
+  return exportGenericToExcel(progressClasses, columns, fileName, 'Progress Classes');
+};

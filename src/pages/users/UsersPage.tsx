@@ -17,6 +17,7 @@ import { MdFileDownload } from "react-icons/md";
 import { useMemo, useState, useCallback } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
+import { UserActivationValidator } from "../../components/shared/validators/UserActivationValidator";
 import Swal from "sweetalert2";
 import { EditUserUnits } from "../../components/shared/forms/EditUserUnits";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
@@ -47,6 +48,43 @@ export const UsersPage = () => {
   // const getAllUsers = useUserStore(state => state.getAllUsers);
   const updateUserById = useUserStore((state) => state.updateUser);
   // const getUserById = useUserStore(state => state.getUserById);
+
+  // Función para activar usuario con validación
+  const handleUserActivation = useCallback(async (userId: string) => {
+    const userToUpdate = users.find((u) => u.id === userId);
+    if (userToUpdate) {
+      await updateUserById({
+        ...userToUpdate,
+        isActive: true,
+      });
+      window.location.reload();
+    }
+  }, [users, updateUserById]);
+
+  // Función para desactivar usuario (sin validación)
+  const handleUserDeactivation = useCallback(async (userId: string) => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Estás a punto de desactivar este usuario",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, desactivar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      const userToUpdate = users.find((u) => u.id === userId);
+      if (userToUpdate) {
+        await updateUserById({
+          ...userToUpdate,
+          isActive: false,
+        });
+        window.location.reload();
+      }
+    }
+  }, [users, updateUserById]);
 
   // Componente del menú dropdown
   const ActionMenu = useCallback(
@@ -93,49 +131,33 @@ export const UsersPage = () => {
               >
                 <div className="p-1 sm:p-2">
                   {/* Toggle Active/Inactive */}
-                  <button
-                    onClick={() =>
-                      handleAction(() => {
-                        Swal.fire({
-                          title: "¿Estás seguro?",
-                          text: `Estas a punto de ${
-                            isActive ? "desactivar" : "activar"
-                          } este usuario`,
-                          icon: "warning",
-                          showCancelButton: true,
-                          confirmButtonColor: "#3085d6",
-                          cancelButtonColor: "#d33",
-                          confirmButtonText: "Sí, continuar",
-                          cancelButtonText: "Cancelar",
-                        }).then(async (result) => {
-                          if (result.isConfirmed) {
-                            const userToUpdate = users.find(
-                              (u) => u.id === userId
-                            );
-                            if (userToUpdate) {
-                              await updateUserById({
-                                ...userToUpdate,
-                                isActive: !isActive,
-                              });
-                              window.location.reload();
-                            }
-                          }
-                        });
-                      })
-                    }
-                    className={`group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
-                      isActive
-                        ? "text-red-700 bg-red-50 hover:bg-red-100 border border-red-200"
-                        : "text-green-700 bg-green-50 hover:bg-green-100 border border-green-200"
-                    }`}
-                  >
-                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
-                      <ToggleButton isActive={isActive} action={() => {}} />
-                    </div>
-                    <span className="ml-2 sm:ml-3">
-                      {isActive ? "Desactivar usuario" : "Activar usuario"}
-                    </span>
-                  </button>
+                  {!isActive ? (
+                    // Usuario inactivo - usar validador para activar
+                    <UserActivationValidator
+                      userId={userId}
+                      onValidationSuccess={() => handleUserActivation(userId)}
+                    >
+                      <button
+                        className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200"
+                      >
+                        <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
+                          <ToggleButton isActive={isActive} action={() => {}} />
+                        </div>
+                        <span className="ml-2 sm:ml-3">Activar usuario</span>
+                      </button>
+                    </UserActivationValidator>
+                  ) : (
+                    // Usuario activo - desactivar directamente
+                    <button
+                      onClick={() => handleAction(() => handleUserDeactivation(userId))}
+                      className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
+                        <ToggleButton isActive={isActive} action={() => {}} />
+                      </div>
+                      <span className="ml-2 sm:ml-3">Desactivar usuario</span>
+                    </button>
+                  )}
 
                   {/* Separador */}
                   <div className="h-px bg-blue-200 my-1 sm:my-2"></div>
@@ -212,8 +234,8 @@ export const UsersPage = () => {
     },
     [
       openDropdown,
-      users,
-      updateUserById,
+      handleUserActivation,
+      handleUserDeactivation,
       setOpenModal,
       setUserToEdit,
       setOpenUnitModal,

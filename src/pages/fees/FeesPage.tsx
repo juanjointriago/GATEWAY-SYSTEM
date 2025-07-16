@@ -6,16 +6,16 @@ import { useFeesStore } from "../../stores/fees/fess.store";
 import { useAuthStore, useUserStore } from "../../stores";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { AddFeeForm } from "../../components/shared/forms/AddFeeForm";
+import { ApprovalFeeForm } from "../../components/shared/forms/ApprovalFeeForm";
 import PDFPreview from "../../components/shared/pdf/PDFPreview";
 import { MdPictureAsPdf } from "react-icons/md";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
 import Swal from "sweetalert2";
 import { exportFeesToExcel, exportPaymentSummary } from "../../helpers/excel.helper";
 
 export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
-  const updateFee = useFeesStore((state) => state.updateFee);
   const fees = useFeesStore((state) => state.fees);
   const user = useAuthStore((state) => state.user);
   const isAdmin = user && user.role === "admin";
@@ -46,34 +46,6 @@ export const FeesPage = () => {
     setSelectedFeeForApproval(null);
     setShowApprovalModal(false);
   }, []);
-
-  const handleApproveFee = useCallback(async (approve: boolean) => {
-    if (!selectedFeeForApproval) return;
-
-    try {
-      const updatedFee = {
-        ...selectedFeeForApproval,
-        isSigned: approve,
-        updatedAt: Date.now()
-      };
-
-      await updateFee(updatedFee);
-      
-      Swal.fire({
-        title: approve ? "¡Pago Aprobado!" : "¡Pago Rechazado!",
-        text: approve ? "El pago ha sido aprobado exitosamente" : "El pago ha sido rechazado",
-        icon: approve ? "success" : "warning",
-        confirmButtonText: "Continuar"
-      });
-
-      // Recargar datos
-      await getAndSetFees();
-      handleCloseApprovalModal();
-    } catch (error) {
-      console.error("Error updating fee:", error);
-      Swal.fire("Error", "Ocurrió un error al actualizar el pago", "error");
-    }
-  }, [selectedFeeForApproval, updateFee, getAndSetFees, handleCloseApprovalModal]);
 
   const handleExportToExcel = useCallback(async () => {
     try {
@@ -426,110 +398,17 @@ export const FeesPage = () => {
         )}
 
         {/* Modal para aprobación de pagos */}
-        {showApprovalModal && selectedFeeForApproval && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center p-6 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-800">Aprobación de Pago</h2>
-                <button
-                  onClick={handleCloseApprovalModal}
-                  className="text-gray-500 hover:text-gray-700 transition-colors p-2"
-                >
-                  <FaTimes className="w-6 h-6" />
-                </button>
-              </div>
-              
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Información del pago */}
-                  <div className="space-y-4">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-gray-800 mb-3">Información del Pago</h3>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="font-medium">Código:</span> {selectedFeeForApproval.code}</p>
-                        <p><span className="font-medium">Monto:</span> ${selectedFeeForApproval.qty}</p>
-                        <p><span className="font-medium">Fecha:</span> {new Date(selectedFeeForApproval.createdAt).toLocaleDateString()}</p>
-                        <p><span className="font-medium">Motivo:</span> {selectedFeeForApproval.reason}</p>
-                        <p><span className="font-medium">Lugar:</span> {selectedFeeForApproval.place}</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-gray-800 mb-3">Método de Pago</h3>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="font-medium">Método:</span> {
-                          selectedFeeForApproval.paymentMethod === 'cash' ? 'Efectivo' :
-                          selectedFeeForApproval.paymentMethod === 'transference' ? 'Transferencia' :
-                          selectedFeeForApproval.paymentMethod === 'deposit' ? 'Depósito' :
-                          selectedFeeForApproval.paymentMethod === 'tc' ? 'Tarjeta de Crédito' : 'Voucher TC'
-                        }</p>
-                        {selectedFeeForApproval.docNumber && (
-                          <p><span className="font-medium">Nro. Comprobante:</span> {selectedFeeForApproval.docNumber}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-gray-800 mb-3">Estudiante</h3>
-                      <div className="space-y-2 text-sm">
-                        <p><span className="font-medium">Nombre:</span> {getUserById(selectedFeeForApproval.studentUid!)?.name}</p>
-                        <p><span className="font-medium">CI:</span> {selectedFeeForApproval.cc}</p>
-                        <p><span className="font-medium">Cliente:</span> {selectedFeeForApproval.customerName}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Imagen del comprobante */}
-                  <div className="space-y-4">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-gray-800 mb-3">Comprobante</h3>
-                      {selectedFeeForApproval.imageUrl ? (
-                        <div className="text-center">
-                          <img 
-                            src={selectedFeeForApproval.imageUrl} 
-                            alt="Comprobante de pago" 
-                            className="w-full max-w-md mx-auto rounded-lg shadow-md border"
-                          />
-                        </div>
-                      ) : (
-                        <p className="text-gray-500 text-center py-8">No hay imagen de comprobante disponible</p>
-                      )}
-                    </div>
-
-                    {/* Estado actual */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-semibold text-gray-800 mb-3">Estado Actual</h3>
-                      <div className="text-center">
-                        <span className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
-                          selectedFeeForApproval.isSigned ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {selectedFeeForApproval.isSigned ? '✓ Aprobado' : '⏳ Pendiente'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Botones de acción */}
-                <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-gray-200">
-                  <button
-                    onClick={() => handleApproveFee(true)}
-                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 font-medium flex items-center justify-center gap-2"
-                  >
-                    <FaCheck className="w-5 h-5" />
-                    Aprobar Pago
-                  </button>
-                  <button
-                    onClick={() => handleApproveFee(false)}
-                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 font-medium flex items-center justify-center gap-2"
-                  >
-                    <FaTimes className="w-5 h-5" />
-                    Rechazar Pago
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        {selectedFeeForApproval && (
+          <ModalGeneric
+            isVisible={showApprovalModal}
+            setIsVisible={setShowApprovalModal}
+            title="Aprobación de Pago"
+          >
+            <ApprovalFeeForm
+              selectedFeeForApproval={selectedFeeForApproval}
+              onClose={handleCloseApprovalModal}
+            />
+          </ModalGeneric>
         )}
       </div>
     </>
