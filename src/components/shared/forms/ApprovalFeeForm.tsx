@@ -1,21 +1,38 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { fee } from "../../../interface/fees.interface";
 import { useFeesStore } from "../../../stores/fees/fess.store";
 import { useUserStore } from "../../../stores";
 import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
 import { sendCustomEmail, footerMail } from "../../../store/firebase/helper";
-import { showSuccessAlert, showErrorAlert, showWarningAlert } from "../../../helpers/swal.helper";
+import CustomModal from "../../../components/CustomModal";
 
 interface ApprovalFeeFormProps {
   selectedFeeForApproval: fee;
   onClose: () => void;
 }
 
-export const ApprovalFeeForm: FC<ApprovalFeeFormProps> = ({ 
-  selectedFeeForApproval, 
-  onClose 
+export const ApprovalFeeForm: FC<ApprovalFeeFormProps> = ({
+  selectedFeeForApproval,
+  onClose
 }) => {
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalTitle, setCustomModalTitle] = useState('');
+  const [customModalMessage, setCustomModalMessage] = useState('');
+  const [customModalType, setCustomModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+  const [customModalAction, setCustomModalAction] = useState<() => void>(() => {});
+
+  const showModal = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success') => {
+    setCustomModalTitle(title);
+    setCustomModalMessage(message);
+    setCustomModalType(type);
+    setCustomModalAction(() => () => {
+      setCustomModalOpen(false);
+      getAndSetFees();
+      onClose();
+    });
+    setCustomModalOpen(true);
+  };
   const updateFee = useFeesStore((state) => state.updateFee);
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
   const getUserById = useUserStore((state) => state.getUserById);
@@ -163,22 +180,19 @@ export const ApprovalFeeForm: FC<ApprovalFeeFormProps> = ({
         : "El pago ha sido rechazado y se ha enviado una notificación al estudiante";
       
       if (approve) {
-        showSuccessAlert("¡Pago Aprobado!", successText, "Continuar");
+        showModal('¡Pago Aprobado!', successText, 'success');
       } else {
-        showWarningAlert("¡Pago Rechazado!", successText, "Continuar");
+        showModal('¡Pago Rechazado!', successText, 'danger');
       }
-
-      // Recargar datos
-      await getAndSetFees();
-      onClose();
     } catch (error) {
       console.error("Error updating fee:", error);
-      showErrorAlert("Error", "Ocurrió un error al actualizar el pago");
+      showModal('Error', 'Ocurrió un error al actualizar el pago', 'danger');
     }
   }, [selectedFeeForApproval, updateFee, getAndSetFees, getUserById, sendNotificationEmail, onClose, getProgressSheetByStudentId, updateProgressSheet]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Información del pago */}
       <div className="space-y-4">
         <div className="bg-gray-50 rounded-lg p-4">
@@ -266,6 +280,16 @@ export const ApprovalFeeForm: FC<ApprovalFeeFormProps> = ({
           </button>
         </div>
       </div>
-    </div>
+      </div>
+
+      <CustomModal
+        isOpen={customModalOpen}
+        title={customModalTitle}
+        message={customModalMessage}
+        type={customModalType}
+        onConfirm={customModalAction}
+        onCancel={() => setCustomModalOpen(false)}
+      />
+    </>
   );
 };

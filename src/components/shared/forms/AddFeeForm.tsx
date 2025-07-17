@@ -2,6 +2,7 @@
 // import { useFormContext } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { generateInvoiceNumber } from "../../../helpers/invoice.helper";
+import CustomModal from "../../../components/CustomModal";
 import { fee } from "../../../interface/fees.interface";
 import { useUserStore } from "../../../stores";
 import { useForm, Controller } from "react-hook-form";
@@ -10,10 +11,10 @@ import { useFeesStore } from "../../../stores/fees/fess.store";
 import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
 import { useAuthStore } from "../../../stores/auth/auth.store";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { showSuccessAlert, showErrorAlert } from "../../../helpers/swal.helper";
 import { v6 as uuid } from "uuid";
 import { sendCustomEmail } from "../../../store/firebase/helper";
 import QRCode from "qrcode";
+import Swal from "sweetalert2";
 
 export const AddFeeForm = () => {
   const getUserByRole = useUserStore((state) => state.getUserByRole);
@@ -22,6 +23,11 @@ export const AddFeeForm = () => {
   const { getProgressSheetByStudentId, updateProgressSheet } = useProgressSheetStore();
   const [isLoading] = useState(false);
   const [error] = useState<string | null>(null);
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalTitle, setCustomModalTitle] = useState('');
+  const [customModalMessage, setCustomModalMessage] = useState('');
+  const [customModalType, setCustomModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+  const [customModalAction, setCustomModalAction] = useState<() => void>(() => {});
   const students = getUserByRole("student").filter(
     (student) => student.isActive
   )!;
@@ -131,19 +137,19 @@ export const AddFeeForm = () => {
       const studentUid = user?.role === 'student' ? user.id : fee.studentUid;
       
       if (!studentUid) {
-        showErrorAlert("Error", "Por favor seleccione un estudiante");
+        showModal('Error', 'Por favor seleccione un estudiante', 'danger');
         return;
       }
 
       const student = getUserById(studentUid);
       if (!student) {
-        showErrorAlert("Error", "No se encontró un estudiante con ese UID");
+        showModal('Error', 'No se encontró un estudiante con ese UID', 'danger');
         return;
       }
 
       // Validar imagen solo si no es efectivo
       if (paymentMethod !== "cash" && !selectedFile) {
-        showErrorAlert("Error", "Por favor seleccione una imagen del comprobante");
+        showModal('Error', 'Por favor seleccione una imagen del comprobante', 'danger');
         return;
       }
 
@@ -152,7 +158,7 @@ export const AddFeeForm = () => {
       // Buscar el progress sheet del estudiante
       const progressSheet = getProgressSheetByStudentId(studentUid);
       if (!progressSheet) {
-        showErrorAlert("Error", "No se encontró un contrato para este estudiante");
+        showModal('Error', 'No se encontró un contrato para este estudiante', 'danger');
         setIsUploading(false);
         return;
       }
@@ -188,7 +194,7 @@ export const AddFeeForm = () => {
         
         // Validar que el monto sea válido
         if (isNaN(paymentAmount) || paymentAmount <= 0) {
-          showErrorAlert("Error", "El monto del pago debe ser un número válido mayor a 0");
+          showModal('Error', 'El monto del pago debe ser un número válido mayor a 0', 'danger');
           setIsUploading(false);
           return;
         }
@@ -217,11 +223,11 @@ export const AddFeeForm = () => {
       await sendPaymentNotificationEmail(feeToSave, student, progressSheet);
 
       // Mostrar mensaje de éxito
-      const successMessage = user?.role === 'student' 
+      const successMessage = user?.role === 'student'
         ? "El pago se ha registrado correctamente y está pendiente de aprobación"
         : "El pago se ha registrado correctamente y se ha actualizado el contrato";
-        
-      showSuccessAlert("¡Éxito!", successMessage, "Continuar");
+
+      showModal('¡Éxito!', successMessage, 'success');
 
       // Limpiar el formulario
       reset();
@@ -230,7 +236,7 @@ export const AddFeeForm = () => {
       setIsUploading(false);
     } catch (error) {
       console.error("Error submitting form:", error);
-      showErrorAlert("Error", "Ocurrió un error al guardar el registro");
+      showModal('Error', 'Ocurrió un error al guardar el registro', 'danger');
       setIsUploading(false);
     }
   };
@@ -311,8 +317,28 @@ export const AddFeeForm = () => {
     }
   };
 
+  const showModal = (
+    title: string,
+    message: string,
+    type: 'warn' | 'info' | 'danger' | 'success'
+  ) => {
+    setCustomModalTitle(title);
+    setCustomModalMessage(message);
+    setCustomModalType(type);
+    setCustomModalAction(() => () => setCustomModalOpen(false));
+    setCustomModalOpen(true);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6">
+      <CustomModal
+        isOpen={customModalOpen}
+        title={customModalTitle}
+        message={customModalMessage}
+        type={customModalType}
+        onConfirm={customModalAction}
+        onCancel={() => setCustomModalOpen(false)}
+      />
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full space-y-4"
@@ -590,11 +616,15 @@ export const AddFeeForm = () => {
                   const file = e.target.files?.[0];
                   if (file) {
                     if (!file.type.startsWith("image/")) {
-                      showErrorAlert("Error", "El archivo debe ser una imagen");
+                      Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "El archivo debe ser una imagen"
+                      });
                       return;
                     }
                     if (file.size > 5 * 1024 * 1024) {
-                      showErrorAlert("Error", "El archivo no debe exceder los 5 MB");
+                      showModal('Error', 'El archivo no debe exceder los 5 MB', 'danger');
                       return;
                     }
                     setSelectedFile(file);

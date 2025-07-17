@@ -48,9 +48,9 @@ export const SideBar: FC = () => {
     }, []);
 
     // Z-index ajustado para no sobreponerse a swal2 (z-index swal2: 9999)
-    const sidebarZ = isMobile ? 'z-[9998]' : 'z-20';
-    const overlayZ = 'z-[9997]';
-    const hamburgerZ = 'z-[9996]';
+    const sidebarZ = isMobile ? 'z-[998]' : 'z-20';
+    const overlayZ = 'z-[997]';
+    const hamburgerZ = 'z-[996]';
 
     return (
         <>

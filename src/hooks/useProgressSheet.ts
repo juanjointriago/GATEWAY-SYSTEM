@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useProgressSheetStore } from "../stores/progress-sheet/progresssheet.store";
 import { progressSheetInterface } from "../interface/progresssheet.interface";
 import { v6 as uuid } from "uuid";
-import { showErrorAlert } from "../helpers/swal.helper";
+import Swal from "sweetalert2";
 
 interface UseProgressSheetProps {
   uid: string;
@@ -70,7 +70,7 @@ export const useProgressSheet = ({ uid, studentName, studentEmail, studentPhone 
         setShowModal(true);
       } catch (error) {
         console.error("Error al crear el Progress Sheet:", error);
-        showErrorAlert("Error", "No se pudo crear el Progress Sheet");
+        Swal.fire("Error", "No se pudo crear el Progress Sheet");
       }
     }
   };

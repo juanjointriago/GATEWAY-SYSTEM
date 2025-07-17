@@ -12,7 +12,7 @@ import { MdPictureAsPdf } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
 import { exportFeesToExcel, exportPaymentSummary } from "../../helpers/excel.helper";
-import { showSuccessAlert, showErrorAlert } from "../../helpers/swal.helper";
+import CustomModal from "../../components/CustomModal";
 
 export const FeesPage = () => {
   const getAndSetFees = useFeesStore((state) => state.getAndSetFees);
@@ -26,6 +26,13 @@ export const FeesPage = () => {
   const [showPreview, setShowPreview] = useState(false); // Estado para vista previa PDF
   const [showApprovalModal, setShowApprovalModal] = useState(false); // Estado para modal de aprobación
   const [selectedFeeForApproval, setSelectedFeeForApproval] = useState<fee | null>(null); // Fee para aprobación
+
+  // Estado para CustomModal
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalTitle, setCustomModalTitle] = useState('');
+  const [customModalMessage, setCustomModalMessage] = useState('');
+  const [customModalType, setCustomModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+  const [customModalAction, setCustomModalAction] = useState<() => void>(() => {});
 
   const handleGeneratePDF = useCallback((row: fee) => {
     setSelectedRow(row); // Guardar la fila seleccionada
@@ -53,13 +60,21 @@ export const FeesPage = () => {
       const success = await exportFeesToExcel(dataToExport);
       
       if (success) {
-        showSuccessAlert("¡Éxito!", "El archivo Excel ha sido descargado exitosamente", "Continuar");
+        setCustomModalTitle('¡Éxito!');
+        setCustomModalMessage('El archivo Excel ha sido descargado exitosamente');
+        setCustomModalType('success');
+        setCustomModalAction(() => () => setCustomModalOpen(false));
+        setCustomModalOpen(true);
       } else {
-        showErrorAlert("Error", "No se pudo exportar el archivo Excel");
+        setCustomModalTitle('Error');
+        setCustomModalMessage('No se pudo exportar el archivo Excel');
+        setCustomModalType('danger');
+        setCustomModalAction(() => () => setCustomModalOpen(false));
+        setCustomModalOpen(true);
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      showErrorAlert("Error", "Ocurrió un error al exportar el archivo");
+      // showErrorAlert("Error", "Ocurrió un error al exportar el archivo");
     }
   }, [fees, isAdmin, user?.uid]);
 
@@ -69,13 +84,20 @@ export const FeesPage = () => {
       const success = await exportPaymentSummary(dataToExport);
       
       if (success) {
-        showSuccessAlert("¡Éxito!", "El resumen de pagos ha sido descargado exitosamente", "Continuar");
+        setCustomModalTitle('¡Éxito!');
+        setCustomModalMessage('El resumen de pagos ha sido descargado exitosamente');
+        setCustomModalType('success');
+        setCustomModalAction(() => () => setCustomModalOpen(false));
+        setCustomModalOpen(true);
       } else {
-        showErrorAlert("Error", "No se pudo exportar el resumen");
+        setCustomModalTitle('Error');
+        setCustomModalMessage('No se pudo exportar el resumen');
+        setCustomModalType('danger');
+        setCustomModalAction(() => () => setCustomModalOpen(false));
+        setCustomModalOpen(true);
       }
     } catch (error) {
       console.error("Error exporting summary:", error);
-      showErrorAlert("Error", "Ocurrió un error al exportar el resumen");
     }
   }, [fees, isAdmin, user?.uid]);
 
@@ -299,6 +321,14 @@ export const FeesPage = () => {
 
   return (
     <>
+      <CustomModal
+        isOpen={customModalOpen}
+        title={customModalTitle}
+        message={customModalMessage}
+        type={customModalType}
+        onConfirm={customModalAction}
+        onCancel={() => setCustomModalOpen(false)}
+      />
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
           {isAdmin ? 'Pagos recibidos' : 'Mis pagos'}
