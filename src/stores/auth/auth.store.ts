@@ -12,8 +12,9 @@ import { useEventStore } from "../events/event.store";
 import { useFeesStore } from "../fees/fess.store";
 import { useProgressSheetStore } from "../progress-sheet/progresssheet.store";
 
+export type Authstatus = 'pending' | 'unauthorized' | 'authorized' | 'error' | 'loading' | 'success';
 export interface AuthState {
-    status: 'pending' | 'unauthorized' | 'authorized';
+    status: Authstatus;
     user?: FirestoreUser
     sigUpUser: (user:newUSer) => Promise<void>;
     loginUser: (email: string, password: string) => Promise<void>;
@@ -33,7 +34,7 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
         if (user) {
             // console.debug('login', { email, password })
             console.debug('Caso de que existe usuario =>', { user });
-            set({ status: 'authorized', user });
+            set({ status: 'authorized', user: user.user });
             console.debug("USUARIO almacenado", get().user);
         } else {
             set({ status: 'unauthorized', user: undefined });
@@ -44,7 +45,7 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
     loginGoogle: async () => {
         const user = await AuthService.googleSignUpLogin();
         if (user) {
-            set({ status: 'authorized', ...user });
+            set({ status: 'authorized',  user: user.user });
         }
         else {
             set({ status: 'unauthorized', user: undefined });
@@ -57,7 +58,7 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
         const user = await AuthService.checkStatus();
         if (user) {
             // console.debug('✅Authorized', JSON.stringify(user))
-            set({ status: 'authorized', ...user });
+            set({ status: 'authorized', user });
         } else {
             // console.debug('❌Unauthorized', JSON.stringify(user))
             set({ status: 'unauthorized', user: undefined });

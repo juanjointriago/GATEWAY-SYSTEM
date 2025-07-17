@@ -10,7 +10,7 @@ import { IoPencil, IoTrash } from "react-icons/io5";
 import { MdFileDownload } from "react-icons/md";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUnitForm } from "../../components/shared/forms/EditUnitForm";
-import Swal from "sweetalert2";
+import CustomModal from "../../components/CustomModal";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { ColumnDef } from "@tanstack/react-table";
@@ -29,23 +29,48 @@ export const UnitsPage = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [unitToEdit, setUnitToEdit] = useState<unit>();
 
+  // Estados para CustomModal
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: () => {},
+    onCancel: undefined as (() => void) | undefined,
+  });
+
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportUnitsToExcel(books);
-      
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El archivo Excel ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
+        setModal({
+          isOpen: true,
+          title: '¡Éxito!',
+          message: 'El archivo Excel ha sido descargado exitosamente',
+          type: 'success',
+          onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+          onCancel: () => setModal(m => ({ ...m, isOpen: false })),
         });
       } else {
-        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+        setModal({
+          isOpen: true,
+          title: 'Error',
+          message: 'No se pudo exportar el archivo Excel',
+          type: 'danger',
+          onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+          onCancel: () => setModal(m => ({ ...m, isOpen: false })),
+        });
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+      setModal({
+        isOpen: true,
+        title: 'Error',
+        message: 'Ocurrió un error al exportar el archivo',
+        type: 'danger',
+        onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+        onCancel: () => setModal(m => ({ ...m, isOpen: false })),
+      });
     }
   }, [books]);
 
@@ -148,20 +173,17 @@ export const UnitsPage = () => {
             <ToggleButton
               isActive={unit.isActive}
               action={() => {
-                Swal.fire({
+                setModal({
+                  isOpen: true,
                   title: '¿Estás seguro?',
-                  text: `Estás a punto de ${unit.isActive ? 'ocultar' : 'mostrar'} este Libro`,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Sí, continuar',
-                  cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
+                  message: `Estás a punto de ${unit.isActive ? 'ocultar' : 'mostrar'} este Libro`,
+                  type: 'warn',
+                  onConfirm: async () => {
+                    setModal(m => ({ ...m, isOpen: false }));
                     await updateUnit({ ...unit, isActive: !unit.isActive });
                     window.location.reload();
-                  }
+                  },
+                  onCancel: () => setModal(m => ({ ...m, isOpen: false })),
                 });
               }}
             />
@@ -179,19 +201,16 @@ export const UnitsPage = () => {
               tootTipText="Eliminar unidad"
               Icon={IoTrash}
               action={() => {
-                Swal.fire({
+                setModal({
+                  isOpen: true,
                   title: '¿Estás seguro?',
-                  text: 'Estás a punto de eliminar este Libro',
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Sí, continuar',
-                  cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
+                  message: 'Estás a punto de eliminar este Libro',
+                  type: 'danger',
+                  onConfirm: async () => {
+                    setModal(m => ({ ...m, isOpen: false }));
                     await deleteUnit(unit.id!);
-                  }
+                  },
+                  onCancel: () => setModal(m => ({ ...m, isOpen: false })),
                 });
               }} 
             />
@@ -204,18 +223,26 @@ export const UnitsPage = () => {
   // Filtrar datos según el rol del usuario
   const filteredData = useMemo(() => {
     if (!user) return [];
-    
+    let data: unit[] = [];
     if (user.role === 'admin') {
-      return books;
+      data = books;
     } else {
-      return user.unitsForBooks ? 
-        books.filter((unit) => user.unitsForBooks.includes(unit.sublevel)) : 
-        [];
+      data = user.unitsForBooks ? books.filter((unit) => user.unitsForBooks.includes(unit.sublevel)) : [];
     }
+    // Ordenar por orderNumber ascendente
+    return [...data].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
   }, [user, books]);
 
   return (
     <>
+      <CustomModal 
+        isOpen={modal.isOpen} 
+        title={modal.title} 
+        message={modal.message} 
+        type={modal.type as 'warn' | 'info' | 'danger' | 'success'}
+        onConfirm={modal.onConfirm}
+        onCancel={modal.onCancel}
+      />
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
           Libros

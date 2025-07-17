@@ -3,7 +3,7 @@ import { unit } from "../../../interface";
 import { useSubLevelStore, useUnitStore } from "../../../stores";
 import { v6 as uuid } from 'uuid'
 import { useRef, useState } from "react";
-import Swal from "sweetalert2";
+import CustomModal from "../../CustomModal";
 
 export const FormUnit = () => {
   const fileRef = useRef(null);
@@ -25,33 +25,71 @@ export const FormUnit = () => {
     updatedAt: Date.now(),
   }
   const { register, handleSubmit, reset, formState: { errors } } = useForm<unit>({ defaultValues });
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info' as 'warn' | 'info' | 'danger' | 'success',
+    onConfirm: () => {},
+    onCancel: undefined as (() => void) | undefined,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = handleSubmit(async (data: unit) => {
-    const unitRecord = { id: uuid(), ...data }
+    const unitRecord = { id: uuid(), ...data };
     if (!fileUpload) {
-      Swal.fire('Ups!', 'Debe subir un archivo', 'warning');
+      setModal({
+        isOpen: true,
+        title: 'Ups!',
+        message: 'Debe subir un archivo',
+        type: 'warn',
+        onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+        onCancel: undefined,
+      });
       return;
     }
-    const inputFile = fileRef.current as HTMLInputElement | null;
-    Swal.fire({
-      title: "Creando Material",
-      text: "Espera un poco...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+    setIsLoading(true);
+    setModal({
+      isOpen: true,
+      title: 'Creando Material',
+      message: 'Espera un poco...',
+      type: 'info',
+      onConfirm: () => {},
+      onCancel: undefined,
     });
+    const inputFile = fileRef.current as HTMLInputElement | null;
     await createUnit(unitRecord, fileUpload[0]);
-    Swal.close();
-    Swal.fire('Material almacenado', 'Material de apoyo creado con éxito', 'success');
-    console.debug({ data })
-    inputFile!.value = ''
-    fileRef.current = null;
-    reset();
-  })
+    setIsLoading(false);
+    setModal({
+      isOpen: true,
+      title: 'Material almacenado',
+      message: 'Material de apoyo creado con éxito',
+      type: 'success',
+      onConfirm: () => {
+        setModal(m => ({ ...m, isOpen: false }));
+        inputFile!.value = '';
+        fileRef.current = null;
+        reset();
+      },
+      onCancel: undefined,
+    });
+    console.debug({ data });
+  });
 
   return (
-    <div className="flex ">
-      <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
+    <>
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onConfirm={modal.onConfirm}
+        onCancel={modal.onCancel}
+      />
+      <div className="flex ">
+        <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
         <div className="flex flex-wrap mx-3 mb-6">
           <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
             <label htmlFor="sublevel" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Unidad a la que pertenece</label>
@@ -152,7 +190,8 @@ export const FormUnit = () => {
             type="submit"
           >💾</button>
         </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   )
 }

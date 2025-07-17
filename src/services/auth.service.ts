@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -8,28 +9,21 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import Swal from "sweetalert2";
+
 import { getItemById, setItem } from "../store/firebase/helper";
 import { FirestoreUser, newUSer } from "../interface";
 import { v6 as uuid } from "uuid";
 import { progressSheetInterface } from "../interface/progresssheet.interface";
+import { Authstatus } from "../stores";
 
 2;
 export class AuthService {
   static login = async (
     email: string,
     password: string
-  ): Promise<FirestoreUser | undefined> => {
+  ): Promise<{ user?: FirestoreUser; status: Authstatus; message: string }> => {
     const auth = getAuth();
     console.debug("✅login", { email, password });
-    Swal.fire({
-      title: "Ingresando al Sistema...",
-      text: "Espera un poco...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       console.debug("✅", user.displayName);
@@ -40,61 +34,33 @@ export class AuthService {
       console.debug("Auth.Service/static login/ getItemById=>", {
         firebaseUser,
       });
-      Swal.close();
       if (firebaseUser && firebaseUser.isActive === false) {
-        // console.debug("Caso Usuario inactivo")
-        Swal.fire({
-          title: `Su usuario está en proceso de aprobación`,
-          icon: "info",
-          allowOutsideClick: true,
-          backdrop: true,
-        });
         await signOut(auth);
-        return;
+        return { status: 'pending', message: 'Su usuario está en proceso de aprobación' };
       }
       if (firebaseUser && firebaseUser.isActive) {
-        Swal.fire({
-          title: `Bienvenido ${firebaseUser.name}`,
-          icon: "success",
-          allowOutsideClick: true,
-          backdrop: true,
-        });
-        // console.debug('Login Exitoso', { firebaseUser });
-        return firebaseUser;
+        return { status: 'success', user: firebaseUser, message: `Bienvenido ${firebaseUser.name}` };
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { status: 'error', message: 'Usuario no encontrado' };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.debug({ error });
-      Swal.close();
-      Swal.fire("Error al iniciar sesión", `${error.message}`, "error");
-      throw new Error("Error al iniciar sesión");
+      return { status: 'error', message: `Error al iniciar sesión: ${error.message}` };
     }
   };
 
-  static resetPassword = async (email: string) => {
+  static resetPassword = async (email: string): Promise<{ status: 'success' | 'error'; message: string }> => {
     const auth = getAuth();
     try {
       await sendPasswordResetEmail(auth, email);
-      Swal.fire({
-        title: `Reinicio de Contraseña`,
-        text: `Revise la bandeja de ${email}`,
-        icon: "success",
-        allowOutsideClick: true,
-        backdrop: true,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { status: 'success', message: `Reinicio de Contraseña: Revise la bandeja de ${email}` };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      Swal.fire({
-        title: `Error al enviar correo`,
-        text: `${error.message}`,
-        icon: "warning",
-        allowOutsideClick: true,
-        backdrop: true,
-      });
+      return { status: 'error', message: `Error al enviar correo: ${error.message}` };
     }
   };
 
-  static signUp = async (signUpUser: newUSer) => {
+  static signUp = async (signUpUser: newUSer): Promise<{ status: 'success' | 'error'; message: string }> => {
     const {
       email,
       password,
@@ -134,7 +100,6 @@ export class AuthService {
           updatedAt: Date.now(),
         };
         await updateProfile(userCredential.user, { displayName: name });
-        // await setDoc(doc(db, import.meta.env.VITE_COLLECTION_USERS, uid), dataUser);//
         await setItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
         //Add preffered info and Total fee for user
         const contractInfo: progressSheetInterface = {
@@ -167,29 +132,14 @@ export class AuthService {
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
-        await setItem( import.meta.env.VITE_COLLECTION_PROGRESS_SHEET, contractInfo);
-        Swal.fire({
-          title: `Registro completo`,
-          text: `Su cuenta se encuentra en proceso de activación`,
-          icon: "success",
-          allowOutsideClick: true,
-          backdrop: true,
-        }).then(() => {
-          signOut(auth);
-        });
-        // await signOut(auth);
-        
+        await setItem(import.meta.env.VITE_COLLECTION_PROGRESS_SHEET, contractInfo);
+        await signOut(auth);
+        return { status: 'success', message: 'Registro completo: Su cuenta se encuentra en proceso de activación' };
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { status: 'error', message: 'No se pudo registrar el usuario' };
     } catch (error: any) {
-      Swal.fire({
-        title: `Error al registrar usuario`,
-        text: `${error.message}`,
-        icon: "warning",
-        allowOutsideClick: true,
-        backdrop: true,
-      });
       await signOut(auth);
+      return { status: 'error', message: `Error al registrar usuario: ${error.message}` };
     }
   };
   /**
@@ -197,7 +147,7 @@ export class AuthService {
    * @param action
    * @returns
    */
-  static googleSignUpLogin = async () => {
+  static googleSignUpLogin = async (): Promise<{ user?: FirestoreUser; status: 'success' | 'pending' | 'error'; message: string }> => {
     const auth = getAuth();
     const googleAuthProvider = new GoogleAuthProvider();
     googleAuthProvider.setCustomParameters({
@@ -206,14 +156,6 @@ export class AuthService {
 
     try {
       const { user } = await signInWithPopup(auth, googleAuthProvider);
-      Swal.fire({
-        title: "Ingresando al Sistema...",
-        text: "Espera un poco...",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
       const { uid, email, displayName, photoURL } = user;
       const firebaseUser = await getItemById<FirestoreUser>(
         import.meta.env.VITE_COLLECTION_USERS,
@@ -237,31 +179,18 @@ export class AuthService {
           createdAt: Date.now(),
         };
         await setItem(import.meta.env.VITE_COLLECTION_USERS, dataUser);
-        Swal.close();
-        return;
+        await signOut(auth);
+        return { status: 'success', message: 'Registro completo: Su cuenta se encuentra en proceso de activación' };
       }
       if (!firebaseUser.isActive) {
-        Swal.fire({
-          title: `Su usuario está en proceso de aprobación`,
-          icon: "info",
-          allowOutsideClick: true,
-          backdrop: true,
-        });
         await signOut(auth);
-        return;
+        return { status: 'pending', message: 'Su usuario está en proceso de aprobación' };
       }
-      Swal.close();
-      return firebaseUser;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { status: 'success', user: firebaseUser, message: `Bienvenido ${firebaseUser.name}` };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.debug({ error });
-      Swal.close();
-      Swal.fire(
-        "Error al iniciar sesión con GOOGLE",
-        `${error.message}`,
-        "error"
-      );
-      throw new Error("Error al iniciar sesión");
+      return { status: 'error', message: `Error al iniciar sesión con GOOGLE: ${error.message}` };
     }
   };
 

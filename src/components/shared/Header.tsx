@@ -61,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSidebar, isSideb
         <div className="flex items-center space-x-4">
           {/* Notificaciones (placeholder) */}
           <button className="hidden sm:flex p-1 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-100 ">
-            <img src={user?.photoUrl} alt="User Avatar" className="w-8 h-8 rounded-full" />
+            <img src={user?.photoURL ?? user?.photoUrl} alt="User Avatar" className="w-8 h-8 rounded-full" />
           </button>
 
           {/* Menú de usuario */}
@@ -72,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSidebar, isSideb
                   {user?.name || 'Usuario'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {user?.role.toUpperCase() || 'ROL'}
+                  {user?.role?.toUpperCase() || 'ROL'}
                 </p>
               </div>
               

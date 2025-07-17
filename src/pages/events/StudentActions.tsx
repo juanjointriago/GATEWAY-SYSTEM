@@ -1,15 +1,15 @@
-import { FC } from "react"
-import { event, status, students } from "../../interface"
+import { FC, useState } from "react";
+import { event, status, students } from "../../interface";
 import { IconType } from "react-icons";
 import { TootipBase } from "../../components/shared/buttons/TootipBase";
 import { useEventStore } from "../../stores/events/event.store";
-import Swal from "sweetalert2";
+import CustomModal from "../../components/CustomModal";
 
 interface Props {
-    event: event
+    event: event;
     students: students;
     Icon: IconType;
-    userId: string
+    userId: string;
 }
 
 const changeVisualAction = (status: status) => {
@@ -48,11 +48,37 @@ const changeVisualStatus = (status: status) => {
     }
 
 }
-export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
+export const StudentActions: FC<Props> = ({ event, students, Icon, userId }) => {
     const updateEvent = useEventStore(state => state.updateEvent);
     const today = Date.now();
+
+    // Estado para CustomModal
+    const [customModalOpen, setCustomModalOpen] = useState(false);
+    const [customModalTitle, setCustomModalTitle] = useState("");
+    const [customModalMessage, setCustomModalMessage] = useState("");
+    const [customModalType, setCustomModalType] = useState<"warn" | "info" | "danger" | "success">("info");
+    const [customModalAction, setCustomModalAction] = useState<() => void>(() => {});
+
+    const showModal = (
+        title: string,
+        message: string,
+        type: "warn" | "info" | "danger" | "success",
+        action?: () => void
+    ) => {
+        setCustomModalTitle(title);
+        setCustomModalMessage(message);
+        setCustomModalType(type);
+        setCustomModalAction(() => {
+            return () => {
+                setCustomModalOpen(false);
+                if (action) action();
+            };
+        });
+        setCustomModalOpen(true);
+    };
     return (
-        <div className="flex flex-row">
+        <>
+            <div className="flex flex-row">
             {
                 // keys.map((key: string) => (
                 <div key={userId} className="flex flex-row">
@@ -61,36 +87,59 @@ export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) =>
                             const student = event.students[userId];
                             const aceptedStudents = Object.values(event.students).filter((student) => student.status === 'CONFIRMED').length;
                             if (!event.limitDate) {
-                                Swal.fire("We're sorry! - ¡Lo sentimos!", 'No booking deadline has been assigned for this class. - No se ha asignado una fecha límite de reservación para esta clase', 'warning')
-                                return
+                                showModal(
+                                    "We're sorry! - ¡Lo sentimos!",
+                                    "No booking deadline has been assigned for this class. - No se ha asignado una fecha límite de reservación para esta clase",
+                                    "warn"
+                                );
+                                return;
                             }
                             if (today > new Date(event.limitDate).getTime()) {
-                                Swal.fire("We're sorry! - ¡Lo sentimos!", 'You are out of the reservation deadline - Estás fuera de la fecha limite de reservación', 'error')
-                                return
+                                showModal(
+                                    "We're sorry! - ¡Lo sentimos!",
+                                    "You are out of the reservation deadline - Estás fuera de la fecha limite de reservación",
+                                    "danger"
+                                );
+                                return;
                             }
                             if (event.maxAssistantsNumber <=aceptedStudents) {
                                 // console.debug('Nro de estudiantes => ', Object.keys(event.students).length, 'Maximo nro de estudiantes evento =>',event.maxAssistantsNumber);
-                                Swal.fire("We're sorry! - ¡Lo sentimos!", 'This class is already full - Esta clase ya se encuentra llena - ', 'error')
-                                return
+                                showModal(
+                                    "We're sorry! - ¡Lo sentimos!",
+                                    "This class is already full - Esta clase ya se encuentra llena - ",
+                                    "danger"
+                                );
+                                return;
                             }
-                            Swal.fire({
-                                title: '¿Estás seguro?',
-                                text: `Estás a punto de ${student.status === 'CONFIRMED' ? 'CANCELAR' : 'ACEPTAR'} la clase`,
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonText: 'Sí, estoy seguro',
-                                cancelButtonText: 'No, cancelar',
-                            }).then(async(result) => {
-                                if (result.isConfirmed) {
-                                    await updateEvent({ ...event, students: { ...event.students, [userId]: { status: student.status === 'CONFIRMED' ? 'DECLINED' : 'CONFIRMED' } } })
-                                    Swal.fire('¡Hecho!', `La clase ha sido ${student.status === 'CONFIRMED' ? 'CANCELADA' : 'ACEPTADA'}`, 'success').then((res)=>{
-                                        if(res.isConfirmed){
+                            showModal(
+                                "¿Estás seguro?",
+                                `Estás a punto de ${
+                                    student.status === "CONFIRMED" ? "CANCELAR" : "ACEPTAR"
+                                } la clase`,
+                                "warn",
+                                async () => {
+                                    await updateEvent({
+                                        ...event,
+                                        students: {
+                                            ...event.students,
+                                            [userId]: {
+                                                status:
+                                                    student.status === "CONFIRMED" ? "DECLINED" : "CONFIRMED",
+                                            },
+                                        },
+                                    });
+                                    showModal(
+                                        "¡Hecho!",
+                                        `La clase ha sido ${
+                                            student.status === "CONFIRMED" ? "CANCELADA" : "ACEPTADA"
+                                        }`,
+                                        "success",
+                                        () => {
                                             window.location.reload();
                                         }
-                                    });
-                                    // window.location.reload();
+                                    );
                                 }
-                            })
+                            );
                         }} style={{ backgroundColor: changeVisualColor(`${event.students[userId].status}`) }} className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full">
                             <Icon size={20} color='white' />
                         </div>
@@ -101,6 +150,16 @@ export const  StudentActions: FC<Props> = ({ event, students, Icon, userId }) =>
 
                 // ))
             }
-        </div>
+            </div>
+
+            <CustomModal
+                isOpen={customModalOpen}
+                title={customModalTitle}
+                message={customModalMessage}
+                type={customModalType}
+                onConfirm={customModalAction}
+                onCancel={() => setCustomModalOpen(false)}
+            />
+        </>
     )
 }
