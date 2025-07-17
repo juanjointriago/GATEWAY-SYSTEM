@@ -72,7 +72,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
       ) : (
         <div className="flex flex-wrap items-center gap-2 p-2">
           {showStudents &&
-            showStudents.slice(0, 3).map((student) => (
+            showStudents.slice(0, 0).map((student) => (
               <AvatarButton
                 key={uuid()}
                 tootTipText={`${student?.name ?? "NO name"} - ${changeVisualStatus(

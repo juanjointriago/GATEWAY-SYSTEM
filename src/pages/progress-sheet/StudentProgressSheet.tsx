@@ -1,22 +1,10 @@
 import { FC, useEffect, useState } from "react";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  PDFViewer,
-} from "@react-pdf/renderer";
-import {
-  ProgressEntry,
-  StudentInfo,
-} from "../../interface/progresssheet.interface";
 import Swal from "sweetalert2";
 import { useProgressSheetStore } from "../../stores/progress-sheet/progresssheet.store";
 import { useUserStore } from "../../stores";
 import { useEventStore } from "../../stores/events/event.store";
 import { NoGradesMessage } from "./NoGradesMessage";
-// import { useWindowSize } from "../../hooks/useWindowSize";
+import { ProgressEntry, StudentInfo } from "../../interface/progresssheet.interface";
 
 interface Props {
   studentID: string;
@@ -40,7 +28,6 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     return <NoGradesMessage />;
   }
   const progressSheet = getProgressSheetByStudentId(studentID);
-  console.log("STUDENT SCREEN Progress Classes:", progressSheet);
   if (!progressSheet) {
     Swal.fire(
       " Warning",
@@ -49,7 +36,7 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     );
     return <NoGradesMessage message="A este estudiante no se le ha asignado un progressSheet debes actualizar su contrato" />;
   }
-  if ( progressSheet.progressClasses.length === 0 ) {
+  if (progressSheet.progressClasses.length === 0) {
     return <NoGradesMessage />;
   }
   const age =
@@ -73,17 +60,16 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     preferredName: progressSheet.myPreferredName || student.name,
     age: age.toString(),
     birthday: student.bornDate,
-    occupation: "student",
+    occupation: progressSheet.work || "N/D",
     fullName: student.name,
     gender: "undefined",
-    observation: "none",
+    observation: progressSheet.observation || "N/D",
     otherContacts: progressSheet.otherContacts || student.phone,
     phone: student.phone,
     idNumber: student.cc,
-    regNumber: student.cc,
-    inscriptionDate: student.createdAt.toString() || "",
-    expirationDate: student.createdAt.toString() || "",
-
+    regNumber: progressSheet.contractNumber || 'N/D',
+    inscriptionDate: progressSheet.inscriptionDate || "",
+    expirationDate: progressSheet.expirationDate || "",
     progressEntries: progressEntries.sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
@@ -91,192 +77,133 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
     }),
   };
 
-  const TableRow = ({ entry }: { entry: ProgressEntry }) => (
-    <View style={styles.tableRow}>
-      <Text style={[styles.tableCell, { width: 80 }]}>{entry.date}</Text>
-      <Text style={[styles.tableCell, { width: 60 }]}>{entry.hour}</Text>
-      <Text style={[styles.tableCell, { width: 100 }]}>{entry.book}</Text>
-      <Text style={[styles.tableCell, { width: 100 }]}>{entry.progress}</Text>
-      <Text style={[styles.tableCell, { width: 60 }]}>{entry.part}</Text>
-      <Text style={[styles.tableCell, { width: 60 }]}>{entry.test}</Text>
-      <Text style={[styles.tableCell, { width: 100 }]}>{entry.teacher}</Text>
-      <Text style={[styles.tableCell, { width: 200 }]}>
-        {entry.observation}
-      </Text>
-    </View>
-  );
-
   if (!isMounted) {
     return null;
   }
 
-  // Ajuste específico para móviles
+  // Vista responsiva y atractiva para el estudiante
   return (
-    <div className="w-full h-full bg-white">
-      <PDFViewer
-        style={{
-          width: "100%",
-          height: "100%",
-          border: "none",
-        }}
-      >
-        <Document>
-          <Page size="A4" style={styles.page}>
-            <Text style={styles.header}>PROGRESS SHEET</Text>
-
-            {/* Información Personal */}
-            <View style={styles.section}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Preferred Name:</Text>
-                <Text style={styles.value}>{studentInfo.preferredName}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>ID Nº:</Text>
-                <Text style={styles.value}>{studentInfo.idNumber}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>REG Nº:</Text>
-                <Text style={styles.value}>{studentInfo.regNumber}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Inscription Date:</Text>
-                <Text style={styles.value}>{studentInfo.inscriptionDate}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Expiration:</Text>
-                <Text style={styles.value}>{studentInfo.expirationDate}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Full Name:</Text>
-                <Text style={styles.value}>{studentInfo.fullName}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Age:</Text>
-                <Text style={styles.value}>{studentInfo.age}</Text>
-                <Text style={styles.label}>Birthday:</Text>
-                <Text style={styles.value}>{studentInfo.birthday}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Phone:</Text>
-                <Text style={styles.value}>{studentInfo.phone}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Other Contacts:</Text>
-                <Text style={styles.value}>{studentInfo.otherContacts}</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.label}>Observation:</Text>
-                <Text style={styles.value}>{studentInfo.observation}</Text>
-              </View>
-            </View>
-          </Page>
-
-          <Page size="A4" orientation="landscape" style={styles.landscapePage}>
-            <Text style={styles.tableTitle}>PROGRESS TABLE</Text>
-
-            {/* Tabla de Progreso */}
-            <View style={styles.table}>
-              <View style={[styles.tableRow, styles.tableHeader]}>
-                <Text style={[styles.tableCell, { width: 80 }]}>DATE</Text>
-                <Text style={[styles.tableCell, { width: 60 }]}>HOUR</Text>
-                <Text style={[styles.tableCell, { width: 100 }]}>BOOK</Text>
-                <Text style={[styles.tableCell, { width: 100 }]}>PROGRESS</Text>
-                <Text style={[styles.tableCell, { width: 60 }]}>PART</Text>
-                <Text style={[styles.tableCell, { width: 60 }]}>TEST</Text>
-                <Text style={[styles.tableCell, { width: 100 }]}>TEACHER</Text>
-                <Text style={[styles.tableCell, { width: 200 }]}>
-                  OBSERVATION
-                </Text>
-              </View>
-              {studentInfo.progressEntries.map((entry, index) => (
-                <TableRow key={index} entry={entry} />
-              ))}
-            </View>
-          </Page>
-        </Document>
-      </PDFViewer>
+    <div className="w-full max-w-4xl mx-auto p-4 md:p-8 bg-white rounded-lg shadow-lg mt-4 mb-8">
+      <h2 className="text-2xl md:text-3xl font-bold text-indigo-700 mb-2 text-center">
+        Progress Sheet
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">
+              Nombre de Representante:
+            </span>{" "}
+            {studentInfo.preferredName}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">ID Nº:</span>{" "}
+            {studentInfo.idNumber}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">REG Nº:</span>{" "}
+            {studentInfo.regNumber}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Inscripción:</span>{" "}
+            {new Date(studentInfo.inscriptionDate).toLocaleDateString()}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Expiración:</span>{" "}
+            {new Date(studentInfo.expirationDate).toLocaleDateString()}
+          </div>
+        </div>
+        <div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Nombre completo:</span>{" "}
+            {studentInfo.fullName}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Edad:</span>{" "}
+            {studentInfo.age}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Cumpleaños:</span>{" "}
+            {new Date(studentInfo.birthday).toLocaleDateString()}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Teléfono:</span>{" "}
+            {studentInfo.phone}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700">Otros contactos:</span>{" "}
+            {studentInfo.otherContacts}
+          </div>
+        </div>
+      </div>
+      <div className="mb-4">
+        <span className="font-semibold text-gray-700">Observación:</span>{" "}
+        {studentInfo.observation}
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-indigo-100">
+            <tr>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Fecha
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Hora
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Libro
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Progreso
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Parte
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Test
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Docente
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Observación
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-100">
+            {studentInfo.progressEntries.map((entry, index) => (
+              <tr
+                key={index}
+                className="hover:bg-indigo-50 transition-colors"
+              >
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.date}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.hour}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.book}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.progress}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.part}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.test}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.teacher}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700">
+                  {entry.observation}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
-
-
-
-// Definimos los estilos
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    backgroundColor: "#ffffff",
-    padding: 30,
-  },
-  landscapePage: {
-    flexDirection: "column",
-    backgroundColor: "#ffffff",
-    padding: 30,
-    size: "landscape",
-  },
-  header: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexGrow: 1,
-  },
-  row: {
-    flexDirection: "row",
-    marginVertical: 5,
-  },
-  label: {
-    width: 120,
-    fontWeight: "bold",
-  },
-  value: {
-    flex: 1,
-    borderBottom: 1,
-    marginLeft: 10,
-  },
-  table: {
-    flexDirection: "column",
-    width: "100%",
-    marginTop: 20,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    minHeight: 25,
-  },
-  tableHeader: {
-    backgroundColor: "#f0f0f0",
-    fontWeight: "bold",
-  },
-  tableCell: {
-    padding: 5,
-    borderRightWidth: 1,
-    borderRightColor: "#000",
-    fontSize: 8,
-    flexWrap: "wrap",
-    minWidth: 60,
-  },
-  tableTitle: {
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: 10,
-    fontWeight: "bold",
-  },
-});

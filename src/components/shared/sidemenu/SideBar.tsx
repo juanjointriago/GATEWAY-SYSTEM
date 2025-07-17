@@ -12,7 +12,7 @@ import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssh
 import { useEnterpriseInfoStore } from "../../../stores/enterpriseinfo/enterpriseinfo.store";
 
 export const SideBar: FC = () => {
-    const [isOpen, setIsOpen] = useState(false); // Cambiado a false por defecto
+    const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const user = useAuthStore(state => state.user);
     const logout = useAuthStore(state => state.logoutUser);
@@ -26,7 +26,6 @@ export const SideBar: FC = () => {
     const getAllNews = useNewsStore(state => state.getAndSetNews);
     const getAllProgressSheet = useProgressSheetStore(state => state.getAndSetProgressSheets);
     const getEnterpriseInfo = useEnterpriseInfoStore(state => state.getEnterpriseInfo);
-    
 
     useEffect(() => {
       getAllEvents();
@@ -39,8 +38,6 @@ export const SideBar: FC = () => {
       getAllProgressSheet();
       getEnterpriseInfo();
     }, [getAllEvents, getAllUsers, getAllLevels, getAllSubLevels, getAllUnits, getAllFees, getAllNews, getAllProgressSheet, getEnterpriseInfo])
-    
-
 
     useEffect(() => {
         const handleResize = () => {
@@ -50,16 +47,20 @@ export const SideBar: FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Z-index ajustado para no sobreponerse a swal2 (z-index swal2: 9999)
+    const sidebarZ = isMobile ? 'z-[9998]' : 'z-20';
+    const overlayZ = 'z-[9997]';
+    const hamburgerZ = 'z-[9996]';
+
     return (
         <>
             {/* Botón hamburguesa para móvil - Solo visible cuando el menú está cerrado */}
             {isMobile && !isOpen && (
                 <button 
                     onClick={() => setIsOpen(true)}
-                    className="fixed top-2 left-0 z-[57] p-2.5 
-                        bg-indigo-600 text-white rounded-lg 
-                        hover:bg-indigo-700 transition-colors
-                        lg:hidden"
+                    className={`fixed top-2 left-2 ${hamburgerZ} p-2.5 \
+                        bg-indigo-600 text-white rounded-lg \
+                        hover:bg-indigo-700 transition-colors\n                        lg:hidden`}
                     aria-label="Abrir menú"
                 >
                     <RiMenu4Line size={24} />
@@ -69,19 +70,19 @@ export const SideBar: FC = () => {
             {/* Overlay para móvil */}
             {isMobile && isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[55]"
+                    className={`fixed inset-0 bg-black/50 backdrop-blur-sm ${overlayZ}`}
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             <aside 
                 className={`
-                    fixed top-0 left-0 h-screen
+                    fixed top-0 left-0 h-full
                     bg-[#1e1b4b] shadow-2xl
                     transition-all duration-300 ease-in-out
                     ${isMobile 
-                        ? `z-[56] w-64 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`
-                        : `z-[40] ${isOpen ? 'w-64' : 'w-20'} lg:translate-x-0`
+                        ? `${sidebarZ} w-64 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`
+                        : `${sidebarZ} ${isOpen ? 'w-64' : 'w-20'} lg:translate-x-0`
                     }
                     lg:relative flex flex-col
                 `}
@@ -94,9 +95,8 @@ export const SideBar: FC = () => {
                             transition-all duration-300
                             ${(!isOpen && !isMobile) ? 'opacity-0 w-0' : 'opacity-100 w-auto'}
                         `}>
-                            Gatway <span className="text-blue-600 font-semibold">System</span>
+                            Gateway <span className="text-blue-600 font-semibold">System</span>
                         </h4>
-                        
                         {/* Botón cerrar para móvil */}
                         {isMobile && (
                             <button 
@@ -106,7 +106,6 @@ export const SideBar: FC = () => {
                                 <IoIosArrowBack size={20} />
                             </button>
                         )}
-                        
                         {/* Botón toggle para desktop */}
                         {!isMobile && (
                             <button 
@@ -121,7 +120,6 @@ export const SideBar: FC = () => {
                         )}
                     </div>
                 </div>
-
                 {/* Contenedor principal con scroll si es necesario */}
                 <div className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
                     {/* Área scrolleable */}
@@ -135,7 +133,6 @@ export const SideBar: FC = () => {
                         ))}
                     </nav>
                 </div>
-
                 {/* Footer fijo */}
                 <div className="sticky bottom-0 bg-[#1e1b4b] border-t border-indigo-800 mt-auto z-10">
                     <div className="p-4">
@@ -164,4 +161,4 @@ export const SideBar: FC = () => {
             </aside>
         </>
     );
-};
+}

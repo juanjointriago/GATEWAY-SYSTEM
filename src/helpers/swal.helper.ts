@@ -24,8 +24,15 @@ const swalConfig: Partial<SweetAlertOptions> = {
     // Configurar el backdrop de forma más sutil
     const container = document.querySelector('.swal2-container');
     if (container) {
+      (container as HTMLElement).style.zIndex = '9999';
       (container as HTMLElement).style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
       (container as HTMLElement).style.backdropFilter = 'blur(1px)';
+    }
+    
+    // Asegurar que el popup tenga el z-index correcto
+    const popup = document.querySelector('.swal2-popup');
+    if (popup) {
+      (popup as HTMLElement).style.zIndex = '9999';
     }
   }
 };
