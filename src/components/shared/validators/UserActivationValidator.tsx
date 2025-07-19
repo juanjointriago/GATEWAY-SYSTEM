@@ -1,7 +1,7 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { useProgressSheetStore } from '../../../stores/progress-sheet/progresssheet.store';
 import { progressSheetInterface } from '../../../interface/progresssheet.interface';
-import Swal from 'sweetalert2';
+import CustomModal from '../../CustomModal';
 
 interface UserActivationValidatorProps {
   userId: string;
@@ -18,72 +18,63 @@ export const UserActivationValidator: FC<UserActivationValidatorProps> = ({
     (state) => state.getProgressSheetByStudentId
   );
 
+  const [modal, setModal] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    type: 'warn' | 'info' | 'danger' | 'success';
+    confirmText?: string;
+    cancelText?: string;
+    onConfirm?: () => void;
+    onCancel?: () => void;
+  }>({ open: false, title: '', message: '', type: 'info' });
+
   const validateUserActivation = async () => {
     try {
       // Obtener el progressSheet del usuario
       const progressSheet = getProgressSheetByStudentId(userId);
-      
+
       if (!progressSheet) {
-        // No existe contrato
-        await Swal.fire({
+        setModal({
+          open: true,
           title: '⚠️ Contrato No Creado',
-          html: `
-            <div class="text-left">
-              <p class="mb-3">No se ha creado un contrato para este estudiante.</p>
-              <p class="text-sm text-gray-600">
-                <strong>Acción requerida:</strong> Debe crear y llenar el contrato del estudiante antes de activarlo.
-              </p>
-            </div>
-          `,
-          icon: 'warning',
-          confirmButtonText: 'Entendido',
-          confirmButtonColor: '#f59e0b',
-          showCancelButton: false,
-          allowOutsideClick: false
+          message: 'No se ha creado un contrato para este estudiante.\n\nDebe crear y llenar el contrato del estudiante antes de activarlo.',
+          type: 'warn',
+          confirmText: 'Entendido',
+          onConfirm: () => setModal((m) => ({ ...m, open: false })),
         });
         return;
       }
 
       // Validar si los totales financieros están en cero
       const hasFinancialData = checkFinancialData(progressSheet);
-      
+
       if (!hasFinancialData) {
-        await Swal.fire({
+        setModal({
+          open: true,
           title: '📋 Actualizar Información del Contrato',
-          html: `
-            <div class="text-left">
-              <p class="mb-3">Los valores financieros del contrato están en cero.</p>
-              <p class="text-sm text-gray-600">
-                <strong>Acción requerida:</strong> Debe actualizar los siguientes campos en el contrato:
-              </p>
-              <ul class="mt-2 text-sm text-gray-600 list-disc list-inside">
-                <li>Total Adeudado</li>
-                <li>Total Pagado (si aplica)</li>
-                <li>Cantidad de Cuotas</li>
-                <li>Otros campos financieros</li>
-              </ul>
-            </div>
-          `,
-          icon: 'info',
-          confirmButtonText: 'Actualizar Contrato',
-          confirmButtonColor: '#3b82f6',
-          showCancelButton: true,
-          cancelButtonText: 'Cancelar',
-          cancelButtonColor: '#6b7280'
+          message:
+            'Los valores financieros del contrato están en cero.\n\nDebe actualizar los siguientes campos en el contrato:\n- Total Adeudado\n- Total Pagado (si aplica)\n- Cantidad de Cuotas\n- Otros campos financieros',
+          type: 'info',
+          confirmText: 'Actualizar Contrato',
+          cancelText: 'Cancelar',
+          onConfirm: () => setModal((m) => ({ ...m, open: false })),
+          onCancel: () => setModal((m) => ({ ...m, open: false })),
         });
         return;
       }
 
       // Si pasa todas las validaciones, proceder con la activación
       onValidationSuccess();
-      
     } catch (error) {
       console.error('Error en validación de activación:', error);
-      await Swal.fire({
+      setModal({
+        open: true,
         title: 'Error',
-        text: 'Ocurrió un error al validar la información del usuario',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
+        message: 'Ocurrió un error al validar la información del usuario',
+        type: 'danger',
+        confirmText: 'Aceptar',
+        onConfirm: () => setModal((m) => ({ ...m, open: false })),
       });
     }
   };
@@ -103,8 +94,22 @@ export const UserActivationValidator: FC<UserActivationValidatorProps> = ({
   };
 
   return (
-    <div onClick={validateUserActivation} style={{ cursor: 'pointer' }}>
-      {children}
-    </div>
+    <>
+      <div
+        onClick={validateUserActivation}
+        className="w-full"
+        style={{ cursor: 'pointer' }}
+      >
+        {children}
+      </div>
+      <CustomModal
+        isOpen={modal.open}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onConfirm={modal.onConfirm || (() => setModal((m) => ({ ...m, open: false })))}
+        onCancel={modal.cancelText ? modal.onCancel : undefined}
+      />
+    </>
   );
 };

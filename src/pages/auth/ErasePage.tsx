@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAuth, signInAnonymously, signOut } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
-import Swal from "sweetalert2";
+import CustomModal from "../../components/CustomModal";
 
 export const DeleteUserData = () => {
   const [email, setEmail] = useState("");
@@ -19,101 +19,96 @@ export const DeleteUserData = () => {
     }
   }, []);
   
+  const [modal, setModal] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    type: 'warn' | 'info' | 'danger' | 'success';
+    confirmText?: string;
+    cancelText?: string;
+    onConfirm?: () => void;
+    onCancel?: () => void;
+  }>({ open: false, title: '', message: '', type: 'info' });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !email.includes("@")) {
       setError("Por favor, ingrese un correo electrónico válido");
       return;
     }
-    
-    // Confirmación con SweetAlert
-    const result = await Swal.fire({
+
+    // Confirmación con CustomModal
+    setModal({
+      open: true,
       title: '¿Estás seguro?',
-      text: "Esta acción marcará tu cuenta para eliminación y no podrá revertirse.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, eliminar mis datos',
-      cancelButtonText: 'Cancelar'
-    });
-    
-    // Si el usuario no confirma, salimos
-    if (!result.isConfirmed) {
-      return;
-    }
-    
-    setIsLoading(true);
-    setError("");
-    
-    const auth = getAuth();
-    
-    try {
-      // Iniciar sesión anónima
-      await signInAnonymously(auth);
-      
-      const db = getFirestore();
-      const usersRef = collection(db, "users");
-      
-      // Buscar el usuario por email
-      const q = query(usersRef, where("email", "==", email));
-      const querySnapshot = await getDocs(q);
-      
-      if (querySnapshot.empty) {
-        setError("No se encontró ninguna cuenta con este correo electrónico");
-        setIsLoading(false);
-        // Cerrar sesión anónima
-        await signOut(auth);
-        return;
-      }
-      
-      // Actualizar isActive a false
-      for (const document of querySnapshot.docs) {
-        const userRef = doc(db, "users", document.id);
-        await updateDoc(userRef, {
-          isActive: false,
-          deletionRequestDate: new Date(),
-          deletionInfo: {
-            requestedOn: new Date(),
-            scheduledDeletion: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 días después
-            reason: "Solicitud del usuario",
+      message: 'Esta acción marcará tu cuenta para eliminación y no podrá revertirse.',
+      type: 'warn',
+      confirmText: 'Sí, eliminar mis datos',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        setModal((m) => ({ ...m, open: false }));
+        setIsLoading(true);
+        setError("");
+        const auth = getAuth();
+        try {
+          // Iniciar sesión anónima
+          await signInAnonymously(auth);
+          const db = getFirestore();
+          const usersRef = collection(db, "users");
+          // Buscar el usuario por email
+          const q = query(usersRef, where("email", "==", email));
+          const querySnapshot = await getDocs(q);
+          if (querySnapshot.empty) {
+            setError("No se encontró ninguna cuenta con este correo electrónico");
+            setIsLoading(false);
+            await signOut(auth);
+            return;
           }
-        });
-      }
-      
-      // BLOQUEO PERMANENTE: Marcar el formulario como usado para siempre
-      localStorage.setItem("deletionFormUsed", "true");
-      
-      setSuccess(true);
-      setIsFormDisabled(true);
-      
-      // Mostrar mensaje de éxito
-      await Swal.fire(
-        '¡Solicitud completada!',
-        'Hemos iniciado el proceso de eliminación de tus datos.',
-        'success'
-      );
-      
-    } catch (err) {
-      console.error("Error al procesar la solicitud:", err);
-      setError("Ocurrió un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde.");
-    } finally {
-      // Cerrar sesión anónima
-      try {
-        if (auth.currentUser) {
-          await signOut(auth);
+          // Actualizar isActive a false
+          for (const document of querySnapshot.docs) {
+            const userRef = doc(db, "users", document.id);
+            await updateDoc(userRef, {
+              isActive: false,
+              deletionRequestDate: new Date(),
+              deletionInfo: {
+                requestedOn: new Date(),
+                scheduledDeletion: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                reason: "Solicitud del usuario",
+              }
+            });
+          }
+          localStorage.setItem("deletionFormUsed", "true");
+          setSuccess(true);
+          setIsFormDisabled(true);
+          setModal({
+            open: true,
+            title: '¡Solicitud completada!',
+            message: 'Hemos iniciado el proceso de eliminación de tus datos.',
+            type: 'success',
+            confirmText: 'Entendido',
+            onConfirm: () => setModal((m) => ({ ...m, open: false })),
+          });
+        } catch (err) {
+          console.error("Error al procesar la solicitud:", err);
+          setError("Ocurrió un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde.");
+        } finally {
+          try {
+            if (auth.currentUser) {
+              await signOut(auth);
+            }
+          } catch (signOutError) {
+            console.error("Error al cerrar sesión anónima:", signOutError);
+          }
+          setIsLoading(false);
         }
-      } catch (signOutError) {
-        console.error("Error al cerrar sesión anónima:", signOutError);
-      }
-      
-      setIsLoading(false);
-    }
+      },
+      onCancel: () => setModal((m) => ({ ...m, open: false })),
+    });
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-4 md:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-gray-900">
           Gateway Corporation
@@ -121,7 +116,7 @@ export const DeleteUserData = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-6 md:px-8 lg:px-10">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden flex flex-col w-full">
             {/* Encabezado */}
             <div className="pb-5 border-b border-gray-200 mb-4">
@@ -160,7 +155,7 @@ export const DeleteUserData = () => {
                       </div>
                     )}
                     
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                           Correo Electrónico
@@ -170,28 +165,26 @@ export const DeleteUserData = () => {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base md:text-sm"
                           placeholder="nombre@ejemplo.com"
                           required
                           disabled={isFormDisabled || isLoading}
                         />
                       </div>
-                      
                       {error && (
-                        <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
+                        <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded">
                           {error}
                         </div>
                       )}
-                      
                       <div className="mt-6">
                         <button
                           type="submit"
                           disabled={isFormDisabled || isLoading}
                           className={`w-full px-4 py-2 text-white rounded-md transition-colors ${
                             isFormDisabled || isLoading
-                              ? 'bg-gray-400 cursor-not-allowed' 
+                              ? 'bg-gray-400 cursor-not-allowed'
                               : 'bg-red-600 hover:bg-red-700'
-                          }`}
+                          } text-base md:text-sm`}
                         >
                           {isLoading ? 'Procesando...' : isFormDisabled ? 'Formulario usado' : 'Eliminar mis datos'}
                         </button>
@@ -246,6 +239,14 @@ export const DeleteUserData = () => {
           </div>
         </div>
       </div>
+      <CustomModal
+        isOpen={modal.open}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onConfirm={modal.onConfirm || (() => setModal((m) => ({ ...m, open: false })))}
+        onCancel={modal.cancelText ? modal.onCancel : undefined}
+      />
     </div>
   );
 };

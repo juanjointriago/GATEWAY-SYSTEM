@@ -109,7 +109,7 @@ export const EditUnitForm: FC<Props> = ({ unit }) => {
                     className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 sm:p-8 md:p-10 border border-gray-100"
                     onSubmit={onSubmit}
                 >
-                    <h2 className="text-2xl font-bold text-emerald-700 mb-6 text-center tracking-tight">Editar Unidad</h2>
+                    <h2 className="text-2xl font-bold text-emerald-700 mb-6 text-center tracking-tight">Editar Libro</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div className="col-span-1">
                             <label htmlFor="sublevel" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Unidad a la que pertenece</label>

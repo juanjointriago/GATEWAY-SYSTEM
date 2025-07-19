@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-interface CustomModalProps {
+export interface CustomModalProps {
   isOpen: boolean;
   title: string;
   message: string;

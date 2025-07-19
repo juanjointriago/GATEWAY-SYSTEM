@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import { useProgressSheetStore } from "../../stores/progress-sheet/progresssheet.store";
 import { useUserStore } from "../../stores";
 import { useEventStore } from "../../stores/events/event.store";
@@ -24,16 +23,11 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
   const student = getUserById(studentID);
   const getEventById = useEventStore((state) => state.getEventById);
   if (!student) {
-    Swal.fire(" Error", "No se encontró un estudiante con ese UID", "error");
     return <NoGradesMessage />;
   }
   const progressSheet = getProgressSheetByStudentId(studentID);
   if (!progressSheet) {
-    Swal.fire(
-      " Warning",
-      "No se encontró un ProgressSheet con ese Estudiante",
-      "info"
-    );
+
     return <NoGradesMessage message="A este estudiante no se le ha asignado un progressSheet debes actualizar su contrato" />;
   }
   if (progressSheet.progressClasses.length === 0) {

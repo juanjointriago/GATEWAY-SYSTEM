@@ -227,7 +227,7 @@ export const EventsPage = () => {
                     message: `Estás a punto de ${info.getValue() ? 'ocultar' : 'mostrar'} esta reservación`,
                     type: 'warn',
                   });
-                  setConfirmAction(async () => {
+                  setConfirmAction(() => async () => {
                     await updateEvent({
                       ...info.row.original,
                       isActive: !(info.getValue() as boolean),
@@ -264,7 +264,7 @@ export const EventsPage = () => {
                     message: 'Estás a punto de eliminar esta reservación',
                     type: 'danger',
                   });
-                  setConfirmAction(async () => {
+                  setConfirmAction(() => async () => {
                     await deleteEvent(info.row.original.id!);
                     setConfirmModal((prev) => ({ ...prev, isOpen: false }));
                     window.location.reload();
@@ -284,7 +284,7 @@ export const EventsPage = () => {
                     message: 'Estás a punto de enviar un correo al docente de esta reservación',
                     type: 'info',
                   });
-                  setConfirmAction(async () => {
+                  setConfirmAction(() => async () => {
                     const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(
                       info.row.original.date
                     ).toLocaleTimeString([], {

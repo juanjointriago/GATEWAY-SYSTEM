@@ -1,16 +1,16 @@
 import { useUserStore } from "../../stores";
 import { useProgressSheetStore } from "../../stores/progress-sheet/progresssheet.store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { progressSheetInterface } from "../../interface";
-import Swal from "sweetalert2";
 import { useForm, Controller } from "react-hook-form";
-import {v6 as uuid} from'uuid'
+import { v6 as uuid } from "uuid";
+import CustomModal from "../../components/CustomModal";
 
 interface Props {
-    studentID: string;
+  studentID: string;
 }
 
-type FormData ={
+type FormData = {
   contractNumber: string;
   headquarters: string;
   inscriptionDate: string;
@@ -37,11 +37,27 @@ type FormData ={
 
 export const StudentContract = ({ studentID }: Props) => {
   const getStudentById = useUserStore((state) => state.getUserById);
-  const getProgressSheetByStudentId = useProgressSheetStore((state) => state.getProgressSheetByStudentId);
-  const createProgressSheet = useProgressSheetStore((state) => state.createProgressSheet);
-  const updateProgressSheet = useProgressSheetStore((state) => state.updateProgressSheet);
-  
+  const getProgressSheetByStudentId = useProgressSheetStore(
+    (state) => state.getProgressSheetByStudentId
+  );
+  const createProgressSheet = useProgressSheetStore(
+    (state) => state.createProgressSheet
+  );
+  const updateProgressSheet = useProgressSheetStore(
+    (state) => state.updateProgressSheet
+  );
+
   const student = getStudentById(studentID);
+
+  // Estados para CustomModal
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info",
+    onConfirm: () => {},
+    onCancel: undefined as (() => void) | undefined,
+  });
 
   const {
     control,
@@ -49,25 +65,25 @@ export const StudentContract = ({ studentID }: Props) => {
     watch,
     setValue,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
-      contractNumber: '',
-      headquarters: '',
-      inscriptionDate: '',
-      expirationDate: '',
-      dueDate: '',
-      myPreferredName: '',
-      contractDate: '',
-      work: '',
-      enterpriseName: '',
-      preferredCI: '',
-      conventionalPhone: '',
-      familiarPhone: '',
-      preferredEmail: '',
-      otherContacts: '',
+      contractNumber: "",
+      headquarters: "",
+      inscriptionDate: "",
+      expirationDate: "",
+      dueDate: "",
+      myPreferredName: "",
+      contractDate: "",
+      work: "",
+      enterpriseName: "",
+      preferredCI: "",
+      conventionalPhone: "",
+      familiarPhone: "",
+      preferredEmail: "",
+      otherContacts: "",
       program: [],
-      observation: '',
+      observation: "",
       totalFee: 0,
       totalPaid: 0,
       totalDue: 0,
@@ -75,23 +91,26 @@ export const StudentContract = ({ studentID }: Props) => {
       quotesQty: 0,
       quoteValue: 0,
     },
-    mode: 'onChange'
+    mode: "onChange",
   });
 
   // Watch valores para cálculos automáticos
-  const totalFee = watch('totalFee');
-  const totalPaid = watch('totalPaid');
-  const totalDiscount = watch('totalDiscount');
-  const quotesQty = watch('quotesQty');
+  const totalFee = watch("totalFee");
+  const totalPaid = watch("totalPaid");
+  const totalDiscount = watch("totalDiscount");
+  const quotesQty = watch("quotesQty");
 
   // Efecto para calcular automáticamente valores derivados
   useEffect(() => {
-    const totalDue = Number(totalFee || 0) - Number(totalPaid || 0) - Number(totalDiscount || 0);
-    setValue('totalDue', totalDue);
-    
+    const totalDue =
+      Number(totalFee || 0) -
+      Number(totalPaid || 0) -
+      Number(totalDiscount || 0);
+    setValue("totalDue", totalDue);
+
     // Calcular valor de cuota automáticamente
     const quoteValue = quotesQty > 0 ? totalDue / quotesQty : 0;
-    setValue('quoteValue', Number(quoteValue.toFixed(2)));
+    setValue("quoteValue", Number(quoteValue.toFixed(2)));
   }, [totalFee, totalPaid, totalDiscount, quotesQty, setValue]);
 
   useEffect(() => {
@@ -100,10 +119,10 @@ export const StudentContract = ({ studentID }: Props) => {
     const initializeProgressSheet = async () => {
       try {
         const progressSheet = getProgressSheetByStudentId(studentID);
-        console.log('Progress Sheet current:', progressSheet?.uid);
-        
+        console.log("Progress Sheet current:", progressSheet?.uid);
+
         if (!progressSheet) {
-          console.debug("no hay uuid")
+          console.debug("no hay uuid");
           const uid = uuid();
           // Crear progresssheet con datos iniciales
           const newProgressSheet: progressSheetInterface = {
@@ -111,17 +130,25 @@ export const StudentContract = ({ studentID }: Props) => {
             id: uid,
             contractNumber: `000`,
             headquarters: "",
-            inscriptionDate: new Date().toISOString().split('T')[0],
-            expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+            inscriptionDate: new Date().toISOString().split("T")[0],
+            expirationDate: new Date(
+              new Date().setFullYear(new Date().getFullYear() + 1)
+            )
+              .toISOString()
+              .split("T")[0],
             myPreferredName: student.name || "",
-            contractDate: new Date().toISOString().split('T')[0],
+            contractDate: new Date().toISOString().split("T")[0],
             work: "",
             enterpriseName: "",
             preferredCI: "",
             conventionalPhone: "",
             familiarPhone: "",
             preferredEmail: "",
-            dueDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+            dueDate: new Date(
+              new Date().setFullYear(new Date().getFullYear() + 1)
+            )
+              .toISOString()
+              .split("T")[0],
             otherContacts: "",
             progressClasses: [],
             program: "",
@@ -137,25 +164,27 @@ export const StudentContract = ({ studentID }: Props) => {
             updatedAt: Date.now(),
           };
           await createProgressSheet(newProgressSheet);
-          
+
           // Actualizar el formulario con los nuevos datos
           reset({
             contractNumber: newProgressSheet.contractNumber,
-            headquarters: newProgressSheet.headquarters || '',
+            headquarters: newProgressSheet.headquarters || "",
             inscriptionDate: newProgressSheet.inscriptionDate,
             expirationDate: newProgressSheet.expirationDate,
-            dueDate: newProgressSheet.dueDate || '',
+            dueDate: newProgressSheet.dueDate || "",
             myPreferredName: newProgressSheet.myPreferredName,
-            contractDate: newProgressSheet.contractDate || '',
-            work: newProgressSheet.work || '',
-            enterpriseName: newProgressSheet.enterpriseName || '',
-            preferredCI: newProgressSheet.preferredCI || '',
-            conventionalPhone: newProgressSheet.conventionalPhone || '',
-            familiarPhone: newProgressSheet.familiarPhone || '',
-            preferredEmail: newProgressSheet.preferredEmail || '',
+            contractDate: newProgressSheet.contractDate || "",
+            work: newProgressSheet.work || "",
+            enterpriseName: newProgressSheet.enterpriseName || "",
+            preferredCI: newProgressSheet.preferredCI || "",
+            conventionalPhone: newProgressSheet.conventionalPhone || "",
+            familiarPhone: newProgressSheet.familiarPhone || "",
+            preferredEmail: newProgressSheet.preferredEmail || "",
             otherContacts: newProgressSheet.otherContacts,
-            program: newProgressSheet.program ? newProgressSheet.program.split(',').map(p => p.trim()) : [],
-            observation: newProgressSheet.observation || '',
+            program: newProgressSheet.program
+              ? newProgressSheet.program.split(",").map((p) => p.trim())
+              : [],
+            observation: newProgressSheet.observation || "",
             totalFee: newProgressSheet.totalFee || 0,
             totalPaid: newProgressSheet.totalPaid || 0,
             totalDue: newProgressSheet.totalDue || 0,
@@ -166,22 +195,32 @@ export const StudentContract = ({ studentID }: Props) => {
         } else {
           // Cargar datos existentes
           reset({
-            contractNumber: progressSheet.contractNumber || '',
-            headquarters: progressSheet.headquarters || '',
-            inscriptionDate: progressSheet.inscriptionDate ? progressSheet.inscriptionDate.split('T')[0] : '',
-            expirationDate: progressSheet.expirationDate ? progressSheet.expirationDate.split('T')[0] : '',
-            dueDate: progressSheet.dueDate ? progressSheet.dueDate.split('T')[0] : '',
-            myPreferredName: progressSheet.myPreferredName || '',
-            contractDate: progressSheet.contractDate ? progressSheet.contractDate.split('T')[0] : '',
-            work: progressSheet.work || '',
-            enterpriseName: progressSheet.enterpriseName || '',
-            preferredCI: progressSheet.preferredCI || '',
-            conventionalPhone: progressSheet.conventionalPhone || '',
-            familiarPhone: progressSheet.familiarPhone || '',
-            preferredEmail: progressSheet.preferredEmail || '',
-            otherContacts: progressSheet.otherContacts || '',
-            program: progressSheet.program ? progressSheet.program.split(',').map(p => p.trim()) : [],
-            observation: progressSheet.observation || '',
+            contractNumber: progressSheet.contractNumber || "",
+            headquarters: progressSheet.headquarters || "",
+            inscriptionDate: progressSheet.inscriptionDate
+              ? progressSheet.inscriptionDate.split("T")[0]
+              : "",
+            expirationDate: progressSheet.expirationDate
+              ? progressSheet.expirationDate.split("T")[0]
+              : "",
+            dueDate: progressSheet.dueDate
+              ? progressSheet.dueDate.split("T")[0]
+              : "",
+            myPreferredName: progressSheet.myPreferredName || "",
+            contractDate: progressSheet.contractDate
+              ? progressSheet.contractDate.split("T")[0]
+              : "",
+            work: progressSheet.work || "",
+            enterpriseName: progressSheet.enterpriseName || "",
+            preferredCI: progressSheet.preferredCI || "",
+            conventionalPhone: progressSheet.conventionalPhone || "",
+            familiarPhone: progressSheet.familiarPhone || "",
+            preferredEmail: progressSheet.preferredEmail || "",
+            otherContacts: progressSheet.otherContacts || "",
+            program: progressSheet.program
+              ? progressSheet.program.split(",").map((p) => p.trim())
+              : [],
+            observation: progressSheet.observation || "",
             totalFee: progressSheet.totalFee || 0,
             totalPaid: progressSheet.totalPaid || 0,
             totalDue: progressSheet.totalDue || 0,
@@ -191,79 +230,95 @@ export const StudentContract = ({ studentID }: Props) => {
           });
         }
       } catch (error) {
-        console.error('Error al inicializar progress sheet:', error);
-        Swal.fire({
-          title: 'Info',
-          text: 'Creando Registro del contrato en Cero',
-          icon: 'info',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Aceptar'
+        console.error("Error al inicializar progress sheet:", error);
+        setModal({
+          isOpen: true,
+          title: "Info",
+          message: "Creando Registro del contrato en Cero",
+          type: "info",
+          onConfirm: () => setModal((m) => ({ ...m, isOpen: false })),
+          onCancel: () => setModal((m) => ({ ...m, isOpen: false })),
         });
       }
     };
 
     initializeProgressSheet();
-  }, [studentID, student, getProgressSheetByStudentId, createProgressSheet, reset]);
+  }, [
+    studentID,
+    student,
+    getProgressSheetByStudentId,
+    createProgressSheet,
+    reset,
+  ]);
 
   const onSubmit = async (data: FormData) => {
     try {
       const progressSheet = getProgressSheetByStudentId(studentID);
       const dataToSave = {
         ...data,
-        program: data.program.join(', '), // Convertir array a string
+        program: data.program.join(", "), // Convertir array a string
         studentId: studentID,
         updatedAt: Date.now(),
-        inscriptionDate: data.inscriptionDate + 'T00:00:00.000Z',
-        expirationDate: data.expirationDate + 'T23:59:59.999Z',
-        dueDate: data.dueDate ? data.dueDate + 'T23:59:59.999Z' : undefined,
-        contractDate: data.contractDate ? data.contractDate + 'T00:00:00.000Z' : undefined,
+        inscriptionDate: data.inscriptionDate + "T00:00:00.000Z",
+        expirationDate: data.expirationDate + "T23:59:59.999Z",
+        dueDate: data.dueDate ? data.dueDate + "T23:59:59.999Z" : undefined,
+        contractDate: data.contractDate
+          ? data.contractDate + "T00:00:00.000Z"
+          : undefined,
         progressClasses: progressSheet?.progressClasses || [],
       };
 
       if (progressSheet?.id) {
-        await updateProgressSheet({ ...dataToSave, id: progressSheet.id } as progressSheetInterface);
+        await updateProgressSheet({
+          ...dataToSave,
+          id: progressSheet.id,
+        } as progressSheetInterface);
       } else {
-        await createProgressSheet({ ...dataToSave, createdAt: Date.now() } as progressSheetInterface);
+        await createProgressSheet({
+          ...dataToSave,
+          createdAt: Date.now(),
+        } as progressSheetInterface);
       }
 
-      Swal.fire({
-        title: '¡Éxito!',
-        text: 'Los datos del contrato han sido guardados correctamente',
-        icon: 'success',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Aceptar'
+      setModal({
+        isOpen: true,
+        title: "¡Éxito!",
+        message: "Los datos del contrato han sido guardados correctamente",
+        type: "success",
+        onConfirm: () => setModal((m) => ({ ...m, isOpen: false })),
+        onCancel: () => setModal((m) => ({ ...m, isOpen: false })),
       });
-
     } catch (error) {
-      console.error('Error al guardar:', error);
-      Swal.fire({
-        title: 'Error',
-        text: 'Hubo un problema al guardar los datos',
-        icon: 'error',
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Aceptar'
+      console.error("Error al guardar:", error);
+      setModal({
+        isOpen: true,
+        title: "Error",
+        message: "Hubo un problema al guardar los datos",
+        type: "error",
+        onConfirm: () => setModal((m) => ({ ...m, isOpen: false })),
+        onCancel: () => setModal((m) => ({ ...m, isOpen: false })),
       });
     }
   };
 
   const handleClearForm = () => {
     reset({
-      contractNumber: '',
-      headquarters: '',
-      inscriptionDate: '',
-      expirationDate: '',
-      dueDate: '',
-      myPreferredName: '',
-      contractDate: '',
-      work: '',
-      enterpriseName: '',
-      preferredCI: '',
-      conventionalPhone: '',
-      familiarPhone: '',
-      preferredEmail: '',
-      otherContacts: '',
+      contractNumber: "",
+      headquarters: "",
+      inscriptionDate: "",
+      expirationDate: "",
+      dueDate: "",
+      myPreferredName: "",
+      contractDate: "",
+      work: "",
+      enterpriseName: "",
+      preferredCI: "",
+      conventionalPhone: "",
+      familiarPhone: "",
+      preferredEmail: "",
+      otherContacts: "",
       program: [],
-      observation: '',
+      observation: "",
       totalFee: 0,
       totalPaid: 0,
       totalDue: 0,
@@ -280,9 +335,7 @@ export const StudentContract = ({ studentID }: Props) => {
           <div className="text-red-500 text-lg font-medium">
             No se encontró el estudiante
           </div>
-          <div className="text-gray-500 mt-2">
-            ID: {studentID}
-          </div>
+          <div className="text-gray-500 mt-2">ID: {studentID}</div>
         </div>
       </div>
     );
@@ -301,7 +354,9 @@ export const StudentContract = ({ studentID }: Props) => {
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{student.name}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {student.name}
+            </h3>
             <p className="text-sm text-gray-600">CC: {student.cc}</p>
             <p className="text-sm text-gray-600">Email: {student.email}</p>
           </div>
@@ -315,7 +370,7 @@ export const StudentContract = ({ studentID }: Props) => {
           <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
             Información del Contrato
           </h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Número de Contrato */}
             <div>
@@ -367,22 +422,26 @@ export const StudentContract = ({ studentID }: Props) => {
                   required: "El Nombre del Representante es requerido",
                   minLength: {
                     value: 2,
-                    message: "El nombre debe tener al menos 2 caracteres"
-                  }
+                    message: "El nombre debe tener al menos 2 caracteres",
+                  },
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="text"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.myPreferredName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.myPreferredName
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="Ingrese el nombre de Representante"
                   />
                 )}
               />
               {errors.myPreferredName && (
-                <p className="mt-1 text-sm text-red-600">{errors.myPreferredName.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.myPreferredName.message}
+                </p>
               )}
             </div>
 
@@ -416,20 +475,24 @@ export const StudentContract = ({ studentID }: Props) => {
                 name="inscriptionDate"
                 control={control}
                 rules={{
-                  required: "La fecha de inscripción es requerida"
+                  required: "La fecha de inscripción es requerida",
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="date"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.inscriptionDate ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.inscriptionDate
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                   />
                 )}
               />
               {errors.inscriptionDate && (
-                <p className="mt-1 text-sm text-red-600">{errors.inscriptionDate.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.inscriptionDate.message}
+                </p>
               )}
             </div>
 
@@ -462,30 +525,34 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   required: "La fecha de expiración es requerida",
                   validate: (value) => {
-                    const inscriptionDate = watch('inscriptionDate');
+                    const inscriptionDate = watch("inscriptionDate");
                     if (inscriptionDate && value) {
                       const inscription = new Date(inscriptionDate);
                       const expiration = new Date(value);
-                      
+
                       if (expiration <= inscription) {
                         return "La fecha de expiración debe ser posterior a la de inscripción";
                       }
                     }
                     return true;
-                  }
+                  },
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="date"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.expirationDate ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.expirationDate
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                   />
                 )}
               />
               {errors.expirationDate && (
-                <p className="mt-1 text-sm text-red-600">{errors.expirationDate.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.expirationDate.message}
+                </p>
               )}
             </div>
 
@@ -514,7 +581,7 @@ export const StudentContract = ({ studentID }: Props) => {
           <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
             Información Personal Adicional
           </h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Trabajo */}
             <div>
@@ -525,21 +592,25 @@ export const StudentContract = ({ studentID }: Props) => {
                 name="work"
                 control={control}
                 rules={{
-                  required: "El trabajo es requerido"
+                  required: "El trabajo es requerido",
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="text"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.work ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.work
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="Ingrese el trabajo"
                   />
                 )}
               />
               {errors.work && (
-                <p className="mt-1 text-sm text-red-600">{errors.work.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.work.message}
+                </p>
               )}
             </div>
 
@@ -552,21 +623,25 @@ export const StudentContract = ({ studentID }: Props) => {
                 name="enterpriseName"
                 control={control}
                 rules={{
-                  required: "El nombre de la empresa es requerido"
+                  required: "El nombre de la empresa es requerido",
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="text"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.enterpriseName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.enterpriseName
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="Ingrese el nombre de la empresa"
                   />
                 )}
               />
               {errors.enterpriseName && (
-                <p className="mt-1 text-sm text-red-600">{errors.enterpriseName.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.enterpriseName.message}
+                </p>
               )}
             </div>
 
@@ -581,8 +656,8 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   pattern: {
                     value: /^[0-9]{10}$/,
-                    message: "La cédula debe tener 10 dígitos"
-                  }
+                    message: "La cédula debe tener 10 dígitos",
+                  },
                 }}
                 render={({ field }) => (
                   <input
@@ -590,14 +665,18 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="text"
                     maxLength={10}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.preferredCI ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.preferredCI
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="Ingrese la cédula"
                   />
                 )}
               />
               {errors.preferredCI && (
-                <p className="mt-1 text-sm text-red-600">{errors.preferredCI.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.preferredCI.message}
+                </p>
               )}
             </div>
 
@@ -612,22 +691,26 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "El email no es válido"
-                  }
+                    message: "El email no es válido",
+                  },
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="email"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.preferredEmail ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.preferredEmail
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="ejemplo@correo.com"
                   />
                 )}
               />
               {errors.preferredEmail && (
-                <p className="mt-1 text-sm text-red-600">{errors.preferredEmail.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.preferredEmail.message}
+                </p>
               )}
             </div>
 
@@ -642,22 +725,27 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   pattern: {
                     value: /^[0-9\-+() ]+$/,
-                    message: "El teléfono solo puede contener números, guiones, paréntesis y espacios"
-                  }
+                    message:
+                      "El teléfono solo puede contener números, guiones, paréntesis y espacios",
+                  },
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="tel"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.conventionalPhone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.conventionalPhone
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="02-123-4567"
                   />
                 )}
               />
               {errors.conventionalPhone && (
-                <p className="mt-1 text-sm text-red-600">{errors.conventionalPhone.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.conventionalPhone.message}
+                </p>
               )}
             </div>
 
@@ -672,22 +760,27 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   pattern: {
                     value: /^[0-9\-+() ]+$/,
-                    message: "El teléfono solo puede contener números, guiones, paréntesis y espacios"
-                  }
+                    message:
+                      "El teléfono solo puede contener números, guiones, paréntesis y espacios",
+                  },
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="tel"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.familiarPhone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.familiarPhone
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="09-123-4567"
                   />
                 )}
               />
               {errors.familiarPhone && (
-                <p className="mt-1 text-sm text-red-600">{errors.familiarPhone.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.familiarPhone.message}
+                </p>
               )}
             </div>
           </div>
@@ -698,7 +791,7 @@ export const StudentContract = ({ studentID }: Props) => {
           <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
             Programas y Observaciones
           </h4>
-          
+
           {/* Programas */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -710,20 +803,23 @@ export const StudentContract = ({ studentID }: Props) => {
               render={({ field }) => {
                 const programOptions = [
                   "English for Kids",
-                  "English for EveryBody", 
+                  "English for EveryBody",
                   "TOELF",
                   "IELTS",
                   "Certification A1",
                   "Certification A2",
                   "Certification B1",
                   "Certification B2",
-                  "Certification C1"
+                  "Certification C1",
                 ];
 
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {programOptions.map((program, index) => (
-                      <label key={index} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <label
+                        key={index}
+                        className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      >
                         <input
                           type="checkbox"
                           checked={field.value.includes(program)}
@@ -731,7 +827,9 @@ export const StudentContract = ({ studentID }: Props) => {
                             if (e.target.checked) {
                               field.onChange([...field.value, program]);
                             } else {
-                              field.onChange(field.value.filter(p => p !== program));
+                              field.onChange(
+                                field.value.filter((p) => p !== program)
+                              );
                             }
                           }}
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
@@ -770,7 +868,7 @@ export const StudentContract = ({ studentID }: Props) => {
           <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
             Información Financiera
           </h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Total Adeudado */}
             <div>
@@ -783,8 +881,8 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   min: {
                     value: 0,
-                    message: "El total adeudado no puede ser negativo"
-                  }
+                    message: "El total adeudado no puede ser negativo",
+                  },
                 }}
                 render={({ field }) => (
                   <input
@@ -792,20 +890,24 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? 0 : parseFloat(value) || 0);
+                      field.onChange(value === "" ? 0 : parseFloat(value) || 0);
                     }}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.totalFee ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.totalFee
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="0.00"
                   />
                 )}
               />
               {errors.totalFee && (
-                <p className="mt-1 text-sm text-red-600">{errors.totalFee.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.totalFee.message}
+                </p>
               )}
             </div>
 
@@ -820,8 +922,8 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   min: {
                     value: 0,
-                    message: "El total pagado no puede ser negativo"
-                  }
+                    message: "El total pagado no puede ser negativo",
+                  },
                 }}
                 render={({ field }) => (
                   <input
@@ -829,20 +931,24 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? 0 : parseFloat(value) || 0);
+                      field.onChange(value === "" ? 0 : parseFloat(value) || 0);
                     }}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.totalPaid ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.totalPaid
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="0.00"
                   />
                 )}
               />
               {errors.totalPaid && (
-                <p className="mt-1 text-sm text-red-600">{errors.totalPaid.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.totalPaid.message}
+                </p>
               )}
             </div>
 
@@ -857,8 +963,8 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   min: {
                     value: 0,
-                    message: "El total descuento no puede ser negativo"
-                  }
+                    message: "El total descuento no puede ser negativo",
+                  },
                 }}
                 render={({ field }) => (
                   <input
@@ -866,10 +972,10 @@ export const StudentContract = ({ studentID }: Props) => {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? 0 : parseFloat(value) || 0);
+                      field.onChange(value === "" ? 0 : parseFloat(value) || 0);
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="0.00"
@@ -877,7 +983,9 @@ export const StudentContract = ({ studentID }: Props) => {
                 )}
               />
               {errors.totalDiscount && (
-                <p className="mt-1 text-sm text-red-600">{errors.totalDiscount.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.totalDiscount.message}
+                </p>
               )}
             </div>
 
@@ -898,7 +1006,9 @@ export const StudentContract = ({ studentID }: Props) => {
                   />
                 )}
               />
-              <p className="mt-1 text-xs text-gray-500">Calculado automáticamente</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Calculado automáticamente
+              </p>
             </div>
 
             {/* Cantidad de Cuotas */}
@@ -912,28 +1022,32 @@ export const StudentContract = ({ studentID }: Props) => {
                 rules={{
                   min: {
                     value: 1,
-                    message: "La cantidad de cuotas debe ser mayor a 0"
-                  }
+                    message: "La cantidad de cuotas debe ser mayor a 0",
+                  },
                 }}
                 render={({ field }) => (
                   <input
                     {...field}
                     type="number"
                     min="1"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? 0 : parseInt(value) || 0);
+                      field.onChange(value === "" ? 0 : parseInt(value) || 0);
                     }}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.quotesQty ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      errors.quotesQty
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300"
                     }`}
                     placeholder="0"
                   />
                 )}
               />
               {errors.quotesQty && (
-                <p className="mt-1 text-sm text-red-600">{errors.quotesQty.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.quotesQty.message}
+                </p>
               )}
             </div>
 
@@ -954,7 +1068,9 @@ export const StudentContract = ({ studentID }: Props) => {
                   />
                 )}
               />
-              <p className="mt-1 text-xs text-gray-500">Calculado automáticamente (Total Pendiente ÷ Cantidad de Cuotas)</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Calculado automáticamente (Total Pendiente ÷ Cantidad de Cuotas)
+              </p>
             </div>
           </div>
         </div>
@@ -972,10 +1088,10 @@ export const StudentContract = ({ studentID }: Props) => {
                 <span>Guardando...</span>
               </div>
             ) : (
-              'Guardar Contrato'
+              "Guardar Contrato"
             )}
           </button>
-          
+
           <button
             type="button"
             onClick={handleClearForm}
@@ -985,6 +1101,14 @@ export const StudentContract = ({ studentID }: Props) => {
           </button>
         </div>
       </form>
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type as "warn" | "info" | "danger" | "success"}
+        onConfirm={modal.onConfirm}
+        onCancel={modal.onCancel}
+      />
     </div>
   );
-}
+};

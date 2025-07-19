@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useProgressSheetStore } from "../stores/progress-sheet/progresssheet.store";
 import { progressSheetInterface } from "../interface/progresssheet.interface";
 import { v6 as uuid } from "uuid";
-import Swal from "sweetalert2";
 
 interface UseProgressSheetProps {
   uid: string;
@@ -24,6 +23,14 @@ export const useProgressSheet = ({ uid, studentName, studentEmail, studentPhone 
   useEffect(() => {
     getAndSetProgressSheets();
   }, [getAndSetProgressSheets]);
+
+  const [modal, setModal] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    type: 'warn' | 'info' | 'danger' | 'success';
+    onConfirm?: () => void;
+  }>({ open: false, title: '', message: '', type: 'info' });
 
   const handleAddProgressSheet = async () => {
     if (myProgressSheet.length > 0) {
@@ -70,7 +77,13 @@ export const useProgressSheet = ({ uid, studentName, studentEmail, studentPhone 
         setShowModal(true);
       } catch (error) {
         console.error("Error al crear el Progress Sheet:", error);
-        Swal.fire("Error", "No se pudo crear el Progress Sheet");
+        setModal({
+          open: true,
+          title: 'Error',
+          message: 'No se pudo crear el Progress Sheet',
+          type: 'danger',
+          onConfirm: () => setModal((m) => ({ ...m, open: false })),
+        });
       }
     }
   };
@@ -81,5 +94,12 @@ export const useProgressSheet = ({ uid, studentName, studentEmail, studentPhone 
     setShowModal,
     currentProgressSheet,
     handleAddProgressSheet,
+    progressSheetModalProps: {
+      isOpen: modal.open,
+      title: modal.title,
+      message: modal.message,
+      type: modal.type,
+      onConfirm: modal.onConfirm || (() => setModal((m) => ({ ...m, open: false }))),
+    },
   };
 };

@@ -9,7 +9,7 @@ import { useAuthStore, useSubLevelStore } from "../../stores"
 import { useMemo, useState, useCallback } from "react"
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric"
 import { EditSubLEvelForm } from "../../components/shared/forms/EditSubLEvelForm"
-import Swal from "sweetalert2"
+import CustomModal, { CustomModalProps } from "../../components/CustomModal"
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton"
 import { ColumnDef } from "@tanstack/react-table"
 import { exportSublevelsToExcel } from "../../helpers/excel.helper"
@@ -23,24 +23,42 @@ export const SubLevelsPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [subLevelToEdit, setSsubLevelToEdit] = useState<string>();
+  // Estado para modales de feedback y confirmación
+  const [modal, setModal] = useState<CustomModalProps>({ 
+    isOpen: false, type: 'info', title: '', message: '', onConfirm: () => {}, onCancel: () => {} });
 
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportSublevelsToExcel(subLevels);
-      
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El archivo Excel ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
+        setModal({
+          isOpen: true,
+          type: 'success',
+          title: '¡Éxito!',
+          message: 'El archivo Excel ha sido descargado exitosamente',
+          onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+          onCancel: () => setModal(m => ({ ...m, isOpen: false })),
         });
       } else {
-        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+        setModal({
+          isOpen: true,
+          type: 'warn',
+          title: 'Error',
+          message: 'No se pudo exportar el archivo Excel',
+          onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+          onCancel: () => setModal(m => ({ ...m, isOpen: false })),
+        });
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+      setModal({
+        isOpen: true,
+        type: 'warn',
+        title: 'Error',
+        message: 'Ocurrió un error al exportar el archivo',
+        onConfirm: () => setModal(m => ({ ...m, isOpen: false })),
+        onCancel: () => setModal(m => ({ ...m, isOpen: false })),
+      });
     }
   }, [subLevels]);
 
@@ -90,23 +108,18 @@ export const SubLevelsPage = () => {
             <ToggleButton
               isActive={subLevel.isActive}
               action={() => {
-                console.debug(subLevel);
-                Swal.fire({
+                setModal({
+                  isOpen: true,
+                  type: 'warn',
                   title: '¿Estás seguro?',
-                  text: `Estas a punto de ${subLevel.isActive ? 'ocultar' : 'mostrar'} esta Unidad`,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Sí, continuar',
-                  cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
-                    console.debug('data for update', { ...subLevel, isActive: !subLevel.isActive });
+                  message: `Estas a punto de ${subLevel.isActive ? 'ocultar' : 'mostrar'} esta Unidad`,
+                  onConfirm: async () => {
+                    setModal(m => ({ ...m, open: false }));
                     await updateSublevel({ ...subLevel, isActive: !subLevel.isActive });
                     window.location.reload();
-                  }
-                });
+                  },
+                  onCancel: () => setModal(m => ({ ...m, open: false })),
+                  });
               }}
             />
             <FabButton 
@@ -123,19 +136,16 @@ export const SubLevelsPage = () => {
               tootTipText="Eliminar unidad"
               Icon={IoTrash}
               action={() => {
-                Swal.fire({
+                setModal({
+                  isOpen: true,
+                  type: 'warn',
                   title: '¿Estás seguro?',
-                  text: `Estas a punto de eliminar esta Unidad (Sub-Nivel)`,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Sí, continuar',
-                  cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
+                  message: 'Estas a punto de eliminar esta Unidad (Sub-Nivel)',
+                  onConfirm: async () => {
+                    setModal(m => ({ ...m, open: false }));
                     await deleteSubLevel(subLevel.id!);
-                  }
+                  },
+                  onCancel: () => setModal(m => ({ ...m, isOpen: false })),
                 });
               }} 
             />
@@ -212,6 +222,15 @@ export const SubLevelsPage = () => {
           data={user && user.role === 'admin' ? subLevels : subLevels.filter((sublevel) => sublevel.id === user?.subLevel)}
         />
       </div>
+      {/* Modal de feedback y confirmación */}
+      <CustomModal
+        isOpen={modal.isOpen}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+        onCancel={modal.onCancel}
+      />
     </>
   )
 }
