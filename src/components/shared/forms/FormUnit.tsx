@@ -34,8 +34,8 @@ export const FormUnit = () => {
     onCancel: undefined as (() => void) | undefined,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
+  console.debug({ isLoading });
 
   const onSubmit = handleSubmit(async (data: unit) => {
     const unitRecord = { id: uuid(), ...data };
