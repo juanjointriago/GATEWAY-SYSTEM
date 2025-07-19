@@ -1,7 +1,7 @@
 import { FabButton } from "../../components/shared/buttons/FabButton";
 import { Carousel } from "../../components/shared/carousel/Carousel";
 import { useAuthStore } from "../../stores";
-import { MdNewspaper } from "react-icons/md";
+import { IoIosAdd } from "react-icons/io";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { useMemo, useState } from "react";
 import { AddNewForm } from "../../components/shared/forms/AddNewForm";
@@ -141,7 +141,7 @@ export const NewsPage = () => {
             isActive
             tootTipText={"Nuevas notificias"}
             action={() => setShowModalAdd(true)}
-            Icon={MdNewspaper}
+            Icon={IoIosAdd}
             tooltipPosition="right"
             className="ml-2"
           />

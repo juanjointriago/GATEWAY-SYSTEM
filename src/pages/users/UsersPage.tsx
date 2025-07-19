@@ -128,30 +128,30 @@ export const UsersPage = () => {
 
               {/* Dropdown menu - responsivo */}
               <div 
-                className="fixed right-10 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200"
+                className="fixed right-10 mt-2 w-52 sm:w-60 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200"
                 style={{ zIndex: 999999 }}
               >
-                <div className="p-1 sm:p-2">
+                <div className="p-1 sm:p-2 space-y-1">
                   {/* Toggle Active/Inactive */}
                   {!isActive ? (
                     <button
                       onClick={() => handleUserActivation(userId)}
-                      className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200"
+                      className="group flex items-center w-full px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200 whitespace-nowrap overflow-hidden"
                     >
-                      <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
+                      <div className="flex items-center justify-center w-6 sm:w-7 h-4 sm:h-5">
                         <ToggleButton isActive={isActive} action={() => {}} />
                       </div>
-                      <span className="ml-2 sm:ml-3">Activar usuario</span>
+                      <span className="ml-2 sm:ml-3 truncate max-w-[120px] sm:max-w-[160px]">Activar usuario</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => handleAction(() => handleUserDeactivation(userId))}
-                      className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all duration-200"
+                      className="group flex items-center w-full px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all duration-200 whitespace-nowrap overflow-hidden"
                     >
-                      <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
+                      <div className="flex items-center justify-center w-6 sm:w-7 h-4 sm:h-5">
                         <ToggleButton isActive={isActive} action={() => {}} />
                       </div>
-                      <span className="ml-2 sm:ml-3">Desactivar usuario</span>
+                      <span className="ml-2 sm:ml-3 truncate max-w-[120px] sm:max-w-[160px]">Desactivar usuario</span>
                     </button>
                   )}
 
@@ -166,12 +166,12 @@ export const UsersPage = () => {
                           setUserforUnit(userId);
                         })
                       }
-                      className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-cyan-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-cyan-300 hover:shadow-sm"
+                      className="group flex items-center w-full px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-cyan-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-cyan-300 hover:shadow-sm whitespace-nowrap overflow-hidden"
                     >
-                      <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-purple-100 rounded-md group-hover:bg-cyan-200 transition-colors duration-200">
+                      <div className="flex items-center justify-center w-6 sm:w-7 h-4 sm:h-5 bg-purple-100 rounded-md group-hover:bg-cyan-200 transition-colors duration-200">
                         <IoDocumentAttachOutline className="w-3 sm:w-4 h-3 sm:h-4 text-cyan-600" />
                       </div>
-                      <span className="ml-2 sm:ml-3">Contrato</span>
+                      <span className="ml-2 sm:ml-3 truncate max-w-[120px] sm:max-w-[160px]">Contrato</span>
                     </button>
                   )}
                   {/* Editar usuario */}
@@ -182,12 +182,12 @@ export const UsersPage = () => {
                         setUserToEdit(userId);
                       })
                     }
-                    className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm mb-1 sm:mb-2"
+                    className="group flex items-center w-full px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm mb-1 sm:mb-2 whitespace-nowrap overflow-hidden"
                   >
-                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-blue-100 rounded-md group-hover:bg-blue-200 transition-colors duration-200">
+                    <div className="flex items-center justify-center w-6 sm:w-7 h-4 sm:h-5 bg-blue-100 rounded-md group-hover:bg-blue-200 transition-colors duration-200">
                       <IoPencil className="w-3 sm:w-4 h-3 sm:h-4 text-blue-600" />
                     </div>
-                    <span className="ml-2 sm:ml-3">Editar usuario</span>
+                    <span className="ml-2 sm:ml-3 truncate max-w-[120px] sm:max-w-[160px]">Editar usuario</span>
                   </button>
 
                   {/* Asignar libros */}
@@ -198,12 +198,12 @@ export const UsersPage = () => {
                         setUserforUnit(userId);
                       })
                     }
-                    className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm mb-1 sm:mb-2"
+                    className="group flex items-center w-full px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm mb-1 sm:mb-2 whitespace-nowrap overflow-hidden"
                   >
-                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-green-100 rounded-md group-hover:bg-green-200 transition-colors duration-200">
+                    <div className="flex items-center justify-center w-6 sm:w-7 h-4 sm:h-5 bg-green-100 rounded-md group-hover:bg-green-200 transition-colors duration-200">
                       <IoBook className="w-3 sm:w-4 h-3 sm:h-4 text-green-600" />
                     </div>
-                    <span className="ml-2 sm:ml-3">Asignar libros</span>
+                    <span className="ml-2 sm:ml-3 truncate max-w-[120px] sm:max-w-[160px]">Asignar libros</span>
                   </button>
 
                   {/* Ver Progress Sheet */}
@@ -214,12 +214,12 @@ export const UsersPage = () => {
                         setUserforUnit(userId);
                       })
                     }
-                    className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:shadow-sm"
+                    className="group flex items-center w-full px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:shadow-sm whitespace-nowrap overflow-hidden"
                   >
-                    <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5 bg-purple-100 rounded-md group-hover:bg-purple-200 transition-colors duration-200">
+                    <div className="flex items-center justify-center w-6 sm:w-7 h-4 sm:h-5 bg-purple-100 rounded-md group-hover:bg-purple-200 transition-colors duration-200">
                       <IoPerson className="w-3 sm:w-4 h-3 sm:h-4 text-purple-600" />
                     </div>
-                    <span className="ml-2 sm:ml-3">Ver Progress Sheet</span>
+                    <span className="ml-2 sm:ml-3 truncate max-w-[120px] sm:max-w-[160px]">Ver Progress Sheet</span>
                   </button>
                 </div>
               </div>

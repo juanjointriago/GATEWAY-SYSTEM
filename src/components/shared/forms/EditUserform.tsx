@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import Swal from "sweetalert2";
+
+import CustomModal from "../../../components/CustomModal";
 
 
 
@@ -292,6 +293,15 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     ]
     console.debug('EditUserForm Found User by id', { user });
     
+
+    // Estados para CustomModal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalMessage, setModalMessage] = useState("");
+    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>("info");
+    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
+    const [modalCancelable, setModalCancelable] = useState<boolean>(false);
+
     // Inicializar formulario con valores por defecto
     const { register, handleSubmit, watch, formState: { errors } } = useForm<FirestoreUser>({ 
         defaultValues: {
@@ -299,92 +309,79 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             updatedAt: Date.now()
         }
     });
-    
-    const onSubmit = handleSubmit((async (data) => {
+
+    const showModal = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success', action?: () => Promise<void> | void, cancelable = false) => {
+        setModalTitle(title);
+        setModalMessage(message);
+        setModalType(type);
+        setModalAction(() => action || (() => setModalOpen(false)));
+        setModalCancelable(cancelable);
+        setModalOpen(true);
+    };
+
+    const onSubmit = handleSubmit(async (data) => {
         // Validar que si es estudiante, debe tener modalidad
         if (data.role === 'student' && !levelStudent) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error de validación',
-                text: 'Debe seleccionar una modalidad para el estudiante',
-            });
+            showModal('Error de validación', 'Debe seleccionar una modalidad para el estudiante', 'danger');
             return;
         }
-
         // Validar que si es estudiante, debe tener sublevel
         if (data.role === 'student' && !selectedSublevels) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error de validación', 
-                text: 'Debe seleccionar un curso para el estudiante',
-            });
+            showModal('Error de validación', 'Debe seleccionar un curso para el estudiante', 'danger');
             return;
         }
-
         // Validar cédula ecuatoriana
         if (data.cc && !validateEcuadorianID(data.cc)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Cédula inválida',
-                text: 'La cédula ingresada no es válida según el algoritmo ecuatoriano',
-            });
+            showModal('Cédula inválida', 'La cédula ingresada no es válida según el algoritmo ecuatoriano', 'danger');
             return;
         }
-
         // Asignar valores específicos para estudiantes
+        const updatedData = { ...data };
         if (data.role === 'student') {
-            data.level = levelStudent;
-            data.subLevel = selectedSublevels?.value || '';
+            updatedData.level = levelStudent;
+            updatedData.subLevel = selectedSublevels?.value || '';
         } else {
-            // Limpiar campos de estudiante si no es estudiante
-            data.level = '';
-            data.subLevel = '';
+            updatedData.level = '';
+            updatedData.subLevel = '';
         }
-
         const updatedUser = {
             ...user,
-            ...data,
+            ...updatedData,
             updatedAt: Date.now()
         };
-
-        console.debug('Usuario actualizado:', { updatedUser });
-
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: `Estás a punto de actualizar los datos de ${user.name}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, continuar',
-            cancelButtonText: 'Cancelar'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+        showModal(
+            '¿Estás seguro?',
+            `Estás a punto de actualizar los datos de ${user.name}`,
+            'warn',
+            async () => {
+                setModalOpen(false);
                 try {
                     await updateUser(updatedUser);
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Actualizado!',
-                        text: 'Los datos del usuario han sido actualizados correctamente.',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    showModal('¡Actualizado!', 'Los datos del usuario han sido actualizados correctamente.', 'success');
                 } catch (error) {
                     console.error('Error actualizando usuario:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un problema al actualizar los datos. Inténtalo de nuevo.',
-                    });
+                    showModal('Error', 'Hubo un problema al actualizar los datos. Inténtalo de nuevo.', 'danger');
                 }
-            }
-        });
-    }));
+            },
+            true
+        );
+    });
+
+    // Ya no se necesita handleConfirmUpdate ni pendingUser
 
     console.debug('👀', watch('role'));
     return (
-        <div className="w-full max-w-none">
-            <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6" onSubmit={onSubmit}>
+        <>
+            <CustomModal
+                isOpen={modalOpen}
+                title={modalTitle}
+                message={modalMessage}
+                type={modalType}
+                onConfirm={modalAction}
+                onCancel={modalCancelable ? () => setModalOpen(false) : undefined}
+            />
+            <div className="w-full max-w-none">
+                <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6" onSubmit={onSubmit}>
                 {/** Name */}
                 <div className="lg:col-span-2 space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
@@ -644,5 +641,6 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 </div>
             </form>
         </div>
+    </>
     )
 }
