@@ -13,6 +13,7 @@ export const AddNewForm = () => {
   const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
   const [modalAction, setModalAction] = useState<() => void>(() => () => setModalOpen(false));
 
+  // Diseño responsivo y atractivo
   const showModal = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success', action?: () => void) => {
     setModalTitle(title);
     setModalMessage(message);
@@ -90,7 +91,7 @@ export const AddNewForm = () => {
   });
 
   return (
-    <div>
+    <>
       <CustomModal
         isOpen={modalOpen}
         title={modalTitle}
@@ -99,10 +100,14 @@ export const AddNewForm = () => {
         onConfirm={modalAction}
         onCancel={() => setModalOpen(false)}
       />
-      <div className="flex">
-        <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
-          <div className="flex flex-wrap mx-3 mb-6">
-            <div className="w-full md:w-1/1 px-3 mb-6 md:mb-2">
+      <div className="flex justify-center items-center bg-gradient-to-br to-emerald-50 py-2 px-2 sm:px-4">
+        <form 
+          className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 sm:p-8 md:p-10 border border-gray-100"
+          onSubmit={onSubmit}
+        >
+          <h2 className="text-2xl font-bold text-emerald-700 mb-6 text-center tracking-tight">Crear Noticia</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="col-span-1">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="title"
@@ -124,7 +129,7 @@ export const AddNewForm = () => {
                 </p>
               )}
             </div>
-            <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
+            <div className="col-span-1">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="description"
@@ -146,15 +151,12 @@ export const AddNewForm = () => {
                 </p>
               )}
             </div>
-            <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="imageUrl"
-              >
+            <div className="col-span-1">
+              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="imageUrl">
                 Imagen de Noticia *
               </label>
               <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                className="block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition"
                 ref={fileRef}
                 id="imageUrl"
                 type="file"
@@ -164,16 +166,13 @@ export const AddNewForm = () => {
                 required
               />
               {errors.imageUrl && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.imageUrl.message}
-                </p>
+                <p className="text-red-500 text-xs italic mt-1">{errors.imageUrl.message}</p>
               )}
-
               {/* Vista previa de la imagen */}
-              {previewUrl && (
-                <div className="mt-4 flex justify-center">
+              <div className="mt-3 flex justify-center">
+                {previewUrl ? (
                   <div className="relative inline-block">
-                    <div className="w-32 h-32 overflow-hidden rounded-lg">
+                    <div className="w-32 h-32 overflow-hidden rounded-lg border shadow-md">
                       <img
                         src={previewUrl}
                         alt="Vista previa"
@@ -203,10 +202,12 @@ export const AddNewForm = () => {
                       </svg>
                     </button>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <span className="text-xs text-gray-400">No hay imagen cargada</span>
+                )}
+              </div>
             </div>
-            <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
+            <div className="col-span-1">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="isActive"
@@ -227,22 +228,18 @@ export const AddNewForm = () => {
                 </p>
               )}
             </div>
-            {/* Reemplazar el div del botón con este */}
-            <div className="w-full flex justify-center mt-6">
+            <div className="col-span-1 md:col-span-2 flex justify-end mt-8">
               <button
-                className="bg-emerald-500 text-white active:bg-emerald-600 
-                         font-bold uppercase text-sm px-6 py-3 
-                         rounded shadow hover:shadow-lg 
-                         outline-none focus:outline-none 
-                         transition-all duration-150"
+                className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-base px-8 py-3 rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-150"
                 type="submit"
               >
-                Crear noticia 💾
+                <span className="inline-block align-middle mr-2">💾</span> Crear Noticia
               </button>
             </div>
           </div>
         </form>
       </div>
-    </div>
+    </>
+
   );
-};
+}
