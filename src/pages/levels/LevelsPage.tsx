@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback } from "react";
 import { level } from "../../interface"
 import { useAuthStore, useLevelStore } from "../../stores";
 import { FormLevel } from "../../components/shared/forms";
-import Swal from "sweetalert2";
+import CustomModal from "../../components/CustomModal";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 import { FabButton } from "../../components/shared/buttons/FabButton";
 import { IoPencil, IoTrash } from "react-icons/io5";
@@ -24,23 +24,47 @@ export const LevelsPage = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [levelToEdit, setLevelToEdit] = useState<string>();
 
+  // Estados para CustomModal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>("info");
+  const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
+  const [modalCancelable, setModalCancelable] = useState<boolean>(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackTitle, setFeedbackTitle] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackType, setFeedbackType] = useState<'warn' | 'info' | 'danger' | 'success'>("info");
+
+  const showModal = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success', action?: () => Promise<void> | void, cancelable = false) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalType(type);
+    setModalAction(() => action || (() => setModalOpen(false)));
+    setModalCancelable(cancelable);
+    setModalOpen(true);
+  };
+
+  const showFeedback = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success', reload = false) => {
+    setFeedbackTitle(title);
+    setFeedbackMessage(message);
+    setFeedbackType(type);
+    setFeedbackOpen(true);
+    if (reload) setTimeout(() => window.location.reload(), 1200);
+  };
+
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportLevelsToExcel(levels);
-      
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El archivo Excel ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
-        });
+        showFeedback("¡Éxito!", "El archivo Excel ha sido descargado exitosamente", "success");
       } else {
-        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+        showFeedback("Error", "No se pudo exportar el archivo Excel", "danger");
       }
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Error exporting to Excel:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+      showFeedback("Error", error.message || "Ocurrió un error al exportar el archivo", "danger");
     }
   }, [levels]);
 
@@ -88,21 +112,17 @@ export const LevelsPage = () => {
             <ToggleButton
               isActive={level.isActive}
               action={() => {
-                Swal.fire({
-                  title: '¿Estás seguro?',
-                  text: `Estás a punto de ${level.isActive ? 'ocultar' : 'mostrar'} esta modalidad`,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Sí, continuar',
-                  cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
+                showModal(
+                  '¿Estás seguro?',
+                  `Estás a punto de ${level.isActive ? 'ocultar' : 'mostrar'} esta modalidad`,
+                  'warn',
+                  async () => {
+                    setModalOpen(false);
                     await updateLevel({ ...level, isActive: !level.isActive });
-                    window.location.reload();
-                  }
-                });
+                    showFeedback('¡Actualizado!', 'El estado de la modalidad ha sido actualizado.', 'success', true);
+                  },
+                  true
+                );
               }}
             />
             <FabButton 
@@ -119,20 +139,17 @@ export const LevelsPage = () => {
               tootTipText="Eliminar modalidad"
               Icon={IoTrash}
               action={() => {
-                Swal.fire({
-                  title: '¿Estás seguro?',
-                  text: 'Estás a punto de eliminar esta modalidad',
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Sí, continuar',
-                  cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
+                showModal(
+                  '¿Estás seguro?',
+                  'Estás a punto de eliminar esta modalidad',
+                  'danger',
+                  async () => {
+                    setModalOpen(false);
                     await deleteLevel(level.id!);
-                  }
-                });
+                    showFeedback('Eliminado', 'La modalidad ha sido eliminada.', 'success', true);
+                  },
+                  true
+                );
               }} 
             />
           </div>
@@ -143,6 +160,21 @@ export const LevelsPage = () => {
 
   return (
     <>
+      <CustomModal
+        isOpen={modalOpen}
+        title={modalTitle}
+        message={modalMessage}
+        type={modalType}
+        onConfirm={modalAction}
+        onCancel={modalCancelable ? () => setModalOpen(false) : undefined}
+      />
+      <CustomModal
+        isOpen={feedbackOpen}
+        title={feedbackTitle}
+        message={feedbackMessage}
+        type={feedbackType}
+        onConfirm={() => setFeedbackOpen(false)}
+      />
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
           Modalidades
