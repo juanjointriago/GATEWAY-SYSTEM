@@ -1,8 +1,8 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import { subLevel } from "../../../interface"
 import { useSubLevelStore } from "../../../stores"
 import { Controller, useForm } from "react-hook-form"
-import Swal from "sweetalert2"
+import CustomModal from "../../../components/CustomModal"
 
 interface Props {
     subLevelId: string
@@ -17,25 +17,42 @@ export const EditSubLEvelForm: FC<Props> = ({ subLevelId }) => {
         updatedAt: Date.now(),
     }
     const { control, handleSubmit, reset, formState: { errors } } = useForm<subLevel>({ defaultValues });
+    // Estados para CustomModal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
+    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
+
     const onSubmit = handleSubmit(async (data: subLevel) => {
-        // console.debug({ unitRecord })
-        //return
-        await updateSubLevel(data).then(() => {
-            Swal.fire({
-                title: 'Unidad actualizada',
-                text: `Unidad actualizada con éxito`,
-                icon: 'success',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Aceptar',
-            }).then((result) => { if (result.isConfirmed) window.location.reload(); })
-        }).catch((error) => {
-            Swal.fire('Error', `${error.message}`, 'error');
+        try {
+            await updateSubLevel(data);
+            setModalTitle('Unidad actualizada');
+            setModalMessage('Unidad actualizada con éxito');
+            setModalType('success');
+            setModalAction(() => () => { setModalOpen(false); window.location.reload(); });
+            setModalOpen(true);
+        } catch (error) {
+            const errMsg = error instanceof Error ? error.message : 'Ocurrió un error al actualizar la unidad';
+            setModalTitle('Error');
+            setModalMessage(errMsg);
+            setModalType('danger');
+            setModalAction(() => () => setModalOpen(false));
+            setModalOpen(true);
             console.error(error);
-        });
+        }
         reset(defaultValues);
     });
     return (
         <>
+            <CustomModal
+                isOpen={modalOpen}
+                title={modalTitle}
+                message={modalMessage}
+                type={modalType}
+                onConfirm={modalAction}
+                onCancel={() => setModalOpen(false)}
+            />
             <div className="flex ">
                 <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
 

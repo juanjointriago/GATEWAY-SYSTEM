@@ -1,9 +1,9 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 // import { v6 as uuid } from 'uuid'
 import { level } from '../../../interface';
 import { useLevelStore } from '../../../stores';
 import { Controller, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
+import CustomModal from '../../../components/CustomModal';
 
 interface Props {
     levelId: string
@@ -21,31 +21,43 @@ export const EditLevelControl: FC<Props> = ({ levelId }) => {
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm<level>({ defaultValues })
 
-    const onSubmit = handleSubmit(async (data: level) => {
+    // Estados para CustomModal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
+    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
 
-        console.debug('👀==> Data del nivel a editar', { data });
-        // return;
-        await editLevel(data).then(() => {
-            Swal.fire({
-                title: 'Modalidad actualizada',
-                text: `Modalidad actualizada con éxito`,
-                icon: 'success',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Aceptar',
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.reload();
-                }
-              })
-        }).catch((error) => {
-            Swal.fire('Error', `${error.message}`, 'error');
+    const onSubmit = handleSubmit(async (data: level) => {
+        try {
+            await editLevel(data);
+            setModalTitle('Modalidad actualizada');
+            setModalMessage('Modalidad actualizada con éxito');
+            setModalType('success');
+            setModalAction(() => () => { setModalOpen(false); window.location.reload(); });
+            setModalOpen(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            setModalTitle('Error');
+            setModalMessage(error.message || 'Ocurrió un error al actualizar la modalidad');
+            setModalType('danger');
+            setModalAction(() => () => setModalOpen(false));
+            setModalOpen(true);
             console.error(error);
-        })
+        }
         reset(defaultValues);
-    })
+    });
 
     return (
         <>
+            <CustomModal
+                isOpen={modalOpen}
+                title={modalTitle}
+                message={modalMessage}
+                type={modalType}
+                onConfirm={modalAction}
+                onCancel={() => setModalOpen(false)}
+            />
             <form className="w-full max-w-lg" onSubmit={onSubmit}>
                 <div className="flex flex-wrap -mx-3 mb-6">
                     <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
