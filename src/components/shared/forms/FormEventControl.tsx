@@ -6,7 +6,7 @@ import { event, students } from "../../../interface";
 import { useEventStore } from "../../../stores/events/event.store"
 import { v6 as uuid } from 'uuid'
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
-import Swal from "sweetalert2";
+import CustomModal from "../../../components/CustomModal";
 import { footerMail, sendCustomEmail } from "../../../store/firebase/helper";
 
 
@@ -41,6 +41,34 @@ export const FormEventControl: FC = () => {
     const students = getUserByRole('student')!.filter((student) => student.isActive);
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!].filter((user) => user.isActive);
 
+    // Estados para CustomModal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalMessage, setModalMessage] = useState("");
+    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>("info");
+    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
+    const [modalCancelable, setModalCancelable] = useState<boolean>(false);
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
+    const [feedbackTitle, setFeedbackTitle] = useState("");
+    const [feedbackMessage, setFeedbackMessage] = useState("");
+    const [feedbackType, setFeedbackType] = useState<'warn' | 'info' | 'danger' | 'success'>("info");
+
+    const showModal = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success', action?: () => Promise<void> | void, cancelable = false) => {
+        setModalTitle(title);
+        setModalMessage(message);
+        setModalType(type);
+        setModalAction(() => action || (() => setModalOpen(false)));
+        setModalCancelable(cancelable);
+        setModalOpen(true);
+    };
+
+    const showFeedback = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success') => {
+        setFeedbackTitle(title);
+        setFeedbackMessage(message);
+        setFeedbackType(type);
+        setFeedbackOpen(true);
+    };
+
     const onSubmit = handleSubmit(async (data: event) => {
         // if (!levelEvent) return;
         // data.levels[0] = { level: getValues('levels.0.level'), subLevels:  };
@@ -58,36 +86,24 @@ export const FormEventControl: FC = () => {
         // if (!data.teacher) return;
         if (data.teacher) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const newTeacher = data.teacher as any
+            const newTeacher = data.teacher as any;
             data.teacher = newTeacher.value;
             data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const newLevel = data.levels[0].level as any;
             data.levels[0].level = newLevel.value;
-            const eventRecord = { id: uuid(), ...data }
-            //loading swal 
-            console.debug({ eventRecord });
-
-            // return;
-            Swal.fire({
-                title: 'Creando Reservación',
-                html: 'Espere un momento por favor',
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading()  //swal loading
-                },
-            })
-            await createEvent(eventRecord).then(() => {
-                // console.debug('ITS ok');
-                Swal.fire({
-                    title: 'Reservación creada',
-                    text: `Reservación creada con éxito`,
-                    icon: 'success',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'Aceptar',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        const text = `Se le ha asignado un horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
+            const eventRecord = { id: uuid(), ...data };
+            showModal(
+                'Creando Reservación',
+                'Espere un momento por favor',
+                'info',
+                async () => {
+                    setModalOpen(false);
+                    try {
+                        await createEvent(eventRecord);
+                        showFeedback('Reservación creada', 'Reservación creada con éxito', 'success');
+                        // Enviar correo
+                        const text = `Se le ha asignado un horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalidad de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
                         await sendCustomEmail({
                             to: [getUserById(data.teacher!)!.email!],
                             message: {
@@ -96,24 +112,39 @@ export const FormEventControl: FC = () => {
                                 html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1> <p>${text}</p> ${footerMail}`
                             },
                         });
-                        window.location.reload();
+                        setTimeout(() => window.location.reload(), 1200);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    } catch (error: any) {
+                        showFeedback('Error', error.message || 'Ocurrió un error al crear la reservación.', 'danger');
+                        console.error(error);
                     }
-                })
-
-            }).catch((error) => {
-                Swal.fire('Error', `${error.message}`, 'error');
-                console.error(error);
-            });
-            // reset(defaultValues);
-
+                },
+                false
+            );
         }
     })
     return (
-        <div className="flex">
-            <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
-                <div className="flex flex-wrap mx-3 mb-6">
+        <>
+            <CustomModal
+                isOpen={modalOpen}
+                title={modalTitle}
+                message={modalMessage}
+                type={modalType}
+                onConfirm={modalAction}
+                onCancel={modalCancelable ? () => setModalOpen(false) : undefined}
+            />
+            <CustomModal
+                isOpen={feedbackOpen}
+                title={feedbackTitle}
+                message={feedbackMessage}
+                type={feedbackType}
+                onConfirm={() => setFeedbackOpen(false)}
+            />
+            <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 mt-4 border border-gray-200">
+                <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+                    <div className="flex flex-wrap -mx-2">
                     {/*Name*/}
-                    <div className="w-full md:w-1/1 px-3 mb-6 md:mb-0">
+                    <div className="w-full px-2 mb-4">
                         <label htmlFor="name" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Nombre</label>
                         <Controller
                             rules={{ required: "El nombre es obligatorio 👀" }}
@@ -131,7 +162,7 @@ export const FormEventControl: FC = () => {
                         {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
                     </div>
                     {/*MaxAssitantNumber*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="maxAssistantsNumber">  Número máximo de estudiantes * </label>
                         <Controller
                             rules={{ required: "Se requiere un maximo de sistentes 👀" }}
@@ -149,7 +180,7 @@ export const FormEventControl: FC = () => {
                         {errors.maxAssistantsNumber && <p className="text-red-500 text-xs italic">{errors.maxAssistantsNumber.message}</p>}
                     </div>
                     {/*MinAssitantNumber*/}
-                    <div className="mb-3 md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="minAssistantsNumber">
                             Número mínimo de estudiantes *
                         </label>
@@ -168,7 +199,7 @@ export const FormEventControl: FC = () => {
                         {errors.minAssistantsNumber && <p className="text-red-500 text-xs italic">{errors.minAssistantsNumber.message}</p>}
                     </div>
                     {/*Teacher*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <Controller
                             rules={{ required: "El docente es obligatorio 👀" }}
                             control={control}
@@ -194,7 +225,7 @@ export const FormEventControl: FC = () => {
                         {errors.teacher && <p className="text-red-500 text-xs italic">{errors.teacher.message}</p>}
                     </div>
                     {/*Level*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <Controller
                             rules={{ required: "La modalidad es obligatoria 👀" }}
                             control={control}
@@ -222,7 +253,7 @@ export const FormEventControl: FC = () => {
                         {errors.levels && errors.levels[0]?.level && <p className="text-red-500 text-xs italic">{errors.levels[0].level.message}</p>}
                     </div>
                     {/*SubLevels*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <div className="bg-indigo-300 w-[auto] rounded-sm ">
                         </div>
                         <Controller
@@ -254,7 +285,7 @@ export const FormEventControl: FC = () => {
                         />
                     </div>
                     {/*Aditional Student*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <Select
                             components={animatedComponents}
                             placeholder="Estudiantes adicionales"
@@ -270,7 +301,7 @@ export const FormEventControl: FC = () => {
                         />
                     </div>
                     {/*SelectTime*/}
-                    <div className="mb-3 w-full md:w-1/1 px-3 mt-2">
+                    <div className="w-full px-2 mb-4">
                         <label htmlFor="date-time" className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">FEcha y hora</label>
                         <Controller
                             rules={{ required: "Debe seleccionar fecha y hora de reservación 👀" }}
@@ -306,7 +337,7 @@ export const FormEventControl: FC = () => {
                         {errors.limitDate && <p className="text-red-500 text-xs italic">{errors.limitDate.message}</p>}
                     </div>
                     {/*IsActive*/}
-                    <div className="w-full md:w-1/1 mt-2 px-3">
+                    <div className="w-full px-2 mt-2 mb-4">
                         <label className="inline-flex items-center cursor-pointer">
                             <Controller
                                 rules={{ required: "Este campo debe registrarse por primera vez como Activo 👀" }}//justneed those for create or not?
@@ -331,16 +362,17 @@ export const FormEventControl: FC = () => {
                         </label>
                         {errors.isActive && <p className="text-red-500 text-xs italic">{errors.isActive.message}</p>}
                     </div>
-                </div>
-                {/*Submit button*/}
-                <div className="flex h-[4rem] w-[4rem] justify-`end` ]">
-                    <button
-                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-5 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 mr-11"
-                        type="submit"
-                        // disabled={isLoading}
-                    >💾</button>
-                </div>
-            </form>
-        </div>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                        <button
+                            className="bg-emerald-500 text-white font-bold uppercase text-sm px-6 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none transition-all duration-150"
+                            type="submit"
+                        >
+                            <span className="mr-2">💾</span> Guardar reservación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </>
     )
 }
