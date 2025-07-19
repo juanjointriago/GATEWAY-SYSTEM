@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface CustomModalProps {
   isOpen: boolean;
   title: string;
   message: string;
   type: 'warn' | 'info' | 'danger' | 'success';
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
   onCancel?: () => void;
 }
 
@@ -37,9 +37,20 @@ const typeStyles = {
 };
 
 const CustomModal: React.FC<CustomModalProps> = ({ isOpen, title, message, type, onConfirm, onCancel }) => {
+  const [loading, setLoading] = useState(false);
   if (!isOpen) return null;
 
   const styles = typeStyles[type];
+
+  const handleConfirm = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
@@ -51,14 +62,16 @@ const CustomModal: React.FC<CustomModalProps> = ({ isOpen, title, message, type,
         <p id="modal-description" className={`mb-6 ${styles.text}`}>{message}</p>
         <div className="flex justify-center gap-4">
           <button
-            onClick={onConfirm}
-            className={`px-4 py-2 rounded font-semibold text-white bg-${type === 'danger' ? 'red' : type === 'warn' ? 'yellow' : type === 'info' ? 'blue' : 'green'}-600 hover:bg-${type === 'danger' ? 'red' : type === 'warn' ? 'yellow' : type === 'info' ? 'blue' : 'green'}-700 transition-colors`}
+            onClick={handleConfirm}
+            disabled={loading}
+            className={`px-4 py-2 rounded font-semibold text-white bg-${type === 'danger' ? 'red' : type === 'warn' ? 'yellow' : type === 'info' ? 'blue' : 'green'}-600 hover:bg-${type === 'danger' ? 'red' : type === 'warn' ? 'yellow' : type === 'info' ? 'blue' : 'green'}-700 transition-colors ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
-            Confirmar
+            {loading ? 'Procesando...' : 'Confirmar'}
           </button>
           {onCancel && (
             <button
               onClick={onCancel}
+              disabled={loading}
               className="px-4 py-2 rounded font-semibold border border-gray-300 hover:bg-gray-100 transition-colors"
             >
               Cancelar
