@@ -14,7 +14,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v6 as uuid } from "uuid";
 import { sendCustomEmail } from "../../../store/firebase/helper";
 import QRCode from "qrcode";
-import Swal from "sweetalert2";
+
 
 export const AddFeeForm = () => {
   const getUserByRole = useUserStore((state) => state.getUserByRole);
@@ -616,11 +616,7 @@ export const AddFeeForm = () => {
                   const file = e.target.files?.[0];
                   if (file) {
                     if (!file.type.startsWith("image/")) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "El archivo debe ser una imagen"
-                      });
+                      showModal('Error', 'El archivo debe ser una imagen', 'danger');
                       return;
                     }
                     if (file.size > 5 * 1024 * 1024) {

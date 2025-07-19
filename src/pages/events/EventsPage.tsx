@@ -21,7 +21,7 @@ import { NavLink } from "react-router-dom";
 import { FabButton } from "../../components/shared/buttons/FabButton";
 import { useMemo, useState, useCallback } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
-import Swal from "sweetalert2";
+import CustomModal from "../../components/CustomModal";
 // import { getInitials } from "../users/helper";
 // import { FormEventControl } from "../../components/shared/forms/FormEventControl";
 import { EditEventControl } from "../../components/shared/forms/EditEventControl";
@@ -48,23 +48,31 @@ export const EventsPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<string>();
 
+  // Estados para CustomModal
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
+  const [modalType, setModalType] = useState<'success' | 'error' | 'warn' | 'info' | null>(null);
+  const [confirmAction, setConfirmAction] = useState<null | (() => Promise<void> | void)>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'warn' | 'info' | 'danger' | 'success';
+  }>({ isOpen: false, title: '', message: '', type: 'warn' });
+
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportEventsToExcel(events);
-      
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El archivo Excel ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
-        });
+        setModalType('success');
+        setModalMessage('El archivo Excel ha sido descargado exitosamente');
       } else {
-        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+        setModalType('error');
+        setModalMessage('No se pudo exportar el archivo Excel');
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+      setModalType('error');
+      setModalMessage('Ocurrió un error al exportar el archivo');
     }
   }, [events]);
 
@@ -213,25 +221,19 @@ export const EventsPage = () => {
               <ToggleButton
                 isActive={info.getValue() as boolean}
                 action={() => {
-                  Swal.fire({
-                    title: "¿Estás seguro?",
-                    text: `Estas a punto de ${
-                      info.getValue() as boolean ? "ocultar" : "mostrar"
-                    } esta reservación`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Sí, continuar",
-                    cancelButtonText: "Cancelar",
-                  }).then(async (result) => {
-                    if (result.isConfirmed) {
-                      await updateEvent({
-                        ...info.row.original,
-                        isActive: !info.getValue() as boolean,
-                      });
-                      window.location.reload();
-                    }
+                  setConfirmModal({
+                    isOpen: true,
+                    title: '¿Estás seguro?',
+                    message: `Estás a punto de ${info.getValue() ? 'ocultar' : 'mostrar'} esta reservación`,
+                    type: 'warn',
+                  });
+                  setConfirmAction(async () => {
+                    await updateEvent({
+                      ...info.row.original,
+                      isActive: !(info.getValue() as boolean),
+                    });
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                    window.location.reload();
                   });
                 }}
               />
@@ -256,20 +258,16 @@ export const EventsPage = () => {
                 isActive
                 Icon={IoTrash}
                 action={() => {
-                  Swal.fire({
-                    title: "¿Estás seguro?",
-                    text: `Estas a punto de eliminar esta reservación`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Sí, continuar",
-                    cancelButtonText: "Cancelar",
-                  }).then(async (result) => {
-                    if (result.isConfirmed) {
-                      await deleteEvent(info.row.original.id!);
-                      window.location.reload();
-                    }
+                  setConfirmModal({
+                    isOpen: true,
+                    title: '¿Estás seguro?',
+                    message: 'Estás a punto de eliminar esta reservación',
+                    type: 'danger',
+                  });
+                  setConfirmAction(async () => {
+                    await deleteEvent(info.row.original.id!);
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                    window.location.reload();
                   });
                 }}
               />
@@ -280,63 +278,51 @@ export const EventsPage = () => {
                 isActive
                 tootTipText={""}
                 action={() => {
-                  Swal.fire({
-                    title: "¿Estás seguro?",
-                    text: `Estas a punto de enviar un correo al docente de esta reservación`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Sí, continuar",
-                    cancelButtonText: "Cancelar",
-                  }).then(async (result) => {
-                    if (result.isConfirmed) {
-                      const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(
-                        info.row.original.date
-                      ).toLocaleTimeString([], {
-                        year: "2-digit",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })} con el nombre de ${
-                        info.row.original.name
-                      }, con estudiantes de la(s) unidad(es) ${info.row.original.levels[0].subLevels
-                        .map(
-                          (sublevel) =>
-                            sublevels.find((sub) => sub.id === sublevel)?.name
-                        )
-                        .join(", ")}, en modalida de ${
-                        levels.find(
-                          (level) => level.id === info.row.original.levels[0].level
-                        )?.name
-                      }.`;
-                      await sendCustomEmail({
-                        to: [
-                          users.find((user) => user.id === info.row.original.teacher)!
-                            .email!,
-                        ],
-                        message: {
-                          subject: "Recordatorio de reservación",
-                          text: `Hola, ${
-                            users.find((user) => user.id === info.row.original.teacher)?.name
-                          } ${text}`,
-                          html: `<h1>Hola, ${
-                            users.find((user) => user.id === info.row.original.teacher)?.name
-                          }</h1> <p>${text}</p> ${footerMail}`,
-                        },
-                      }).then(async () => {
-                        await Swal.fire({
-                          title: "Correo enviado",
-                          text: `Se ha enviado un correo a ${
-                            users.find((user) => user.id === info.row.original.teacher)?.name
-                          }`,
-                          icon: "success",
-                          confirmButtonColor: "#3085d6",
-                          confirmButtonText: "Continuar",
-                        });
-                      });
-                    }
+                  setConfirmModal({
+                    isOpen: true,
+                    title: '¿Estás seguro?',
+                    message: 'Estás a punto de enviar un correo al docente de esta reservación',
+                    type: 'info',
+                  });
+                  setConfirmAction(async () => {
+                    const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(
+                      info.row.original.date
+                    ).toLocaleTimeString([], {
+                      year: "2-digit",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })} con el nombre de ${
+                      info.row.original.name
+                    }, con estudiantes de la(s) unidad(es) ${info.row.original.levels[0].subLevels
+                      .map(
+                        (sublevel) =>
+                          sublevels.find((sub) => sub.id === sublevel)?.name
+                      )
+                      .join(", ")}, en modalida de ${
+                      levels.find(
+                        (level) => level.id === info.row.original.levels[0].level
+                      )?.name
+                    }.`;
+                    await sendCustomEmail({
+                      to: [
+                        users.find((user) => user.id === info.row.original.teacher)!
+                          .email!,
+                      ],
+                      message: {
+                        subject: "Recordatorio de reservación",
+                        text: `Hola, ${
+                          users.find((user) => user.id === info.row.original.teacher)?.name
+                        } ${text}`,
+                        html: `<h1>Hola, ${
+                          users.find((user) => user.id === info.row.original.teacher)?.name
+                        }</h1> <p>${text}</p> ${footerMail}`,
+                      },
+                    });
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                    setModalType('success');
+                    setModalMessage(`Se ha enviado un correo a ${users.find((user) => user.id === info.row.original.teacher)?.name}`);
                   });
                 }}
                 Icon={IoMail}
@@ -357,6 +343,30 @@ export const EventsPage = () => {
   // console.debug('events', events.length)
   return (
     <>
+      {/* CustomModal de confirmación para acciones */}
+      <CustomModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        type={confirmModal.type}
+        onConfirm={async () => {
+          if (confirmAction) await confirmAction();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => {
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+      />
+      {/* Modal de mensaje custom */}
+      {modalMessage && (
+        <ModalGeneric
+          title={modalType === 'success' ? '¡Éxito!' : 'Error'}
+          isVisible={!!modalMessage}
+          setIsVisible={() => setModalMessage(null)}
+        >
+          <div className={`text-center text-lg ${modalType === 'success' ? 'text-green-600' : 'text-red-600'}`}>{modalMessage}</div>
+        </ModalGeneric>
+      )}
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
           Reservaciones

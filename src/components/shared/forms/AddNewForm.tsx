@@ -2,11 +2,24 @@ import { useRef, useState } from "react";
 import { useNewsStore } from "../../../stores/news/news.store";
 import { useForm } from "react-hook-form";
 import { INew } from "../../../interface/new.interface";
-import Swal from "sweetalert2";
+import CustomModal from "../../../components/CustomModal";
 import { v6 as uuid } from "uuid";
 import Select, { SingleValue } from "react-select"; // Importar react-select
 
 export const AddNewForm = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+  const [modalAction, setModalAction] = useState<() => void>(() => () => setModalOpen(false));
+
+  const showModal = (title: string, message: string, type: 'warn' | 'info' | 'danger' | 'success', action?: () => void) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalType(type);
+    setModalAction(() => action ? action : () => setModalOpen(false));
+    setModalOpen(true);
+  };
   const fileRef = useRef<HTMLInputElement>(null);
   const createNew = useNewsStore((state) => state.createNews);
   const [fileUpload, setFileUpload] = useState<FileList | null>(null);
@@ -58,26 +71,19 @@ export const AddNewForm = () => {
   const onSubmit = handleSubmit(async (data: INew) => {
     const newRecord = { id: uuid(), altText: data.title, ...data };
     if (fileUpload && fileUpload.length > 1) {
-      Swal.fire("Ups!", "Solo puedes subir un archivo", "warning");
+      showModal("Ups!", "Solo puedes subir un archivo", "warn");
       return;
     }
     if (!fileUpload) {
-      alert("Debe subir un archivo");
+      showModal("Error", "Debe subir un archivo", "danger");
       return;
     }
     const inputFile = fileRef.current as HTMLInputElement | null;
-    Swal.fire({
-      title: "Creando Noticia",
-      text: "Espera un poco...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    showModal("Creando Noticia", "Espera un poco...", "info", () => {});
     await createNew(newRecord, fileUpload[0]);
-    Swal.close();
-    Swal.fire("Noticia almacenada", "Noticia creado con éxito", "success");
-    inputFile!.value = "";
+    setModalOpen(false);
+    showModal("Noticia almacenada", "Noticia creado con éxito", "success");
+    if (inputFile) inputFile.value = "";
     setFileUpload(null);
     setPreviewUrl(null);
     reset();
@@ -85,6 +91,14 @@ export const AddNewForm = () => {
 
   return (
     <div>
+      <CustomModal
+        isOpen={modalOpen}
+        title={modalTitle}
+        message={modalMessage}
+        type={modalType}
+        onConfirm={modalAction}
+        onCancel={() => setModalOpen(false)}
+      />
       <div className="flex">
         <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
           <div className="flex flex-wrap mx-3 mb-6">
