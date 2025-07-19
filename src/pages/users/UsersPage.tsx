@@ -17,8 +17,6 @@ import { MdFileDownload } from "react-icons/md";
 import { useMemo, useState, useCallback } from "react";
 import { ModalGeneric } from "../../components/shared/ui/ModalGeneric";
 import { EditUserform } from "../../components/shared/forms/EditUserform";
-import { UserActivationValidator } from "../../components/shared/validators/UserActivationValidator";
-import Swal from "sweetalert2";
 import { EditUserUnits } from "../../components/shared/forms/EditUserUnits";
 import { ToggleButton } from "../../components/shared/buttons/ToggleButton";
 // import { EditStudentSheet } from "../../components/shared/forms/EditStudentSheet";
@@ -27,6 +25,7 @@ import { TableGeneric } from "../../components/shared/tables/TableGeneric";
 import { StudentProgressSheet } from "../progress-sheet/StudentProgressSheet";
 import { StudentContract } from "../contract/StudentContract";
 import { exportUsersToExcel } from "../../helpers/excel.helper";
+import CustomModal from "../../components/CustomModal";
 
 export const UsersPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -36,6 +35,10 @@ export const UsersPage = () => {
   const [userToEdit, setUserToEdit] = useState<string>();
   const [userforUnit, setUserforUnit] = useState<string>();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
+  const [modalType, setModalType] = useState<'success' | 'error' | null>(null);
+  const [confirmDeactivateUserId, setConfirmDeactivateUserId] = useState<string | null>(null);
+  const [confirmActivateUserId, setConfirmActivateUserId] = useState<string | null>(null);
   
   const user = useAuthStore((state) => state.user);
   const isAdmin = user && user.role === "admin";
@@ -50,41 +53,40 @@ export const UsersPage = () => {
   // const getUserById = useUserStore(state => state.getUserById);
 
   // Función para activar usuario con validación
-  const handleUserActivation = useCallback(async (userId: string) => {
-    const userToUpdate = users.find((u) => u.id === userId);
+  const handleUserActivation = useCallback((userId: string) => {
+    setConfirmActivateUserId(userId);
+  }, []);
+
+  const confirmActivation = useCallback(async () => {
+    if (!confirmActivateUserId) return;
+    const userToUpdate = users.find((u) => u.id === confirmActivateUserId);
     if (userToUpdate) {
       await updateUserById({
         ...userToUpdate,
         isActive: true,
       });
+      setConfirmActivateUserId(null);
       window.location.reload();
     }
-  }, [users, updateUserById]);
+  }, [confirmActivateUserId, users, updateUserById]);
 
   // Función para desactivar usuario (sin validación)
-  const handleUserDeactivation = useCallback(async (userId: string) => {
-    const result = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "Estás a punto de desactivar este usuario",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, desactivar",
-      cancelButtonText: "Cancelar",
-    });
+  const handleUserDeactivation = useCallback((userId: string) => {
+    setConfirmDeactivateUserId(userId);
+  }, []);
 
-    if (result.isConfirmed) {
-      const userToUpdate = users.find((u) => u.id === userId);
-      if (userToUpdate) {
-        await updateUserById({
-          ...userToUpdate,
-          isActive: false,
-        });
-        window.location.reload();
-      }
+  const confirmDeactivation = useCallback(async () => {
+    if (!confirmDeactivateUserId) return;
+    const userToUpdate = users.find((u) => u.id === confirmDeactivateUserId);
+    if (userToUpdate) {
+      await updateUserById({
+        ...userToUpdate,
+        isActive: false,
+      });
+      setConfirmDeactivateUserId(null);
+      window.location.reload();
     }
-  }, [users, updateUserById]);
+  }, [confirmDeactivateUserId, users, updateUserById]);
 
   // Componente del menú dropdown
   const ActionMenu = useCallback(
@@ -132,22 +134,16 @@ export const UsersPage = () => {
                 <div className="p-1 sm:p-2">
                   {/* Toggle Active/Inactive */}
                   {!isActive ? (
-                    // Usuario inactivo - usar validador para activar
-                    <UserActivationValidator
-                      userId={userId}
-                      onValidationSuccess={() => handleUserActivation(userId)}
+                    <button
+                      onClick={() => handleUserActivation(userId)}
+                      className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200"
                     >
-                      <button
-                        className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
-                          <ToggleButton isActive={isActive} action={() => {}} />
-                        </div>
-                        <span className="ml-2 sm:ml-3">Activar usuario</span>
-                      </button>
-                    </UserActivationValidator>
+                      <div className="flex items-center justify-center w-6 sm:w-8 h-4 sm:h-5">
+                        <ToggleButton isActive={isActive} action={() => {}} />
+                      </div>
+                      <span className="ml-2 sm:ml-3">Activar usuario</span>
+                    </button>
                   ) : (
-                    // Usuario activo - desactivar directamente
                     <button
                       onClick={() => handleAction(() => handleUserDeactivation(userId))}
                       className="group flex items-center w-full px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all duration-200"
@@ -376,25 +372,50 @@ export const UsersPage = () => {
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportUsersToExcel(filteredUsers);
-      
       if (success) {
-        Swal.fire({
-          title: "¡Éxito!",
-          text: "El archivo Excel ha sido descargado exitosamente",
-          icon: "success",
-          confirmButtonText: "Continuar"
-        });
+        setModalType('success');
+        setModalMessage('El archivo Excel ha sido descargado exitosamente');
       } else {
-        Swal.fire("Error", "No se pudo exportar el archivo Excel", "error");
+        setModalType('error');
+        setModalMessage('No se pudo exportar el archivo Excel');
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      Swal.fire("Error", "Ocurrió un error al exportar el archivo", "error");
+      setModalType('error');
+      setModalMessage('Ocurrió un error al exportar el archivo');
     }
   }, [filteredUsers]);
 
   return (
     <>
+      {/* CustomModal para desactivación */}
+      <CustomModal
+        isOpen={!!confirmDeactivateUserId}
+        title="¿Estás seguro?"
+        message="Estás a punto de desactivar este usuario."
+        type="warn"
+        onConfirm={confirmDeactivation}
+        onCancel={() => setConfirmDeactivateUserId(null)}
+      />
+      {/* CustomModal para activación */}
+      <CustomModal
+        isOpen={!!confirmActivateUserId}
+        title="Activar usuario"
+        message="¿Deseas activar este usuario?"
+        type="success"
+        onConfirm={confirmActivation}
+        onCancel={() => setConfirmActivateUserId(null)}
+      />
+      {/* Modal de mensaje custom */}
+      {modalMessage && (
+        <ModalGeneric
+          title={modalType === 'success' ? '¡Éxito!' : 'Error'}
+          isVisible={!!modalMessage}
+          setIsVisible={() => setModalMessage(null)}
+        >
+          <div className={`text-center text-lg ${modalType === 'success' ? 'text-green-600' : 'text-red-600'}`}>{modalMessage}</div>
+        </ModalGeneric>
+      )}
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6x">
           Usuarios
