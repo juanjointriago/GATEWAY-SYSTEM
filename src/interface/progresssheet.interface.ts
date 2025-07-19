@@ -41,6 +41,7 @@ export interface progressSheetInterface {
     totalDue?: number;// total pendiente
     totalDiscount?: number;// total descuento
     observation?: string;// observacion
+    adminObservation?: string; // Observación del administrador
     quotesQty?: number;// cantidad de cuotas
     quoteValue?: number;// valor de la cuota
     dueDate?: string;// fecha de vencimiento

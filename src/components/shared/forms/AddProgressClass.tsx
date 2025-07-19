@@ -5,7 +5,7 @@ import {
   progressSheetInterface,
 } from "../../../interface/progresssheet.interface";
 import { useProgressSheetStore } from "../../../stores/progress-sheet/progresssheet.store";
-import Swal from "sweetalert2";
+import CustomModal from "../../../components/CustomModal";
 import { useUserStore } from "../../../stores";
 import { useEventStore } from "../../../stores/events/event.store";
 import Select, { SingleValue } from "react-select"; // Importar react-select
@@ -34,6 +34,12 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
     progressSheet
   );
 
+  // Estados para CustomModal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+  const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
   // Crear automáticamente un progressSheet si no existe
   useEffect(() => {
     const createProgressSheetIfNotExists = async () => {
@@ -71,17 +77,20 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
             createdAt: Date.now(),
             updatedAt: Date.now(),
           };
-           await createProgressSheet(newProgressSheet);
+          await createProgressSheet(newProgressSheet);
           setCurrentProgressSheet(newProgressSheet); // Actualizar el estado con el nuevo progressSheet
         } catch (error) {
           console.error("Error al crear el Progress Sheet:", error);
-          Swal.fire("Error", "No se pudo crear el Progress Sheet", "error");
+          setModalTitle("Error");
+          setModalMessage("No se pudo crear el Progress Sheet");
+          setModalType("danger");
+          setModalAction(() => () => setModalOpen(false));
+          setModalOpen(true);
         } finally {
           setIsLoading(false);
         }
       }
     };
-
     createProgressSheetIfNotExists();
   }, [currentProgressSheet, createProgressSheet, studentId, getUserById]);
   const studentEvents = getEventsByStudentId(studentId);
@@ -100,42 +109,42 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
     try {
       // Usar currentProgressSheet si progressSheet no está disponible
       const targetProgressSheet = progressSheet || currentProgressSheet;
-      
       if (!targetProgressSheet) {
-        Swal.fire(
-          "Error",
-          "No se encontró un Progress Sheet para este estudiante",
-          "error"
-        );
+        setModalTitle("Error");
+        setModalMessage("No se encontró un Progress Sheet para este estudiante");
+        setModalType("danger");
+        setModalAction(() => () => setModalOpen(false));
+        setModalOpen(true);
         return;
       }
-
       setIsLoading(true); // Mostrar mensaje de carga
-
       const updatedProgressClasses = [
         ...targetProgressSheet.progressClasses,
         { ...data, createdAt: Date.now(), updatedAt: Date.now() },
       ];
-
       const updatedProgressSheet: progressSheetInterface = {
         ...targetProgressSheet,
         progressClasses: updatedProgressClasses,
         updatedAt: Date.now(),
       };
-
       // Actualizar en Firebase
       await updateProgressSheet(updatedProgressSheet);
-
       // Actualizar el estado local
       setCurrentProgressSheet(updatedProgressSheet);
-
-      Swal.fire("Éxito", "El registro se ha agregado correctamente", "success");
-
+      setModalTitle("Éxito");
+      setModalMessage("El registro se ha agregado correctamente");
+      setModalType("success");
+      setModalAction(() => () => setModalOpen(false));
+      setModalOpen(true);
       // Limpiar el formulario
       reset();
     } catch (error) {
       console.error("Error al agregar el registro:", error);
-      Swal.fire("Error", "No se pudo agregar el registro", "error");
+      setModalTitle("Error");
+      setModalMessage("No se pudo agregar el registro");
+      setModalType("danger");
+      setModalAction(() => () => setModalOpen(false));
+      setModalOpen(true);
     } finally {
       setIsLoading(false); // Ocultar mensaje de carga
     }
@@ -145,7 +154,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
   const eventOptions =
     studentEvents?.map((event) => ({
       value: event.id,
-      label: event.name,
+      label: `${event.name} (${new Date(event.date).toLocaleDateString("es-ES")})`, // Mostrar nombre y fecha del evento
     })) ?? [];
 
   return (
@@ -179,7 +188,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
                 {...field}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 options={eventOptions as SingleValue<any>[]}
-                placeholder="Seleccione un evento"
+                placeholder="Seleccione un evento donde ha participado el estudiante"
                 className="w-full"
                 classNamePrefix="react-select"
                 isSearchable // Habilitar búsqueda
@@ -317,20 +326,11 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
             type="button"
             className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
             onClick={() => {
-              Swal.fire({
-                title: "¿Estás seguro?",
-                text: "Los cambios no guardados se perderán",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Sí, cancelar",
-                cancelButtonText: "No, continuar",
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  reset();
-                }
-              });
+              setModalTitle("¿Estás seguro?");
+              setModalMessage("Los cambios no guardados se perderán");
+              setModalType("warn");
+              setModalAction(() => () => { reset(); setModalOpen(false); });
+              setModalOpen(true);
             }}
             disabled={isLoading}
           >
@@ -352,6 +352,14 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
           </button>
         </div>
       </form>
+    <CustomModal
+      isOpen={modalOpen}
+      title={modalTitle}
+      message={modalMessage}
+      type={modalType}
+      onConfirm={modalAction}
+      onCancel={() => setModalOpen(false)}
+    />
     </div>
   );
 };

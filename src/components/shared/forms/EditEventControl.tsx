@@ -10,7 +10,7 @@ import {
     // subLevel
 } from "../../../interface";
 import { Controller, useForm } from "react-hook-form";
-import Swal from "sweetalert2";
+import CustomModal from "../../../components/CustomModal";
 import { footerMail, sendCustomEmail } from "../../../store/firebase/helper";
 interface Props {
     eventId: string
@@ -44,6 +44,13 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [aditionalStudents, setAditionalStudents] = useState<any[]>([]);
 
+    // Estados para CustomModal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalMessage, setModalMessage] = useState("");
+    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
+
     const onSubmit = handleSubmit(async (data: event) => {
         const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
         console.debug(aditionalStudentsToSave);
@@ -56,7 +63,7 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
         data.students = allstudents as students;//change for STUDENTS
         if (data.teacher) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const newTeacher = data.teacher as any
+            const newTeacher = data.teacher as any;
             data.teacher = newTeacher.value;
             data.meetLink = teachers.find((user) => user.id === data.teacher) ? teachers.find((user) => user.id === data.teacher)?.teacherLink : null;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,47 +71,50 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
             data.levels[0].level = newLevel.value;
             // console.debug('👀 level[0].level =>', data.levels[0].level);
             console.debug({ data });
-            // return;
-            Swal.fire({
-                title: 'Actualizando Reservación',
-                html: 'Espere un momento por favor',
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading()  //swal loading
-                },
-            })
-            await editEvent(data).then(() => {
-                Swal.fire({
-                    title: 'Reservación actualizada',
-                    text: `Reservación actualizada con éxito`,
-                    icon: 'success',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'Aceptar',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        const text = `Se ha actualizado el horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
-                        await sendCustomEmail({
-                            to: [getUserById(data.teacher!)!.email!],
-                            message: {
-                                subject: 'Actualizacion de horario de clase',
-                                text: `Hola, ${getUserById(data.teacher!)!.name} ${text}`,
-                                html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1> <p>${text}</p>${footerMail}`
-                            },
-                        });
-                        window.location.reload();
-                    }
-                })
-            }).catch((error) => {
-                Swal.fire('Error', `${error.message}`, 'error');
+            setModalTitle('Actualizando Reservación');
+            setModalMessage('Espere un momento por favor');
+            setModalType('info');
+            setModalAction(() => async () => {}); // No acción en loading
+            setModalOpen(true);
+            try {
+                await editEvent(data);
+                setModalTitle('Reservación actualizada');
+                setModalMessage('Reservación actualizada con éxito');
+                setModalType('success');
+                setModalAction(() => async () => {
+                    const text = `Se ha actualizado el horario de clase con fecha y hora : ${new Date(data.date).toLocaleTimeString([], { year: '2-digit', month: "2-digit", day: '2-digit', hour: '2-digit', minute: '2-digit' })} con el nombre de ${data.name}, con estudiantes de la(s) unidad(es) ${data.levels[0].subLevels.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(', ')}, en modalida de ${levels.find((level) => level.id === data.levels[0].level)?.name}.`;
+                    await sendCustomEmail({
+                        to: [getUserById(data.teacher!)!.email!],
+                        message: {
+                            subject: 'Actualizacion de horario de clase',
+                            text: `Hola, ${getUserById(data.teacher!)!.name} ${text}`,
+                            html: `<h1>Hola, ${getUserById(data.teacher!)!.name}</h1> <p>${text}</p>${footerMail}`
+                        },
+                    });
+                    setModalOpen(false);
+                    window.location.reload();
+                });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (error: any) {
+                setModalTitle('Error');
+                setModalMessage(error.message || 'Ocurrió un error al actualizar la reservación');
+                setModalType('danger');
+                setModalAction(() => () => setModalOpen(false));
                 console.error(error);
-            });
-            // reset(defaultValues);
-
+            }
         }
 
     })
     return (
         <div className="flex">
+            <CustomModal
+                isOpen={modalOpen}
+                title={modalTitle}
+                message={modalMessage}
+                type={modalType}
+                onConfirm={modalAction}
+                onCancel={() => setModalOpen(false)}
+            />
             <form className=" flex w-full max-w-lg" onSubmit={onSubmit}>
                 <div className="flex flex-wrap mx-3 mb-6">
                     {/*Name*/}

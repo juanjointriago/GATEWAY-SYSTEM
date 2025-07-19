@@ -19,7 +19,7 @@ export const ProgressSheetPage = () => {
   const getEventById = useEventStore((state) => state.getEventById);
   const user = useAuthStore((state) => state.user);
   const isTeacher = user && user.role === "teacher";
-  
+
   const student = getUserById(uid!);
   const columns = useProgressClassesColumns(getEventById);
   
@@ -54,7 +54,7 @@ export const ProgressSheetPage = () => {
         {hasProgressSheet ? (
           <>
             {/* Información del Contrato - Siempre visible cuando existe progressSheet */}
-            <ContractInfo progressSheet={myProgressSheet[0]} />
+            {<ContractInfo progressSheet={myProgressSheet[0]} />}
 
             {/* Progress Classes Table o Mensaje de No Grades */}
             {hasProgressClasses ? (

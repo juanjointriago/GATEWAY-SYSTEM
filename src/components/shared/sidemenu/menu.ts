@@ -14,8 +14,8 @@ interface MenuItem {
 
 
 const admin: MenuItem[] = [ 
-  { title: 'Noticias', subTitle: 'Informativo de novedades', href: '/dashboard/news', Icon: IoNewspaper, active: true },
   { title: 'Dashboard', subTitle: 'Estadisticas del sitio', href: '/dashboard', Icon: IoSpeedometerOutline, active: true },
+  { title: 'Noticias', subTitle: 'Informativo de novedades', href: '/dashboard/news', Icon: IoNewspaper, active: true },
   { title: 'Libros', subTitle: 'Material de apoyo', href: '/dashboard/units', Icon: IoBook, active: true },
   { title: 'Usuarios', subTitle: 'Gestión de usuarios', href: '/dashboard/users', Icon: IoPerson, active: true },
   { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
