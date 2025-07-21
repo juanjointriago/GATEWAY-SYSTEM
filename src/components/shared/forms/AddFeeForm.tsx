@@ -20,7 +20,7 @@ export const AddFeeForm = () => {
   const getUserByRole = useUserStore((state) => state.getUserByRole);
   const createFee = useFeesStore((state) => state.createFee);
   const { user } = useAuthStore();
-  const { getProgressSheetByStudentId, updateProgressSheet } = useProgressSheetStore();
+  const { getProgressSheetByStudentId } = useProgressSheetStore();
   const [isLoading] = useState(false);
   const [error] = useState<string | null>(null);
   const [customModalOpen, setCustomModalOpen] = useState(false);
@@ -186,38 +186,8 @@ export const AddFeeForm = () => {
         imageUrl,
       };
 
-      // Solo actualizar el progress sheet si el usuario es admin/teacher
-      // Los estudiantes deben esperar a que se apruebe el pago
-      if (user?.role === 'admin' || user?.role === 'teacher') {
-        // Actualizar los valores del progress sheet
-        const paymentAmount = Number(fee.qty); // Asegurar que sea número
-        
-        // Validar que el monto sea válido
-        if (isNaN(paymentAmount) || paymentAmount <= 0) {
-          showModal('Error', 'El monto del pago debe ser un número válido mayor a 0', 'danger');
-          setIsUploading(false);
-          return;
-        }
-        
-        const currentTotalPaid = Number(progressSheet.totalPaid || 0);
-        const currentTotalDue = Number(progressSheet.totalDue || 0);
-        
-        const updatedProgressSheet = {
-          ...progressSheet,
-          totalPaid: currentTotalPaid + paymentAmount,
-          totalDue: Math.max(0, currentTotalDue - paymentAmount), // Asegurar que no sea negativo
-          updatedAt: Date.now(),
-        };
-
-        // Guardar el fee y actualizar el progress sheet
-        await Promise.all([
-          createFee(feeToSave),
-          updateProgressSheet(updatedProgressSheet)
-        ]);
-      } else {
-        // Si es estudiante, solo guardar el fee (sin actualizar progressSheet)
-        await createFee(feeToSave);
-      }
+      // Al registrar un pago, solo guardar el fee (sin actualizar progressSheet)
+      await createFee(feeToSave);
 
       // Enviar email de notificación
       await sendPaymentNotificationEmail(feeToSave, student, progressSheet);
