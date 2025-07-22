@@ -21,7 +21,6 @@ const changeVisualAction = (status: status) => {
         default:
             return '❌ CANCELAR CLASE'
     }
-
 }
 
 const changeVisualColor = (status: status) => {
