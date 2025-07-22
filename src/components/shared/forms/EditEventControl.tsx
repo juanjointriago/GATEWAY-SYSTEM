@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FC, useState } from "react";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
@@ -28,28 +29,56 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
     const getUserByRole = useUserStore(state => state.getUserByRole);
     const students = getUserByRole('student').filter((student)=>student.isActive)!;
     const teachers = [...getUserByRole('teacher')!, ...getUserByRole('admin')!];
+       const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalMessage, setModalMessage] = useState("");
+    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
+    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
 
-    //To formulary
-    const defaultValues: event = {
-        ...getEventById(eventId)!,
+    // Obtener el evento y transformar valores para los selects
+    const eventToEdit = getEventById(eventId);
+
+    // Transformar teacher a { value, label }
+    const teacherOption = eventToEdit && eventToEdit.teacher
+        ? teachers.map(t => ({ value: t.id, label: t.name })).find(t => t.value === eventToEdit.teacher)
+        : null;
+
+    // Transformar level a { value, label }
+    const levelOption = eventToEdit && eventToEdit.levels[0]?.level
+        ? levels.map(l => ({ value: l.id, label: l.name })).find(l => l.value === eventToEdit.levels[0].level)
+        : null;
+
+    // Transformar subLevels a array de { value, label }
+    const subLevelOptions = eventToEdit && eventToEdit.levels[0]?.subLevels?.map(subId => {
+        const sub = sublevels.find(s => s.id === subId);
+        return sub ? { value: sub.id, label: sub.name } : null;
+    }).filter(Boolean);
+
+    const defaultValues: event = eventToEdit ? {
+        ...eventToEdit,
+        teacher: teacherOption ? teacherOption.value ?? null : null,
+        levels: [{
+            level: levelOption && typeof levelOption.value === "string" ? levelOption.value : "",
+            subLevels: subLevelOptions ? subLevelOptions.map(opt => opt!.value!).filter((v): v is string => typeof v === 'string') : []
+        }],
         updatedAt: Date.now()
-    };
+    } : {} as event;
 
-
-    console.debug('EVENT TO EDIT ', { event: getEventById(eventId) });
-    // console.debug('EVENT TO EDIT ', { defaultValues });
-    // console.debug('EVENT TO EDIT ',  defaultValues.levels[0].subLevels );
+    console.debug('EVENT TO EDIT ', { event: eventToEdit });
 
     const { control, handleSubmit, formState: { errors } } = useForm<event>({ defaultValues })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [aditionalStudents, setAditionalStudents] = useState<any[]>([]);
 
     // Estados para CustomModal
-    const [modalOpen, setModalOpen] = useState(false);
-    const [modalTitle, setModalTitle] = useState("");
-    const [modalMessage, setModalMessage] = useState("");
-    const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>('info');
-    const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
+
+    if (!eventToEdit) {
+        return (
+            <div className="flex">
+                <div>No se encontró el evento</div>
+            </div>
+        );
+    }
 
     const onSubmit = handleSubmit(async (data: event) => {
         const aditionalStudentsToSave: students = aditionalStudents.reduce((acc, curr) => ({ ...acc, [curr.value]: { status: 'COMMING' } }), {});
@@ -180,17 +209,13 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             rules={{ required: "El docente es obligatorio 👀" }}
                             control={control}
                             name="teacher"
-                            render={({ field: { onChange, onBlur, ref, name } }) => (
-
+                            render={({ field: { onChange, onBlur, value, ref, name } }) => (
                                 <Select
                                     name={name}
                                     id={name}
-                                    // {...field}
                                     components={animatedComponents}
-                                    defaultInputValue={defaultValues.teacher ? getUserByRole('teacher')?.find(user => user.id === defaultValues.teacher)?.name : 'Profesor'}
-                                    // isMulti
-                                    options={teachers && teachers.map(teacher => ({ value: teacher.id, label: teacher.name }))}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    value={value}
+                                    options={teachers.map(teacher => ({ value: teacher.id, label: teacher.name }))as any}
                                     onChange={onChange}
                                     placeholder="Profesor"
                                     onBlur={onBlur}
@@ -207,24 +232,17 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             rules={{ required: "La modalidad es obligatoria 👀" }}
                             control={control}
                             name="levels.0.level"
-                            render={({ field: { onChange, onBlur, ref, name } }) => (
+                            render={({ field: { onChange, onBlur, value, ref, name } }) => (
                                 <Select
-                                    // {...field}
                                     ref={ref}
                                     name={name}
                                     id={name}
                                     components={animatedComponents}
-                                    defaultInputValue={defaultValues.levels[0].level ? levels.find(level => level.id === defaultValues.levels[0].level)?.name : 'Modalidad'}
+                                    value={value}
                                     placeholder="Modalidad"
-                                    options={levels.map(level => ({ value: level.id, label: level.name }))}
+                                    options={levels.map(level => ({ value: level.id, label: level.name }))as any }
                                     onBlur={onBlur}
                                     onChange={onChange}
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                // onChange={(e: any) => {
-                                //     setValue('levels.0.level', e.value);
-                                //     if (!e.value) return
-                                //     setLevelEvent(e.value);
-                                // }}
                                 />
                             )}
                         />
@@ -239,28 +257,18 @@ export const EditEventControl: FC<Props> = ({ eventId }) => {
                             rules={{ required: "La(s) unidad(es) es(son) obligatoria(s) 👀" }}
                             control={control}
                             name="levels.0.subLevels"
-                            render={({ field: { onBlur, onChange, ref, name } }) => (
-                                // console.debug(getValues("levels.0.level")),
+                            render={({ field: { onBlur, onChange, value, ref, name } }) => (
                                 <Select
-                                    // {...field}
                                     ref={ref}
                                     name={name}
                                     id={name}
                                     onBlur={onBlur}
                                     onChange={onChange}
-                                    // value={value}
+                                    value={value}
                                     components={animatedComponents}
-                                    defaultInputValue={getEventById(eventId)?.levels[0].subLevels?.map(sublevel => sublevels.find(sub => sub.id === sublevel)?.name).join(' - ') ?? 'Unidades'}
                                     isMulti
                                     placeholder="Unidades"
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     options={sublevels.map(sublevel => ({ value: sublevel.id, label: sublevel.name })) as any}
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                // onChange={(e: any) => {
-                                //     console.debug('SUB-LEVELID', { e });
-                                //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                //     setValue('levels.0.subLevels', e);
-                                // }}
                                 />
                             )}
                         />
