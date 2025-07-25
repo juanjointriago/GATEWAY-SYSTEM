@@ -29,8 +29,8 @@ export const Presentation = () => {
   const [modal, setModal] = useState<{ open: boolean, title: string, desc: string, icon: string } | null>(null);
 
   return (
-    <div className=" bg-gradient-to-br from-indigo-50 to-blue-100 md:py-8 py-2 px-2 md:px-8 overflow-y-auto flex justify-center items-start">
-      <div className=" w-full bg-white/90 rounded-2xl shadow-2xl p-4 md:p-12 mt-0 md:mt-8">
+    <div className="bg-gradient-to-br from-indigo-50 to-blue-100 min-h-[100vh] w-full flex justify-center px-0 md:px-8">
+      <div className="w-full max-w-4xl bg-white/90 rounded-2xl shadow-2xl p-4 md:p-12 overflow-y-auto" style={{maxHeight: '100vh'}}>
         <h1 className="text-3xl md:text-5xl font-extrabold text-indigo-700 mb-2 flex items-center gap-2">🚀 Gateway Academic</h1>
         <p className="text-lg md:text-xl text-gray-700 mb-6">Plataforma integral para la gestión académica, administrativa y financiera de instituciones educativas. Rápida, responsiva y accesible desde cualquier dispositivo.</p>
 
