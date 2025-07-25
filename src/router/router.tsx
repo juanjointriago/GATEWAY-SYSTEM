@@ -25,6 +25,7 @@ import { ProgressSheetMain } from "../pages/progress-sheet/PrograssSheetMain";
 import DeleteUserData from "../pages/auth/ErasePage";
 import { NotificationPage } from "../pages/notification/NotificationPage";
 import { SettingsPage } from "../pages/settings/SettingsPage";
+import { Presentation } from "../pages/landding/Presentation";
 
 export const router = createBrowserRouter([
   {
@@ -41,13 +42,13 @@ export const router = createBrowserRouter([
             path: "",
             element: <DashboardPage />,
           },
-          { 
-            path: "news", 
-            element: <NewsPage /> 
+          {
+            path: "news",
+            element: <NewsPage />,
           },
           {
-            path: "student-progress", 
-            element: <ProgressSheetMain /> 
+            path: "student-progress",
+            element: <ProgressSheetMain />,
           },
           {
             path: "users",
@@ -128,6 +129,10 @@ export const router = createBrowserRouter([
           {
             path: "erase-my-data",
             element: <DeleteUserData />,
+          },
+          {
+            path: "new-stages",
+            element: <Presentation />,
           },
         ],
       },
