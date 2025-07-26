@@ -671,7 +671,7 @@ export const DashboardAdmin: FC = () => {
                                 <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-2 rounded-full mr-3">
                                     <IoCalendar className="text-white" size={18} />
                                 </div>
-                                Eventos Recientes
+                                Reservaciones Recientes
                             </h3>
                             <div className="text-sm text-gray-500">
                                 Últimos 30 días
