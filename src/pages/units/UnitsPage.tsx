@@ -227,7 +227,9 @@ export const UnitsPage = () => {
     if (user.role === 'admin') {
       data = books;
     } else {
-      data = user.unitsForBooks ? books.filter((unit) => user.unitsForBooks.includes(unit.sublevel)) : [];
+      data = user.unitsForBooks && user.unitsForBooks.length > 0
+        ? books.filter((unit) => user.unitsForBooks.some((ufb) => ufb === unit.sublevel))
+        : [];
     }
     // Ordenar por orderNumber ascendente
     return [...data].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
@@ -290,7 +292,7 @@ export const UnitsPage = () => {
         )}
 
         {/* Solo botón de exportación para no admin */}
-        {!isAdmin && (
+        {isAdmin && (
           <div className="mb-6 flex justify-end">
             <button 
               onClick={handleExportToExcel}
