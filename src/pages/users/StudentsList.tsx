@@ -40,7 +40,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
   const user = useAuthStore((state) => state.user);
 
   const isAdmin = user && user.role === "admin";
-  //   const isTeacher = user && user.role === 'teacher';
+    const isTeacher = user && user.role === 'teacher';
   const navigate = useNavigate(); // Hook para redirigir
 
   // Filtrar estudiantes basado en la búsqueda
@@ -149,7 +149,7 @@ export const StudentsList: FC<Props> = ({ record }) => {
                     </div>
                   </div>
 
-                  {isAdmin && (
+                  {(isAdmin || isTeacher) && (
                     <FabButton
                       isActive
                       tootTipText="Ver Progress Sheet"

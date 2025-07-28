@@ -35,7 +35,7 @@ import { exportEventsToExcel } from "../../helpers/excel.helper";
 
 export const EventsPage = () => {
   const [showModal, setShowModal] = useState(false);
-  
+
   const events = useEventStore((state) => state.events);
   const users = useUserStore((state) => state.users);
   const user = useAuthStore((state) => state.user);
@@ -50,43 +50,48 @@ export const EventsPage = () => {
 
   // Estados para CustomModal
   const [modalMessage, setModalMessage] = useState<string | null>(null);
-  const [modalType, setModalType] = useState<'success' | 'error' | 'warn' | 'info' | null>(null);
-  const [confirmAction, setConfirmAction] = useState<null | (() => Promise<void> | void)>(null);
+  const [modalType, setModalType] = useState<
+    "success" | "error" | "warn" | "info" | null
+  >(null);
+  const [confirmAction, setConfirmAction] = useState<
+    null | (() => Promise<void> | void)
+  >(null);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
-    type: 'warn' | 'info' | 'danger' | 'success';
-  }>({ isOpen: false, title: '', message: '', type: 'warn' });
+    type: "warn" | "info" | "danger" | "success";
+  }>({ isOpen: false, title: "", message: "", type: "warn" });
 
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportEventsToExcel(events);
       if (success) {
-        setModalType('success');
-        setModalMessage('El archivo Excel ha sido descargado exitosamente');
+        setModalType("success");
+        setModalMessage("El archivo Excel ha sido descargado exitosamente");
       } else {
-        setModalType('error');
-        setModalMessage('No se pudo exportar el archivo Excel');
+        setModalType("error");
+        setModalMessage("No se pudo exportar el archivo Excel");
       }
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      setModalType('error');
-      setModalMessage('Ocurrió un error al exportar el archivo');
+      setModalType("error");
+      setModalMessage("Ocurrió un error al exportar el archivo");
     }
   }, [events]);
 
-  const iconEdit:IconType = isAdmin?IoPencil:MdPerson
+  const iconEdit: IconType = isAdmin ? IoPencil : MdPerson;
 
-  const columns = useMemo<ColumnDef<event>[]>(
-    
-    () => {
-      const teacherFilter: FilterFn<event> = (row, columnId, filterValue) => {
-        const teacherId = row.getValue<string>(columnId);
-        const teacher = users.find((user) => user.id === teacherId);
-        return teacher?.name?.toLowerCase().includes(filterValue.toLowerCase()) || false;
-      };
-      return [
+  const columns = useMemo<ColumnDef<event>[]>(() => {
+    const teacherFilter: FilterFn<event> = (row, columnId, filterValue) => {
+      const teacherId = row.getValue<string>(columnId);
+      const teacher = users.find((user) => user.id === teacherId);
+      return (
+        teacher?.name?.toLowerCase().includes(filterValue.toLowerCase()) ||
+        false
+      );
+    };
+    return [
       {
         accessorFn: (row) => row.date,
         id: "date",
@@ -111,7 +116,11 @@ export const EventsPage = () => {
       },
       {
         accessorKey: "name",
-        cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
+        cell: (info) => (
+          <p className="text-start text-nowrap text-xs">
+            {info.getValue() as string}
+          </p>
+        ),
         header: () => <span>Name</span>,
       },
       {
@@ -131,16 +140,20 @@ export const EventsPage = () => {
           });
           return `${formattedDate} ${formattedTime}`;
         },
-          filterFn: "includesString",
+        filterFn: "includesString",
         header: () => <span className="text-xs">F. Limite Resevarcion</span>,
       },
       {
         accessorKey: "teacher",
         cell: (info) => {
           const teacher = users.find(
-            (user) => user.id === info.getValue() as string
+            (user) => user.id === (info.getValue() as string)
           );
-          return teacher ? <span>{teacher.name}</span> : <span>Sin docente</span>;
+          return teacher ? (
+            <span>{teacher.name}</span>
+          ) : (
+            <span>Sin docente</span>
+          );
         },
         header: () => <span>Docente</span>,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,28 +166,28 @@ export const EventsPage = () => {
         cell: (info) => {
           // console.debug('meetLink =>',info.row.original);
           return (
-          <>
-            {info.getValue() ? (
-              <NavLink
-                to={info.getValue() as string}
-                target="_blank"
-                end
-                rel="noreferrer noopener"
-              >
-                <span className="text-sm text-blue-500 md:block">
-                  🧑‍💻 Ir a reunión
+            <>
+              {info.getValue() ? (
+                <NavLink
+                  to={info.getValue() as string}
+                  target="_blank"
+                  end
+                  rel="noreferrer noopener"
+                >
+                  <span className="text-sm text-blue-500 md:block">
+                    🧑‍💻 Ir a reunión
+                  </span>
+                </NavLink>
+              ) : (
+                <span className="text-sm  text-blue-500 md:block">
+                  Sin enlace configurado
                 </span>
-              </NavLink>
-            ) : (
-              <span className="text-sm  text-blue-500 md:block">
-                Sin enlace configurado
-              </span>
-            )}
-          </>
-        )},
+              )}
+            </>
+          );
+        },
         header: () => <span>MeetLink</span>,
         enableColumnFilter: false,
-
       },
       {
         accessorKey: "students",
@@ -186,7 +199,10 @@ export const EventsPage = () => {
                 <>
                   {" "}
                   {!record.row.original.students.length ? (
-                    <StudentsList key={record.row.original.id} record={record.row.original.students} />
+                    <StudentsList
+                      key={record.row.original.id}
+                      record={record.row.original.students}
+                    />
                   ) : (
                     <div>Sin asistentes</div>
                   )}{" "}
@@ -207,140 +223,193 @@ export const EventsPage = () => {
             </>
           );
         },
-        header: () => <span className={`${isAdmin?'text-xs':undefined}`}>{isAdmin?'Asistentes':'Confirmar asistencia'}</span>,
+        header: () => (
+          <span className={`${isAdmin ? "text-xs" : undefined}`}>
+            {isAdmin ? "Asistentes" : "Confirmar asistencia"}
+          </span>
+        ),
         enableColumnFilter: false,
       },
       {
         accessorKey: "isActive",
         header: () => <span>Acciones</span>,
         cell: (info) => {
-         return (
-          <div className="flex flex-direction-row">
-            {/* //Cambiar estado */}
-            {isAdmin ? (
-              <ToggleButton
-                isActive={info.getValue() as boolean}
-                action={() => {
-                  setConfirmModal({
-                    isOpen: true,
-                    title: '¿Estás seguro?',
-                    message: `Estás a punto de ${info.getValue() ? 'ocultar' : 'mostrar'} esta reservación`,
-                    type: 'warn',
-                  });
-                  setConfirmAction(() => async () => {
-                    await updateEvent({
-                      ...info.row.original,
-                      isActive: !(info.getValue() as boolean),
+          return (
+            <div className="flex flex-direction-row">
+              {/* //Cambiar estado */}
+              {isAdmin ? (
+                <ToggleButton
+                  isActive={info.getValue() as boolean}
+                  action={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      title: "¿Estás seguro?",
+                      message: `Estás a punto de ${
+                        info.getValue() ? "ocultar" : "mostrar"
+                      } esta reservación`,
+                      type: "warn",
                     });
-                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-                    window.location.reload();
-                  });
-                }}
-              />
-            ) : (
-              <div>{info.getValue() as boolean ? "Público" : "Privado"}</div>
-            )}
-            {/* //Editar reservación */}
-            {isAdmin && (
-              <FabButton
-                isActive
-                tootTipText={""}
-                action={() => {
-                  setOpenModal(true);
-                  setEventToEdit(info.row.original.id);
-                }}
-                Icon={iconEdit}
-              />
-            )}
-            {/* //Eliminar reservación */}
-            {isAdmin && (
-              <FabButton
-                isActive
-                Icon={IoTrash}
-                action={() => {
-                  setConfirmModal({
-                    isOpen: true,
-                    title: '¿Estás seguro?',
-                    message: 'Estás a punto de eliminar esta reservación',
-                    type: 'danger',
-                  });
-                  setConfirmAction(() => async () => {
-                    await deleteEvent(info.row.original.id!);
-                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-                    window.location.reload();
-                  });
-                }}
-              />
-            )}
-            {/* //envio correo Admin */}
-            {isAdmin && (
-              <FabButton
-                isActive
-                tootTipText={""}
-                action={() => {
-                  setConfirmModal({
-                    isOpen: true,
-                    title: '¿Estás seguro?',
-                    message: 'Estás a punto de enviar un correo al docente de esta reservación',
-                    type: 'info',
-                  });
-                  setConfirmAction(() => async () => {
-                    const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(
-                      info.row.original.date
-                    ).toLocaleTimeString([], {
-                      year: "2-digit",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })} con el nombre de ${
-                      info.row.original.name
-                    }, con estudiantes de la(s) unidad(es) ${info.row.original.levels[0].subLevels
-                      .map(
-                        (sublevel) =>
-                          sublevels.find((sub) => sub.id === sublevel)?.name
-                      )
-                      .join(", ")}, en modalida de ${
-                      levels.find(
-                        (level) => level.id === info.row.original.levels[0].level
-                      )?.name
-                    }.`;
-                    await sendCustomEmail({
-                      to: [
-                        users.find((user) => user.id === info.row.original.teacher)!
-                          .email!,
-                      ],
-                      message: {
-                        subject: "Recordatorio de reservación",
-                        text: `Hola, ${
-                          users.find((user) => user.id === info.row.original.teacher)?.name
-                        } ${text}`,
-                        html: `<h1>Hola, ${
-                          users.find((user) => user.id === info.row.original.teacher)?.name
-                        }</h1> <p>${text}</p> ${footerMail}`,
-                      },
+                    setConfirmAction(() => async () => {
+                      await updateEvent({
+                        ...info.row.original,
+                        isActive: !(info.getValue() as boolean),
+                      });
+                      setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                      window.location.reload();
                     });
-                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-                    setModalType('success');
-                    setModalMessage(`Se ha enviado un correo a ${users.find((user) => user.id === info.row.original.teacher)?.name}`);
-                  });
-                }}
-                Icon={IoMail}
-              />
-            )}
-          </div>
-        ) 
+                  }}
+                />
+              ) : (
+                <div>
+                  {(info.getValue() as boolean) ? "Público" : "Privado"}
+                </div>
+              )}
+              {/* //Editar reservación */}
+              {isAdmin && (
+                <FabButton
+                  isActive
+                  tootTipText={""}
+                  action={() => {
+                    setOpenModal(true);
+                    setEventToEdit(info.row.original.id);
+                  }}
+                  Icon={iconEdit}
+                />
+              )}
+              {/* //Eliminar reservación */}
+              {isAdmin && (
+                <FabButton
+                  isActive
+                  Icon={IoTrash}
+                  action={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      title: "¿Estás seguro?",
+                      message: "Estás a punto de eliminar esta reservación",
+                      type: "danger",
+                    });
+                    setConfirmAction(() => async () => {
+                      await deleteEvent(info.row.original.id!);
+                      setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                      window.location.reload();
+                    });
+                  }}
+                />
+              )}
+              {/* //envio correo Admin */}
+              {isAdmin && (
+                <FabButton
+                  isActive
+                  tootTipText={""}
+                  action={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      title: "¿Estás seguro?",
+                      message:
+                        "Estás a punto de enviar un correo al docente de esta reservación",
+                      type: "info",
+                    });
+                    setConfirmAction(() => async () => {
+                      const text = `Le recordamos que tiene asignado un horario de clase con fecha y hora : ${new Date(
+                        info.row.original.date
+                      ).toLocaleTimeString([], {
+                        year: "2-digit",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })} con el nombre de ${
+                        info.row.original.name
+                      }, con estudiantes de la(s) unidad(es) ${info.row.original.levels[0].subLevels
+                        .map(
+                          (sublevel) =>
+                            sublevels.find((sub) => sub.id === sublevel)?.name
+                        )
+                        .join(", ")}, en modalida de ${
+                        levels.find(
+                          (level) =>
+                            level.id === info.row.original.levels[0].level
+                        )?.name
+                      }.`;
+                      await sendCustomEmail({
+                        to: [
+                          users.find(
+                            (user) => user.id === info.row.original.teacher
+                          )!.email!,
+                        ],
+                        message: {
+                          subject: "Recordatorio de reservación",
+                          text: `Hola, ${
+                            users.find(
+                              (user) => user.id === info.row.original.teacher
+                            )?.name
+                          } ${text}`,
+                          html: `<h1>Hola, ${
+                            users.find(
+                              (user) => user.id === info.row.original.teacher
+                            )?.name
+                          }</h1> <p>${text}</p> ${footerMail}`,
+                        },
+                      });
+                      setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                      setModalType("success");
+                      setModalMessage(
+                        `Se ha enviado un correo a ${
+                          users.find(
+                            (user) => user.id === info.row.original.teacher
+                          )?.name
+                        }`
+                      );
+                    });
+                  }}
+                  Icon={IoMail}
+                />
+              )}
+            </div>
+          );
         },
         enableColumnFilter: false,
-      }
-    ]},
-    [ isAdmin, levels, sublevels, users, updateEvent, deleteEvent, setEventToEdit, isTeacher, user, iconEdit]
-  );
+      },
+    ];
+  }, [
+    isAdmin,
+    levels,
+    sublevels,
+    users,
+    updateEvent,
+    deleteEvent,
+    setEventToEdit,
+    isTeacher,
+    user,
+    iconEdit,
+  ]);
 
-  const sortedEvents = events.filter(event => event.isActive).sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedEvents = events
+    .filter((event) => event.isActive)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   // console.debug('events', events.length)
+  if (user && user.role === "student") {
+    console.debug(user);
+    console.debug(
+      "PREVIOUS",
+      sortedEvents.filter(
+        (event) =>
+          event.students[user.id!] &&
+          event.isActive &&
+          event.levels[0].level === user.level
+      ).length
+    );
+
+    console.debug(
+      "My Student Events",
+      events.filter(
+        (event) =>
+          event.students[user.id!] &&
+          event.levels[0].level == user.level &&
+          event.levels[0].subLevels.includes(user.subLevel!)
+      ).length
+    );
+  }
   return (
     <>
       {/* CustomModal de confirmación para acciones */}
@@ -360,18 +429,24 @@ export const EventsPage = () => {
       {/* Modal de mensaje custom */}
       {modalMessage && (
         <ModalGeneric
-          title={modalType === 'success' ? '¡Éxito!' : 'Error'}
+          title={modalType === "success" ? "¡Éxito!" : "Error"}
           isVisible={!!modalMessage}
           setIsVisible={() => setModalMessage(null)}
         >
-          <div className={`text-center text-lg ${modalType === 'success' ? 'text-green-600' : 'text-red-600'}`}>{modalMessage}</div>
+          <div
+            className={`text-center text-lg ${
+              modalType === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {modalMessage}
+          </div>
         </ModalGeneric>
       )}
       <div className="pt-5">
         <h1 className="ml-11 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
           Reservaciones
         </h1>
-        
+
         {/* Modal para editar evento */}
         {eventToEdit && (
           <ModalGeneric
@@ -387,22 +462,22 @@ export const EventsPage = () => {
             }
           />
         )}
-        
+
         {/* Modal para agregar nueva reservación */}
         {isAdmin && (
-          <ModalGeneric 
-            title="Crear Reservación" 
-            isVisible={showModal} 
-            setIsVisible={setShowModal} 
+          <ModalGeneric
+            title="Crear Reservación"
+            isVisible={showModal}
+            setIsVisible={setShowModal}
             children={<FormEventControl />}
           />
         )}
-        
+
         {/* Botón para agregar nueva reservación */}
         {isAdmin && (
           <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex flex-wrap gap-2">
-              <button 
+              <button
                 onClick={handleExportToExcel}
                 className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
               >
@@ -410,7 +485,7 @@ export const EventsPage = () => {
                 Exportar Excel
               </button>
             </div>
-            <button 
+            <button
               onClick={() => setShowModal(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
@@ -422,7 +497,7 @@ export const EventsPage = () => {
         {/* Solo botón de exportación para teachers */}
         {isTeacher && (
           <div className="mb-6 flex justify-end">
-            <button 
+            <button
               onClick={handleExportToExcel}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
@@ -431,22 +506,25 @@ export const EventsPage = () => {
             </button>
           </div>
         )}
-        
+
         {/* Tabla con TableGeneric */}
         {events && (
           <TableGeneric
             columns={columns}
-            data={(user &&
-                  (user.role === "admin"
-                    ? sortedEvents
-                    : user.role === "teacher"
-                    ? sortedEvents.filter((event) => event.teacher === user.id)
-                    : sortedEvents.filter(
-                        (event) =>
-                          event.students[user.id!] &&
-                          event.isActive &&
-                          event.levels[0].level === user.level
-                      )) )?? []}
+            data={
+              (user &&
+                (user.role === "admin"
+                  ? sortedEvents
+                  : user.role === "teacher"
+                  ? sortedEvents.filter((event) => event.teacher === user.id)
+                  : sortedEvents.filter(
+                      (event) =>
+                        event.students[user.id!] &&
+                        event.isActive &&
+                        event.levels[0].level === user.level
+                    ))) ??
+              []
+            }
           />
         )}
       </div>

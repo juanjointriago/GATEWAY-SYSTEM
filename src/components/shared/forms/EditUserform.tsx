@@ -633,7 +633,10 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     <button
                         type="button"
                         className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-sm"
-                        onClick={() => resetPasswordByEmail(user.email)}
+                        onClick={() => {
+                            console.log('enviando correo para reinicio de contraseña');
+                            console.log('user.email', user.email);
+                            resetPasswordByEmail(user.email)}}
                     >
                         <span>Enviar correo para reinicio de contraseña</span>
                         <span>🔑</span>

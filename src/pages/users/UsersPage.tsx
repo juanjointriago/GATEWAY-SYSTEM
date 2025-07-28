@@ -365,7 +365,7 @@ export const UsersPage = () => {
       const matchesSubLevel = selectedSubLevel
         ? user.subLevel === selectedSubLevel
         : true;
-      return matchesLevel && matchesSubLevel;
+      return matchesLevel && matchesSubLevel
     });
   }, [users, selectedLevel, selectedSubLevel]);
 
@@ -468,7 +468,7 @@ export const UsersPage = () => {
         )}
         
         {/* Modal */}
-        {<TableGeneric columns={columns} data={filteredUsers} />}
+        {<TableGeneric columns={columns} data={filteredUsers    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())} />}
       </div>
     </>
   );

@@ -52,6 +52,7 @@ export class AuthService {
   static resetPassword = async (email: string): Promise<{ status: 'success' | 'error'; message: string }> => {
     const auth = getAuth();
     try {
+      console.log('reseteando contrasena', email);
       await sendPasswordResetEmail(auth, email);
       return { status: 'success', message: `Reinicio de Contraseña: Revise la bandeja de ${email}` };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
