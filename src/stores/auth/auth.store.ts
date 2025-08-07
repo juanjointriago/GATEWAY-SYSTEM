@@ -29,16 +29,14 @@ export const storeAPI: StateCreator<AuthState, [["zustand/devtools", never], ["z
     sigUpUser: async (user:newUSer) =>  {await AuthService.signUp(user)},
 
     loginUser: async (email: string, password: string) => {
-        const user = await AuthService.login(email, password);
-        console.debug('auth.store/StoreAPI/loginUser ', { user });
-        if (user) {
-            // console.debug('login', { email, password })
-            console.debug('Caso de que existe usuario =>', { user });
-            set({ status: 'authorized', user: user.user });
+        const result = await AuthService.login(email, password);
+        console.debug('auth.store/StoreAPI/loginUser ', { result });
+        if (result.status === 'success' && result.user) {
+            set({ status: 'authorized', user: result.user });
             console.debug("USUARIO almacenado", get().user);
         } else {
             set({ status: 'unauthorized', user: undefined });
-            throw new Error('Unable to login');
+            throw new Error(result.message || 'Error al iniciar sesión');
         }
     },
 
