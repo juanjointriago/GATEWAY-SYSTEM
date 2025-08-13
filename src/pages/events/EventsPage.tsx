@@ -521,6 +521,8 @@ export const EventsPage = () => {
                       (event) =>
                         event.students[user.id!] &&
                         event.isActive 
+                        // &&
+                        // event.levels[0].level === user.level
                     ))) ??
               []
             }
