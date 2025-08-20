@@ -15,7 +15,7 @@ import { useProgressSheetStore } from "../progress-sheet/progresssheet.store";
 export type Authstatus = 'pending' | 'unauthorized' | 'authorized' | 'error' | 'loading' | 'success';
 export interface AuthState {
     status: Authstatus;
-    user?: FirestoreUser
+    user?: FirestoreUser;
     sigUpUser: (user:newUSer) => Promise<void>;
     loginUser: (email: string, password: string) => Promise<void>;
     loginGoogle: () => Promise<void>;
