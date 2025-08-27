@@ -230,7 +230,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
         </div>
 
         {/* NA */}
-        <div>
+        {/* <div>
           <label className="block text-gray-700 font-medium mb-2">NA *</label>
           <input
             type="text"
@@ -241,7 +241,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
           {errors.na && (
             <p className="text-red-500 text-sm mt-1">{errors.na.message}</p>
           )}
-        </div>
+        </div> */}
 
         {/* Observaciones */}
         <div>
@@ -293,7 +293,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
         </div>
 
         {/* RW */}
-        <div>
+        {/* <div>
           <label className="block text-gray-700 font-medium mb-2">RW *</label>
           <input
             type="text"
@@ -304,7 +304,7 @@ export const AddProgressClass: FC<Props> = ({ progressSheet, studentId }) => {
           {errors.rw && (
             <p className="text-red-500 text-sm mt-1">{errors.rw.message}</p>
           )}
-        </div>
+        </div> */}
 
         {/* Prueba */}
         <div>

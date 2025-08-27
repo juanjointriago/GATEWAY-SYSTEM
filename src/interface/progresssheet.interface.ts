@@ -4,14 +4,14 @@ type EventInfo = {
 }
 export interface progressClassesInterface {
     eventInfo:EventInfo
-    a:string
+    // a:string
     book:string
     lesson:string
-    na: string
+    // na: string
     observation: string
     part: string
     progress: string
-    rw: string
+    // rw: string
     test: string
     createdAt?: number
     updatedAt?: number
