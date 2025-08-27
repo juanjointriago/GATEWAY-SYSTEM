@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { unit } from "../../interface"
-import { useAuthStore, useUnitStore } from "../../stores";
+import { useAuthStore, useUnitStore, useSubLevelStore } from "../../stores";
 import { FormUnit } from "../../components/shared/forms/FormUnit";
 import { UrlIframe } from "../../components/shared/pdf/UrlIframe";
 import { NavLink } from "react-router-dom";
@@ -25,9 +25,13 @@ export const UnitsPage = () => {
   const isAdmin = user && user.role === 'admin';
   const getAllUnits = useUnitStore(state => state.getAndSetUnits);
   const books = useUnitStore(state => state.units);
+  const subLevels = useSubLevelStore(state => state.subLevels);
+  const getAndSetSubLevels = useSubLevelStore(state => state.getAndSetSubLevels);
+  
   const [openModal, setOpenModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [unitToEdit, setUnitToEdit] = useState<unit>();
+  const [selectedSublevel, setSelectedSublevel] = useState<string | null>(null);
 
   // Estados para CustomModal
   const [modal, setModal] = useState({
@@ -77,7 +81,8 @@ export const UnitsPage = () => {
 
   useEffect(() => {
     getAllUnits();
-  }, [getAllUnits]);
+    getAndSetSubLevels();
+  }, [getAllUnits, getAndSetSubLevels]);
   
   console.debug('UNIDADES', books);
 
@@ -93,12 +98,35 @@ export const UnitsPage = () => {
     },
     {
       accessorKey: 'sublevel',
-      header: 'Unidad',
+      header: () => (
+        <div>
+          <span>Unidad</span>
+          <select
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            value={selectedSublevel || ""}
+            onChange={(e) => setSelectedSublevel(e.target.value || null)}
+          >
+            <option value="">Todos</option>
+            {subLevels
+              .filter(sublevel => sublevel.isActive)
+              .map((sublevel) => (
+                <option key={sublevel.id} value={sublevel.id}>
+                  {sublevel.name}
+                </option>
+              ))}
+          </select>
+        </div>
+      ),
       cell: ({ row }) => (
         <div className="flex items-center">
           <SubLevelById subLevelId={row.getValue('sublevel')} />
         </div>
       ),
+      enableColumnFilter: false,
+      enableSorting: false,
+      filterFn: (row, columnId, filterValue) => {
+        return filterValue ? row.getValue(columnId) === filterValue : true;
+      },
     },
     {
       accessorKey: 'name',
@@ -218,9 +246,9 @@ export const UnitsPage = () => {
         );
       },
     },
-  ], [updateUnit, deleteUnit, isAdmin]);
+  ], [updateUnit, deleteUnit, isAdmin, selectedSublevel, subLevels]);
 
-  // Filtrar datos según el rol del usuario
+  // Filtrar datos según el rol del usuario y aplicar filtros
   const filteredData = useMemo(() => {
     if (!user) return [];
     let data: unit[] = [];
@@ -231,9 +259,15 @@ export const UnitsPage = () => {
         ? books.filter((unit) => user.unitsForBooks.some((ufb) => ufb === unit.sublevel))
         : [];
     }
+    
+    // Aplicar filtro por sublevel si está seleccionado
+    if (selectedSublevel) {
+      data = data.filter((unit) => unit.sublevel === selectedSublevel);
+    }
+    
     // Ordenar por orderNumber ascendente
     return [...data].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
-  }, [user, books]);
+  }, [user, books, selectedSublevel]);
 
   return (
     <>
