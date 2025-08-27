@@ -43,13 +43,7 @@ export const useProgressClassesColumns = (getEventById: (eventId: string) => { n
         cell: (info) => <p className="text-start text-nowrap text-xs">{info.getValue() as string}</p>,
         header: () => <span>Lesson</span>,
       },
-      {
-        accessorFn: (row) => row.na,
-        id: "na",
-        cell: (data) => <p className="text-start text-nowrap text-xs">{data.getValue() as string}</p>,
-        enableColumnFilter: false,
-        header: () => <span>NA</span>,
-      },
+
       {
         accessorFn: (row) => row.observation,
         id: "observation",
@@ -70,13 +64,6 @@ export const useProgressClassesColumns = (getEventById: (eventId: string) => { n
         cell: (data) => <p className="text-start text-nowrap text-xs">{data.getValue() as string}</p>,
         enableColumnFilter: false,
         header: () => <span>Progress</span>,
-      },
-      {
-        accessorFn: (row) => row.rw,
-        id: "rw",
-        cell: (data) => <p className="text-start text-nowrap text-xs">{data.getValue() as string}</p>,
-        enableColumnFilter: false,
-        header: () => <span>RW</span>,
       },
       {
         accessorFn: (row) => row.test,
