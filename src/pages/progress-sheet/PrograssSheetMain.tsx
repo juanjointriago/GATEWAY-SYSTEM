@@ -62,7 +62,7 @@ export const ProgressSheetMain: FC = () => {
 
   const handleViewProgressSheet = (studentId: string) => {
     console.log('Ver Progress Sheet del estudiante:', studentId);
-    // Aquí puedes agregar la lógica para navegar o mostrar el progress sheet
+    //TODO agregar la lógica para navegar o mostrar el progress sheet
   };
 
   return (

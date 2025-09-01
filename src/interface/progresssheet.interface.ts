@@ -59,6 +59,8 @@ export interface ProgressEntry {
     date: string;
     hour: string;
     book: string;
+    startClass?: string;
+    endClass?:string;
     progress: string;
     part: string;
     test: string;

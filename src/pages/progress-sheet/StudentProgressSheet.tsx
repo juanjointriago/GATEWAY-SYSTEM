@@ -141,6 +141,9 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
                 Fecha
               </th>
               <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Hora de Inicio:
+              </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
                 Hora
               </th>
               <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
@@ -161,6 +164,9 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
               <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
                 Observación
               </th>
+              <th className="px-2 py-2 text-xs md:text-sm font-semibold text-gray-700">
+                Fin de Clase
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
@@ -171,6 +177,9 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
               >
                 <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
                   {entry.date}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.startClass}
                 </td>
                 <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
                   {entry.hour}
@@ -193,6 +202,12 @@ export const StudentProgressSheet: FC<Props> = ({ studentID }) => {
                 <td className="px-2 py-2 text-xs md:text-sm text-gray-700">
                   {entry.observation}
                 </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.startClass}
+                </td>
+                <td className="px-2 py-2 text-xs md:text-sm text-gray-700 whitespace-nowrap">
+                  {entry.endClass}
+                </td> 
               </tr>
             ))}
           </tbody>
