@@ -510,7 +510,7 @@ export const EventsPage = () => {
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
               >
                 <IoRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                {isRefreshing ? 'Actualizando...' : 'Actualizar Eventos'}
+                {isRefreshing ? 'Actualizando...' : 'Actualizar Reservaciones'}
               </button>
             </div>
             <button
