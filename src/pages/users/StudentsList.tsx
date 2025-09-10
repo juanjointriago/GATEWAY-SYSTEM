@@ -29,6 +29,7 @@ const changeVisualStatus = (status: status) => {
   }
 };
 export const StudentsList: FC<Props> = ({ record }) => {
+  // console.debug('StudentList RECORD',{record})
   const getUserByRole = useUserStore((state) => state.getUserByRole);
   const studentIds = Object.keys(record);
   const allStudents = getUserByRole("student");

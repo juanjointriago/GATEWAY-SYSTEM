@@ -14,6 +14,7 @@ interface EventStore {
     createEvent: (event: event) => Promise<void>;
     updateEvent: (event: event) => Promise<void>;
     deleteEvent: (id: string) => Promise<void>;
+    clearCache: () => void;
 }
 
 
@@ -46,15 +47,24 @@ const storeAPI: StateCreator<EventStore, [["zustand/devtools", never], ["zustand
     getEventsByStudentId: (id: string) => get().events.filter(event => event.students[id]),
     createEvent: async (event: event) => {
         await EventService.createEvent(event);
-        set({ events: [...get().events, event] })
+        // Después de crear en Firebase, refrescar los eventos desde la base de datos
+        const events = await EventService.getEvents();
+        set({ events: [...events] });
     },
     updateEvent: async (event: event) => {
         await EventService.updateEvent(event);
-        set({ events: [...get().events.map(e => e.id === event.id ? event : e)] })
+        // Después de actualizar en Firebase, refrescar los eventos desde la base de datos
+        const events = await EventService.getEvents();
+        set({ events: [...events] });
     },
     deleteEvent: async (id: string) => {
         await EventService.deleteEventById(id);
-        set({ events: [...get().events.filter(event => event.id !== id)] })
+        // Después de eliminar en Firebase, refrescar los eventos desde la base de datos
+        const events = await EventService.getEvents();
+        set({ events: [...events] });
+    },
+    clearCache: () => {
+        set({ events: [] });
     }
 });
 

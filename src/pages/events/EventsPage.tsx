@@ -14,6 +14,7 @@ import {
   IoMail,
   IoPencil,
   IoTrash,
+  IoRefresh,
 } from "react-icons/io5";
 import { MdPerson, MdFileDownload } from "react-icons/md";
 import { NavLink } from "react-router-dom";
@@ -43,6 +44,7 @@ export const EventsPage = () => {
   const levels = useLevelStore((state) => state.levels);
   const updateEvent = useEventStore((state) => state.updateEvent);
   const deleteEvent = useEventStore((state) => state.deleteEvent);
+  const getAndSetEvents = useEventStore((state) => state.getAndSetEvents);
   const isAdmin = user && user.role === "admin";
   const isTeacher = user && user.role === "teacher";
   const [openModal, setOpenModal] = useState(false);
@@ -63,6 +65,9 @@ export const EventsPage = () => {
     type: "warn" | "info" | "danger" | "success";
   }>({ isOpen: false, title: "", message: "", type: "warn" });
 
+  // Estado para el loading del refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const handleExportToExcel = useCallback(async () => {
     try {
       const success = await exportEventsToExcel(events);
@@ -79,6 +84,21 @@ export const EventsPage = () => {
       setModalMessage("Ocurrió un error al exportar el archivo");
     }
   }, [events]);
+
+  const handleRefreshEvents = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await getAndSetEvents();
+      setModalType("success");
+      setModalMessage("Los eventos han sido actualizados exitosamente");
+    } catch (error) {
+      console.error("Error refreshing events:", error);
+      setModalType("error");
+      setModalMessage("Error al actualizar los eventos");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [getAndSetEvents]);
 
   const iconEdit: IconType = isAdmin ? IoPencil : MdPerson;
 
@@ -484,6 +504,14 @@ export const EventsPage = () => {
                 <MdFileDownload className="w-5 h-5" />
                 Exportar Excel
               </button>
+              <button
+                onClick={handleRefreshEvents}
+                disabled={isRefreshing}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+              >
+                <IoRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Actualizando...' : 'Actualizar Eventos'}
+              </button>
             </div>
             <button
               onClick={() => setShowModal(true)}
@@ -496,13 +524,35 @@ export const EventsPage = () => {
 
         {/* Solo botón de exportación para teachers */}
         {isTeacher && (
-          <div className="mb-6 flex justify-end">
+          <div className="mb-6 flex justify-end gap-2">
             <button
               onClick={handleExportToExcel}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
             >
               <MdFileDownload className="w-5 h-5" />
               Exportar Excel
+            </button>
+            <button
+              onClick={handleRefreshEvents}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              <IoRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Actualizando...' : 'Actualizar'}
+            </button>
+          </div>
+        )}
+
+        {/* Botón de actualización para estudiantes */}
+        {user && user.role === "student" && (
+          <div className="mb-6 flex justify-end">
+            <button
+              onClick={handleRefreshEvents}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200"
+            >
+              <IoRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Actualizando...' : 'Actualizar Eventos'}
             </button>
           </div>
         )}
