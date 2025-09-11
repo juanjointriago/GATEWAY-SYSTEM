@@ -301,6 +301,9 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     const [modalType, setModalType] = useState<'warn' | 'info' | 'danger' | 'success'>("info");
     const [modalAction, setModalAction] = useState<() => Promise<void> | void>(() => {});
     const [modalCancelable, setModalCancelable] = useState<boolean>(false);
+    
+    // Estado para loading del reset de contraseña
+    const [isResettingPassword, setIsResettingPassword] = useState(false);
 
     // Inicializar formulario con valores por defecto
     const { register, handleSubmit, watch, formState: { errors } } = useForm<FirestoreUser>({ 
@@ -317,6 +320,45 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         setModalAction(() => action || (() => setModalOpen(false)));
         setModalCancelable(cancelable);
         setModalOpen(true);
+    };
+
+    const handleResetPassword = async () => {
+        setIsResettingPassword(true);
+        try {
+            const result = await resetPasswordByEmail(user.email);
+            if (result.status === 'success') {
+                showModal(
+                    'Correo enviado exitosamente',
+                    `Se ha enviado un correo de recuperación de contraseña a ${user.email}. El usuario podrá cambiar su contraseña siguiendo las instrucciones del correo.`,
+                    'success'
+                );
+            } else {
+                showModal(
+                    'Error al enviar correo',
+                    result.message || 'Hubo un problema al enviar el correo de recuperación de contraseña.',
+                    'danger'
+                );
+            }
+        } catch (error) {
+            console.error('Error al enviar correo de recuperación:', error);
+            showModal(
+                'Error al enviar correo',
+                'Hubo un problema al enviar el correo de recuperación de contraseña. Por favor, inténtalo de nuevo más tarde.',
+                'danger'
+            );
+        } finally {
+            setIsResettingPassword(false);
+        }
+    };
+
+    const confirmResetPassword = () => {
+        showModal(
+            'Confirmar envío de correo',
+            `¿Estás seguro de que deseas enviar un correo de recuperación de contraseña a ${user.email}?`,
+            'info',
+            handleResetPassword,
+            true // cancelable
+        );
     };
 
     const onSubmit = handleSubmit(async (data) => {
@@ -630,16 +672,14 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                         <span>🤘🏻</span>
                     </button>
                     
-                    <button
+                    <button 
                         type="button"
-                        className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-sm"
-                        onClick={() => {
-                            console.log('enviando correo para reinicio de contraseña');
-                            console.log('user.email', user.email);
-                            resetPasswordByEmail(user.email)}}
+                        disabled={isResettingPassword}
+                        className={`w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-medium py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-sm`}
+                        onClick={confirmResetPassword}
                     >
-                        <span>Enviar correo para reinicio de contraseña</span>
-                        <span>🔑</span>
+                        <span>{isResettingPassword ? 'Enviando correo...' : 'Enviar correo para reinicio de contraseña'}</span>
+                        <span>{isResettingPassword ? '📧' : '🔑'}</span>
                     </button>
                 </div>
             </form>

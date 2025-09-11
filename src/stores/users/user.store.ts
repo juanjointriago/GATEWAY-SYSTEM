@@ -12,7 +12,7 @@ interface UsersStore {
     createUser: (user: FirestoreUser) => Promise<void>;
     updateUser: (user: FirestoreUser) => Promise<void>;
     deleteUserById: (id: string) => Promise<void>;
-    resetPasswordByEmail: (email: string) => Promise<void>;
+    resetPasswordByEmail: (email: string) => Promise<{ status: "success" | "error"; message: string; }>;
 }
 
 
@@ -61,7 +61,7 @@ const storeAPI: StateCreator<UsersStore, [["zustand/devtools", never], ["zustand
         }
     },
     resetPasswordByEmail: async (email: string) => {
-        AuthService.resetPassword(email);
+        return await AuthService.resetPassword(email);
     }
 })
 
