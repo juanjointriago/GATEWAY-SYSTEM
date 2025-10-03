@@ -1,4 +1,4 @@
-import { IoBarChart, IoBook, IoCalendar, IoSettings, IoCash, IoNotifications, IoPerson, IoPieChart, IoSpeedometerOutline, IoFootstepsOutline, IoNewspaper } from "react-icons/io5";
+import { IoBarChart, IoBook, IoCalendar, IoSettings, IoTime, IoCash, IoNotifications, IoPerson, IoPieChart, IoSpeedometerOutline, IoFootstepsOutline, IoNewspaper } from "react-icons/io5";
 import { IconType } from "react-icons";
 import { role } from "../../../interface";
 
@@ -21,6 +21,7 @@ const admin: MenuItem[] = [
   { title: 'Modalidades', subTitle: 'Control de modalidades', href: '/dashboard/levels', Icon: IoPieChart, active: true },
   { title: 'Unidades', subTitle: 'Gestión de unidades', href: '/dashboard/sub-levels', Icon: IoBarChart, active: true},
   { title: 'Reservaciones', subTitle: 'Gestión de reservaciones', href: '/dashboard/events', Icon: IoCalendar, active: true },
+  { title: 'Historial', subTitle: 'Histórico de reservaciones', href: '/dashboard/history', Icon: IoTime, active: true },
   { title: 'Cobranza', subTitle: 'Gestión de cobranza', href: '/dashboard/fees', Icon: IoCash, active: true },
   { title: 'Notificaciones', subTitle: 'Gestión de Notificaciones', href: '/dashboard/notifications', Icon: IoNotifications, active: true },
   { title: 'Configuraciones', subTitle: 'Gestión de Configuraciones', href: '/dashboard/settings', Icon: IoSettings, active: true },
