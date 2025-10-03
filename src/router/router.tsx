@@ -26,7 +26,6 @@ import DeleteUserData from "../pages/auth/ErasePage";
 import { NotificationPage } from "../pages/notification/NotificationPage";
 import { SettingsPage } from "../pages/settings/SettingsPage";
 import { Presentation } from "../pages/landding/Presentation";
-import { HistoryPage } from "../pages/events/HistoryPage";
 import EventSearchPage from "../pages/events/EventSearchPage";
 
 export const router = createBrowserRouter([
