@@ -136,6 +136,8 @@ button {
 body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 /* Prevenir comportamientos indeseados en móvil - REMOVIDO el position fixed que bloqueaba el scroll */

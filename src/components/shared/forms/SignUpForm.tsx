@@ -271,19 +271,25 @@ export const SignUpForm = () => {
   });
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-3 sm:p-6 bg-white rounded-lg sm:rounded-xl shadow-lg overflow-y-auto max-h-[calc(100vh-2rem)] sm:max-h-none">
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Registro de Nuevo Usuario</h1>
-      {!isLoading ? (
-        <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6" onSubmit={onSubmit}>
+    <div className="w-full max-w-4xl mx-auto bg-white rounded-lg sm:rounded-xl shadow-lg h-screen sm:h-auto sm:max-h-[calc(100vh-2rem)] flex flex-col safe-area-inset">
+      {/* Header fijo */}
+      <div className="p-4 sm:p-6 flex-shrink-0 border-b border-gray-100 sm:border-b-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-center">Registro de Nuevo Usuario</h1>
+      </div>
+      
+      {/* Contenido con scroll */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 sm:overflow-visible">
+        {!isLoading ? (
+          <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 pb-6 sm:pb-0" onSubmit={onSubmit}>
           {/** Name */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
             <input
               {...register("name", { required: "El nombre es obligatorio 👀" })}
               type="text"
               id="name"
               placeholder="Ej. Juan Pérez"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.name && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -294,7 +300,7 @@ export const SignUpForm = () => {
           </div>
 
           {/** CC */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Cédula de Ciudadanía</label>
             <input
               {...register("cc", {
@@ -305,10 +311,11 @@ export const SignUpForm = () => {
                 },
               })}
               type="text"
+              inputMode="numeric"
               maxLength={13}
               placeholder="10123000009"
               id="cc"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.cc && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -319,14 +326,15 @@ export const SignUpForm = () => {
           </div>
 
           {/** Email */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               {...register("email", { required: "El email es obligatorio 👀" })}
               type="email"
+              inputMode="email"
               id="email"
               placeholder="ejemplo@correo.com"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.email && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -337,7 +345,7 @@ export const SignUpForm = () => {
           </div>
 
           {/** Ciudad*/}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label htmlFor="city" className="block text-sm font-medium text-gray-700">
               Ciudad
             </label>
@@ -345,7 +353,7 @@ export const SignUpForm = () => {
               {...register("city", { required: "Ciudad" })}
               id="city"
               defaultValue={""}
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 bg-white text-base appearance-none touch-manipulation"
             >
               <option value={""}>Seleccione ciudad</option>
               {cities.map((city, index) => {
@@ -365,7 +373,7 @@ export const SignUpForm = () => {
           </div>
 
           {/** Password*/}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Contraseña</label>
             <input
               {...register("password", {
@@ -378,7 +386,7 @@ export const SignUpForm = () => {
               type="password"
               name="password"
               placeholder="Mínimo 6 caracteres"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.password && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -389,7 +397,7 @@ export const SignUpForm = () => {
           </div>
 
           {/** Password2*/}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
             <input
               {...register("password2", {
@@ -401,7 +409,7 @@ export const SignUpForm = () => {
               type="password"
               id="password2"
               placeholder="Confirme su contraseña"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.password2 && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -412,16 +420,17 @@ export const SignUpForm = () => {
           </div>
 
           {/** Telefono*/}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Teléfono</label>
             <input
               {...register("phone", {
                 required: "El teléfono es obligatorio 👀",
               })}
               type="tel"
+              inputMode="tel"
               id="phone"
               placeholder="Ej. 0987654321"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.phone && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -432,7 +441,7 @@ export const SignUpForm = () => {
           </div>
 
           {/** Dirección*/}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Dirección</label>
             <input
               {...register("address", {
@@ -441,7 +450,7 @@ export const SignUpForm = () => {
               type="text"
               id="address"
               placeholder="Ej. Av. Principal 123"
-              className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
             {errors.address && (
               <p className="text-red-500 text-xs italic flex items-center gap-1">
@@ -452,7 +461,7 @@ export const SignUpForm = () => {
           </div>
 
           {/** BornDate*/}
-          <div className="space-y-1 lg:col-span-2">
+          <div className="space-y-2 lg:col-span-2">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <span>Fecha de cumpleaños</span>
               <span>🎂</span>
@@ -461,15 +470,15 @@ export const SignUpForm = () => {
               {...register("bornDate")}
               type="date" 
               name="bornDate" 
-              className="w-full sm:w-1/2 lg:w-1/3 px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+              className="w-full sm:w-1/2 lg:w-1/3 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base touch-manipulation"
             />
           </div>
 
           {/** Buttons*/}
-          <div className="lg:col-span-2 space-y-3 pt-2 sm:pt-4">
+          <div className="lg:col-span-2 space-y-4 pt-6">
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 sm:py-2.5 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 text-base"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out flex items-center justify-center gap-2 text-base min-h-[48px] touch-manipulation"
             >
               <span>Registrarme</span>
               <span>🤘🏻</span>
@@ -477,7 +486,7 @@ export const SignUpForm = () => {
             <div className="text-center">
               <a 
                 href="/auth/signin" 
-                className="inline-flex items-center justify-center w-full py-3 sm:py-2.5 px-6 border-2 border-blue-500 text-blue-600 font-medium rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out gap-2 text-sm sm:text-base"
+                className="inline-flex items-center justify-center w-full py-4 px-6 border-2 border-blue-500 text-blue-600 font-medium rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out gap-2 text-base min-h-[48px] touch-manipulation"
               >
                 <span className="hidden sm:inline">¿Ya eres estudiante? Continúa por aquí</span>
                 <span className="sm:hidden">¿Ya tienes cuenta? Inicia sesión</span>
@@ -485,25 +494,26 @@ export const SignUpForm = () => {
               </a>
             </div>
           </div>
-        </form>
-      ) : (
-        <div className="flex flex-col items-center justify-center min-h-[250px] sm:min-h-[300px] bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
-          <div className="bg-white rounded-full p-3 sm:p-4 mb-3 sm:mb-4 shadow-lg">
-            <Loading />
+          </form>
+        ) : (
+          <div className="flex flex-col items-center justify-center min-h-[300px] bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-lg p-6">
+            <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
+              <Loading />
+            </div>
+            <h1 className="text-xl font-bold text-gray-800 text-center mb-2">
+              Procesando registro...
+            </h1>
+            <p className="text-gray-600 text-center text-sm">
+              Por favor espera mientras creamos tu cuenta
+            </p>
+            <div className="mt-4 flex space-x-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
           </div>
-          <h1 className="text-lg sm:text-xl font-bold text-gray-800 text-center mb-2">
-            Procesando registro...
-          </h1>
-          <p className="text-gray-600 text-center text-sm">
-            Por favor espera mientras creamos tu cuenta
-          </p>
-          <div className="mt-3 flex space-x-1">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
