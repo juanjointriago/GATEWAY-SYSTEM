@@ -48,7 +48,7 @@ const NoResultsFound: FC = () => (
       No se encontraron resultados
     </h3>
     <p className="text-gray-500 text-center max-w-md">
-      No hay eventos que coincidan con los criterios de búsqueda especificados.
+      No hay reservaciones que coincidan con los criterios de búsqueda especificados.
       Intenta modificar los filtros o ampliar el rango de fechas.
     </p>
   </div>
@@ -58,7 +58,7 @@ const NoResultsFound: FC = () => (
 const LoadingSearch: FC = () => (
   <div className="flex flex-col items-center justify-center py-16">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-    <p className="text-gray-600">Buscando eventos...</p>
+    <p className="text-gray-600">Buscando reservaciones...</p>
   </div>
 );
 
@@ -302,10 +302,10 @@ export const AdvancedEventSearch: FC = () => {
       <div className="border-b border-gray-200 pb-4">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <IoFilterOutline className="text-blue-600" />
-          Búsqueda Avanzada de Eventos
+          Búsqueda Avanzada de Reservaciones
         </h2>
         <p className="text-gray-600 mt-1">
-          Utiliza los filtros para encontrar eventos específicos
+          Utiliza los filtros para encontrar reservaciones específicas
         </p>
       </div>
 
@@ -481,7 +481,7 @@ export const AdvancedEventSearch: FC = () => {
             ) : (
               <>
                 <IoSearchOutline className="w-5 h-5" />
-                Buscar Eventos
+                Buscar Reservaciones
               </>
             )}
           </button>
@@ -530,7 +530,7 @@ export const AdvancedEventSearch: FC = () => {
               Configura tus filtros de búsqueda
             </h3>
             <p className="text-gray-500">
-              Selecciona los criterios de búsqueda y presiona "Buscar Eventos" para ver los resultados.
+              Selecciona los criterios de búsqueda y presiona "Buscar Reservaciones" para ver los resultados.
             </p>
           </div>
         )}
