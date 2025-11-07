@@ -4,14 +4,19 @@ import { useForm } from "react-hook-form";
 import { useLevelStore, useSubLevelStore, useUserStore } from "../../../stores";
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { IoInformationCircle, IoMail, IoWarning } from 'react-icons/io5';
 
 import CustomModal from "../../../components/CustomModal";
+import { AuthService, UserMigrationService } from "../../../services";
+import { Loading } from "../ui/Loading";
 
 
 
 interface Props {
     userId: string
 }
+
+type TabType = 'general' | 'advanced-email';
 
 export const EditUserform: FC<Props> = ({ userId }) => {
     const updateUser = useUserStore(state => state.updateUser);
@@ -305,6 +310,17 @@ export const EditUserform: FC<Props> = ({ userId }) => {
     // Estado para loading del reset de contraseña
     const [isResettingPassword, setIsResettingPassword] = useState(false);
 
+    // Estados para tabs
+    const [activeTab, setActiveTab] = useState<TabType>('general');
+    
+    // Estados para edición avanzada de email
+    const [newEmail, setNewEmail] = useState('');
+    const [confirmEmail, setConfirmEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [migrationStep, setMigrationStep] = useState('');
+    const [migrationProgress, setMigrationProgress] = useState(0);
+    const [isMigratingUser, setIsMigratingUser] = useState(false);
+
     // Inicializar formulario con valores por defecto
     const { register, handleSubmit, watch, formState: { errors } } = useForm<FirestoreUser>({ 
         defaultValues: {
@@ -361,6 +377,113 @@ export const EditUserform: FC<Props> = ({ userId }) => {
         );
     };
 
+    const handleAdvancedEmailEdit = async () => {
+        setEmailError('');
+
+        // Validaciones
+        if (!newEmail || !confirmEmail) {
+            setEmailError('Por favor, complete ambos campos');
+            return;
+        }
+
+        if (newEmail !== confirmEmail) {
+            setEmailError('Los emails no coinciden');
+            return;
+        }
+
+        const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        if (!emailRegex.test(newEmail)) {
+            setEmailError('El formato del email no es válido');
+            return;
+        }
+
+        if (newEmail === user.email) {
+            setEmailError('El nuevo email es igual al actual');
+            return;
+        }
+
+        setIsMigratingUser(true);
+        setMigrationStep('Iniciando migración...');
+        setMigrationProgress(0);
+        
+        try {
+            const handleProgress = (step: string, progressValue: number) => {
+                setMigrationStep(step);
+                setMigrationProgress(progressValue);
+            };
+
+            // Paso 1-4: Crear nuevo usuario en Auth y colección users (20-40%)
+            const migrationResult = await AuthService.migrateUserToNewEmail(
+                user.id!,
+                user,
+                newEmail,
+                handleProgress
+            );
+
+            if (migrationResult.status === 'error') {
+                throw new Error(migrationResult.message);
+            }
+
+            if (!migrationResult.newUid || !migrationResult.oldUid) {
+                throw new Error('Error: No se recibieron los UIDs necesarios');
+            }
+
+            // Paso 5-7: Actualizar todas las colecciones (50-90%)
+            const updateResults = await UserMigrationService.migrateUserData(
+                migrationResult.oldUid,
+                migrationResult.newUid,
+                handleProgress
+            );
+
+            console.debug('Migración completada:', {
+                progressSheetsUpdated: updateResults.progressSheetsUpdated,
+                eventsUpdated: updateResults.eventsUpdated
+            });
+
+            // Resetear campos
+            setNewEmail('');
+            setConfirmEmail('');
+            setMigrationProgress(100);
+            setMigrationStep('¡Migración completada exitosamente!');
+            
+            // Esperar un momento antes de mostrar el modal de éxito
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Mostrar mensaje de éxito
+            showModal(
+                '¡Migración Exitosa!',
+                `El usuario ha sido migrado exitosamente al nuevo email ${newEmail}.\n\n` +
+                `Detalles:\n` +
+                `- Hojas de progreso actualizadas: ${updateResults.progressSheetsUpdated}\n` +
+                `- Eventos actualizados: ${updateResults.eventsUpdated}\n\n` +
+                `Contraseña temporal: ${user.cc || 'estudiante@gateway.corp'}\n\n` +
+                `El usuario debe iniciar sesión con el nuevo email y cambiar su contraseña.`,
+                'success',
+                () => {
+                    setModalOpen(false);
+                    // Volver a la tab general
+                    setActiveTab('general');
+                }
+            );
+
+            // Recargar la lista de usuarios
+            await useUserStore.getState().getAllUsers();
+            
+        } catch (error) {
+            console.error('Error en migración:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Error desconocido en la migración';
+            
+            setEmailError(errorMessage);
+            showModal(
+                'Error en la Migración',
+                `No se pudo completar la migración del usuario:\n${errorMessage}\n\nPor favor, contacte al soporte técnico.`,
+                'danger'
+            );
+        } finally {
+            setIsMigratingUser(false);
+        }
+    };
+
     const onSubmit = handleSubmit(async (data) => {
         // Validar que si es estudiante, debe tener modalidad
         if (data.role === 'student' && !levelStudent) {
@@ -372,8 +495,8 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             showModal('Error de validación', 'Debe seleccionar un curso para el estudiante', 'danger');
             return;
         }
-        // Validar cédula ecuatoriana
-        if (data.cc && !validateEcuadorianID(data.cc)) {
+        // Validar cédula ecuatoriana solo si tiene valor
+        if (data.cc && data.cc.trim() !== '' && !validateEcuadorianID(data.cc)) {
             showModal('Cédula inválida', 'La cédula ingresada no es válida según el algoritmo ecuatoriano', 'danger');
             return;
         }
@@ -386,6 +509,10 @@ export const EditUserform: FC<Props> = ({ userId }) => {
             updatedData.level = '';
             updatedData.subLevel = '';
         }
+        
+        // Mantener el email original (no permitir cambios)
+        updatedData.email = user.email;
+        
         const updatedUser = {
             ...user,
             ...updatedData,
@@ -423,6 +550,42 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                 onCancel={modalCancelable ? () => setModalOpen(false) : undefined}
             />
             <div className="w-full max-w-none">
+                {/* Tabs Navigation */}
+                <div className="flex items-center gap-2 mb-6 bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 rounded-xl p-1 shadow-sm">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('general')}
+                        className={`group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                            activeTab === 'general'
+                                ? 'bg-white text-indigo-700 border-indigo-300 shadow'
+                                : 'bg-transparent text-indigo-700 border-transparent hover:text-white hover:bg-indigo-600 hover:border-indigo-600'
+                        } focus:outline-none focus:ring-2 ${
+                            activeTab === 'general' ? 'focus:ring-indigo-300' : 'focus:ring-indigo-200'
+                        }`}
+                        aria-current={activeTab === 'general' ? 'page' : undefined}
+                    >
+                        <IoInformationCircle className="text-base group-hover:scale-110 transition-transform" />
+                        <span className="group-hover:font-semibold">Información General</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('advanced-email')}
+                        className={`group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                            activeTab === 'advanced-email'
+                                ? 'bg-white text-amber-700 border-amber-300 shadow'
+                                : 'bg-transparent text-amber-600 border-transparent hover:text-amber-700 hover:bg-amber-50 hover:border-amber-200'
+                        } focus:outline-none focus:ring-2 ${
+                            activeTab === 'advanced-email' ? 'focus:ring-amber-300' : 'focus:ring-amber-200'
+                        }`}
+                        aria-current={activeTab === 'advanced-email' ? 'page' : undefined}
+                    >
+                        <IoWarning className="text-base group-hover:scale-110 transition-transform" />
+                        <span className="group-hover:font-semibold">Edición Avanzada de Email</span>
+                    </button>
+                </div>
+
+                {/* Tab Content */}
+                {activeTab === 'general' ? (
                 <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6" onSubmit={onSubmit}>
                 {/** Name */}
                 <div className="lg:col-span-2 space-y-2">
@@ -445,13 +608,12 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     <label className="block text-sm font-medium text-gray-700">Cédula de Ciudadanía</label>
                     <input
                         {...register("cc", { 
-                            required: "La cédula es obligatoria", 
                             pattern: { 
                                 value: /^[0-9]{10}$/, 
                                 message: 'La cédula debe tener exactamente 10 dígitos' 
                             },
                             validate: (value) => {
-                                if (value && !validateEcuadorianID(value)) {
+                                if (value && value.trim() !== '' && !validateEcuadorianID(value)) {
                                     return 'La cédula no es válida según el algoritmo ecuatoriano';
                                 }
                                 return true;
@@ -492,24 +654,23 @@ export const EditUserform: FC<Props> = ({ userId }) => {
 
                 {/** Email */}
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Email
+                        <span className="text-xs text-gray-500 ml-2">(No editable por seguridad)</span>
+                    </label>
                     <input
-                        {...register("email", { 
-                            required: "El email es obligatorio",
-                            pattern: {
-                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                message: "El formato del email no es válido"
-                            }
-                        })}
+                        {...register("email")}
                         type="email"
                         id="email"
+                        disabled
                         placeholder="ejemplo@correo.com"
-                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out hover:border-gray-400 text-base"
+                        className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 cursor-not-allowed text-base"
+                        title="El email no puede ser editado. Para cambiar el email, el usuario debe usar la opción de 'Reiniciar contraseña' y crear una nueva cuenta."
                     />
-                    {errors.email && <p className="text-red-500 text-xs italic flex items-center gap-1">
-                        <span>⚠️</span>
-                        {errors.email.message}
-                    </p>}
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <span>ℹ️</span>
+                        <span>El email está vinculado a la autenticación y no puede modificarse directamente. Use el botón de reinicio de contraseña si el usuario necesita actualizar su correo.</span>
+                    </p>
                 </div>
 
                 {/*Role*/}
@@ -683,7 +844,164 @@ export const EditUserform: FC<Props> = ({ userId }) => {
                     </button>
                 </div>
             </form>
-        </div>
-    </>
+            ) : (
+                /* Tab de Edición Avanzada de Email */
+                <div className="space-y-6">
+                    {!isMigratingUser ? (
+                        <>
+                            {/* Información del usuario actual */}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                                    <IoInformationCircle />
+                                    Usuario Actual
+                                </h3>
+                                <div className="space-y-1 text-sm">
+                                    <p><span className="font-medium">Nombre:</span> {user.name}</p>
+                                    <p><span className="font-medium">Email actual:</span> {user.email}</p>
+                                    <p><span className="font-medium">ID:</span> {user.id}</p>
+                                </div>
+                            </div>
+
+                            {/* Advertencia */}
+                            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                                <div className="flex gap-3">
+                                    <IoWarning className="text-yellow-600 text-xl flex-shrink-0 mt-0.5" />
+                                    <div className="text-sm text-yellow-800 space-y-2">
+                                        <p className="font-semibold">⚠️ Importante: Esta operación realizará lo siguiente:</p>
+                                        <ul className="list-disc list-inside space-y-1 ml-2">
+                                            <li>Creará una nueva cuenta de autenticación con el nuevo email</li>
+                                            <li>La contraseña temporal será la cédula del usuario o "estudiante@gateway.corp"</li>
+                                            <li>Actualizará todas las referencias del usuario en las colecciones:
+                                                <ul className="list-disc list-inside ml-4 mt-1">
+                                                    <li>Usuarios (users)</li>
+                                                    <li>Hojas de progreso (progress-sheet)</li>
+                                                    <li>Eventos (events)</li>
+                                                </ul>
+                                            </li>
+                                            <li>El usuario deberá usar el nuevo email para iniciar sesión</li>
+                                            <li>La contraseña temporal es: <strong>{user.cc || 'estudiante@gateway.corp'}</strong></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Formulario de nuevo email */}
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        <IoMail className="inline mr-2" />
+                                        Nuevo Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={newEmail}
+                                        onChange={(e) => setNewEmail(e.target.value)}
+                                        placeholder="nuevo@email.com"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        <IoMail className="inline mr-2" />
+                                        Confirmar Nuevo Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={confirmEmail}
+                                        onChange={(e) => setConfirmEmail(e.target.value)}
+                                        placeholder="nuevo@email.com"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Error */}
+                                {emailError && (
+                                    <div className="bg-red-50 border border-red-300 rounded-lg p-3">
+                                        <p className="text-red-800 text-sm flex items-center gap-2">
+                                            <IoWarning />
+                                            {emailError}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Botón de migración */}
+                                <button
+                                    type="button"
+                                    onClick={handleAdvancedEmailEdit}
+                                    disabled={!newEmail || !confirmEmail}
+                                    className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-md hover:from-orange-600 hover:to-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    <IoMail />
+                                    Migrar Usuario al Nuevo Email
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        /* Loading State durante migración */
+                        <div className="py-12">
+                            <Loading 
+                                h="16" 
+                                w="16" 
+                                borderColor="orange"
+                                message={migrationStep}
+                            />
+                            
+                            {/* Barra de progreso */}
+                            <div className="mt-8 space-y-3">
+                                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                    <div 
+                                        className="bg-gradient-to-r from-orange-500 to-red-500 h-3 rounded-full transition-all duration-500"
+                                        style={{ width: `${migrationProgress}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-center text-sm text-gray-600">
+                                    {migrationProgress}% completado
+                                </p>
+                            </div>
+
+                            {/* Pasos del proceso */}
+                            <div className="mt-8 space-y-2 text-sm text-gray-600">
+                                <p className={migrationProgress >= 10 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 10 ? '✓' : '○'} Preparando migración
+                                </p>
+                                <p className={migrationProgress >= 20 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 20 ? '✓' : '○'} Creando cuenta de autenticación
+                                </p>
+                                <p className={migrationProgress >= 30 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 30 ? '✓' : '○'} Actualizando perfil
+                                </p>
+                                <p className={migrationProgress >= 40 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 40 ? '✓' : '○'} Creando registro de usuario
+                                </p>
+                                <p className={migrationProgress >= 50 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 50 ? '✓' : '○'} Actualizando hojas de progreso
+                                </p>
+                                <p className={migrationProgress >= 70 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 70 ? '✓' : '○'} Actualizando eventos
+                                </p>
+                                <p className={migrationProgress >= 90 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 90 ? '✓' : '○'} Eliminando datos antiguos
+                                </p>
+                                <p className={migrationProgress >= 100 ? 'text-green-600 font-medium' : ''}>
+                                    {migrationProgress >= 100 ? '✓' : '○'} Finalizado
+                                </p>
+                            </div>
+
+                            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p className="text-sm text-blue-800 text-center">
+                                    Por favor, no cambie de pestaña ni cierre esta ventana. El proceso puede tomar varios minutos.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+                {/* Botón para eliminar usuario si era admin (opcional) */}
+            </div>
+        </>
     )
 }

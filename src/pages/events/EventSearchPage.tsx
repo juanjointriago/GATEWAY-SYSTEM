@@ -23,10 +23,10 @@ export const EventSearchPage: FC = () => {
         {/* Header de la página */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Búsqueda de Eventos
+            Búsqueda de Reservaciones
           </h1>
           <p className="text-gray-600 max-w-2xl">
-            Encuentra eventos específicos utilizando nuestros filtros avanzados. 
+            Encuentra Reservaciones específicos utilizando nuestros filtros avanzados. 
             Puedes buscar por fechas, estudiantes, niveles académicos y más.
           </p>
         </div>
